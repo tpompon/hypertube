@@ -1,4 +1,5 @@
 import React from 'react';
+import translations from '../translations'
 
 function Poster(props) {
 
@@ -10,7 +11,7 @@ function Poster(props) {
       <div className="poster-content">
         <h3>{(language === 'FR') ? movie.name_fr : movie.name_en}</h3>
         <p>{(language === 'FR') ? movie.description_fr : movie.description_en}</p>
-        <span>{(language === 'FR') ? 'Note' : 'Rating'} - {movie.rating}</span>
+        <span>{translations[language].poster.rating} - {movie.rating}</span>
       </div>
     </div>
   );

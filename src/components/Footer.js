@@ -1,7 +1,8 @@
 import React from 'react';
+import translations from '../translations'
 import { Link } from "react-router-dom";
 
-class Header extends React.Component {
+class Footer extends React.Component {
 
   constructor(props) {
     super(props);
@@ -15,10 +16,10 @@ class Header extends React.Component {
 
     return (
       <div className="App-footer">
-        <div className="footer-text">42 Project by tpompon & syboeuf</div>
+        <div className="footer-text">{translations[language].footer.title}</div>
       </div>
     );
   }
 }
 
-export default Header;
+export default Footer;

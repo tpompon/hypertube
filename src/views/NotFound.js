@@ -1,10 +1,11 @@
 import React from 'react';
+import translations from '../translations'
 
 function NotFound({language}) {
   return (
     <div className="text-center">
       <h2>404</h2>
-      {(language === 'FR') ? 'Cette page n\'existe pas' : 'Page not found'}
+      {translations[language].notfound.title}
     </div>
   );
 }

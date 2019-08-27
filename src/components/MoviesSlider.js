@@ -1,8 +1,8 @@
 import React from 'react';
 import Poster from './Poster'
 import { Link } from "react-router-dom";
-import { ReactComponent as ArrowLeft } from '../arrow-point-to-left.svg'
-import { ReactComponent as ArrowRight } from '../arrow-point-to-right.svg'
+import { ReactComponent as ArrowLeft } from '../svg/arrow-point-to-left.svg'
+import { ReactComponent as ArrowRight } from '../svg/arrow-point-to-right.svg'
 
 class PostersSlider extends React.Component {
 

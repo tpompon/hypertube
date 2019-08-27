@@ -2,15 +2,15 @@ import React from 'react';
 import './App.css';
 import Header from './components/Header'
 import Footer from './components/Footer'
-import Movie from './pages/Movie'
-import MoviesList from './pages/MoviesList'
-import Profile from './pages/Profile'
-import User from './pages/User'
-import Settings from './pages/Settings'
-import Register from './pages/Register'
-import Login from './pages/Login'
-import Logout from './pages/Logout'
-import NotFound from './pages/NotFound'
+import Movie from './views/Movie'
+import MoviesList from './views/MoviesList'
+import Profile from './views/Profile'
+import User from './views/User'
+import Settings from './views/Settings'
+import Register from './views/Register'
+import Login from './views/Login'
+import Logout from './views/Logout'
+import NotFound from './views/NotFound'
 
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 
@@ -20,7 +20,7 @@ class App extends React.Component {
     super(props);
     this.state = {
       search: "",
-      language: "FR"
+      language: "fr"
     }
   }
 
@@ -48,7 +48,7 @@ class App extends React.Component {
             <Route component={() => <NotFound language={language} />} />
           </Switch>
           </div>
-          <Footer />
+          <Footer language={language} />
         </div>
       </Router>
     );

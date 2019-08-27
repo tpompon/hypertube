@@ -1,5 +1,8 @@
 import React from 'react';
-import { ReactComponent as SearchIcon } from '../search.svg'
+import axios from 'axios';
+import config from '../config'
+import translations from '../translations'
+import { ReactComponent as SearchIcon } from '../svg/search.svg'
 import { Link } from "react-router-dom";
 
 const movies = [
@@ -20,8 +23,16 @@ class Header extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      search: ""
+      search: "",
+      user: {}
     }
+  }
+
+  componentWillMount() {
+    axios.get(`http://${config.hostname}:${config.port}/user/ipare`)
+    .then(res => {
+      this.setState({user: res.data});
+    });
   }
 
   resetSearchBar = () => {
@@ -112,7 +123,7 @@ class Header extends React.Component {
   }
 
   render() {
-    const { search } = this.state;
+    const { search, user } = this.state;
     const { language } = this.props;
 
     return (
@@ -123,7 +134,7 @@ class Header extends React.Component {
           </Link>
           <div className="search-bar">
             <div className="row align-center">
-              <input className="input-search-bar" type="text" placeholder={(language === 'FR') ? 'Je veux regarder...' : 'I want to watch...'} spellCheck="false" value={search} onChange={this.handleSearch} onClick={this.handleSearch} />
+              <input className="input-search-bar" type="text" placeholder={translations[language].header.searchPlaceholder} spellCheck="false" value={search} onChange={this.handleSearch} onClick={this.handleSearch} />
               <SearchIcon className="submit-search-bar" style={{ fill: "#fff", width: 20, height: 20 }} />
             </div>
             {
@@ -131,7 +142,7 @@ class Header extends React.Component {
                 <div className="search-bar-extended">
                 {
                   movies.map((movie) => {
-                    if (movie.name_fr.toLowerCase().trim().includes(search.toLowerCase().trim()) || movie.name_en.toLowerCase().trim().includes(search.toLowerCase().trim())) {
+                    if (movie.name_fr.toLowerCase().trim().startsWith(search.toLowerCase().trim()) || movie.name_en.toLowerCase().trim().startsWith(search.toLowerCase().trim())) {
                       return (
                         <Link to={`/watch/${movie.id}`} key={`movie-${movie.id}`} onClick={() => this.resetSearchBar()}>
                           <div className="search-bar-extended-result"><img src={movie.poster} width="20" height="20" alt={`movie-${movie.id}`} style={{marginRight: 10}} />{(language === 'FR') ? movie.name_fr : movie.name_en}</div>
@@ -149,21 +160,21 @@ class Header extends React.Component {
           </div>
           <SearchIcon className="show-search-bar" style={{ fill: "#fff", width: 20, height: 20 }} />
           <div style={{position: 'relative'}}>
-            <img className="avatar" src={process.env.PUBLIC_URL + '/avatars/irina.jpg'} alt="Avatar" width="50" height="50" />
+            <img className="avatar" src={user.avatar} alt="Avatar" width="50" height="50" />
             <div className="avatar-dropdown">
               <Link to="/profile" onClick={() => this.closeMenus()}>
                 <div className="avatar-dropdown-item">
-                  {(language === 'FR') ? 'Profil' : 'Profile'}
+                  {translations[language].header.avatarMenu.profile}
                 </div>
               </Link>
               <Link to="/settings" onClick={() => this.closeMenus()}>
                 <div className="avatar-dropdown-item">
-                  {(language === 'FR') ? 'Paramètres' : 'Settings'}
+                  {translations[language].header.avatarMenu.settings}
                 </div>
               </Link>
               <Link to="/logout" onClick={() => this.closeMenus()}>
                 <div className="avatar-dropdown-item">
-                  {(language === 'FR') ? 'Déconnexion' : 'Logout'}
+                  {translations[language].header.avatarMenu.logout}
                 </div>
               </Link>
             </div>
@@ -171,7 +182,7 @@ class Header extends React.Component {
         </div>
         <div className="search-bar-collapse">
           <div className="row align-center">
-            <input className="input-search-bar-collapse" type="text" placeholder={(language === 'FR') ? 'Je veux regarder...' : 'I want to watch...'} spellCheck="false" value={search} onChange={this.handleSearch} onClick={this.handleSearch} />
+            <input className="input-search-bar-collapse" type="text" placeholder={translations[language].header.searchPlaceholder} spellCheck="false" value={search} onChange={this.handleSearch} onClick={this.handleSearch} />
             <SearchIcon className="submit-search-bar-collapse" style={{ fill: "#fff", width: 20, height: 20 }} />
           </div>
           {
@@ -179,12 +190,14 @@ class Header extends React.Component {
               <div className="search-bar-extended">
               {
                 movies.map((movie) => {
-                  if (movie.name_fr.toLowerCase().trim().includes(search.toLowerCase().trim()) || movie.name_en.toLowerCase().trim().includes(search.toLowerCase().trim())) {
+                  if (movie.name_fr.toLowerCase().trim().startsWith(search.toLowerCase().trim()) || movie.name_en.toLowerCase().trim().startsWith(search.toLowerCase().trim())) {
                     return (
                       <Link to={`/watch/${movie.id}`} key={`movie-${movie.id}`} onClick={() => this.resetSearchBar()}>
                         <div className="search-bar-extended-result"><img src={movie.poster} width="20" height="20" alt={`movie-${movie.id}`} style={{marginRight: 10}} />{(language === 'FR') ? movie.name_fr : movie.name_en}</div>
                       </Link>
                     )
+                  } else {
+                    return null;
                   }
                 })
               }
