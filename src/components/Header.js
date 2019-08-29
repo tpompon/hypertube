@@ -31,7 +31,9 @@ class Header extends React.Component {
   componentWillMount() {
     axios.get(`http://${config.hostname}:${config.port}/user/ipare`)
     .then(res => {
-      this.setState({user: res.data});
+      if (res.data.success) {
+        this.setState({user: res.data.user[0]});
+      }
     });
   }
 

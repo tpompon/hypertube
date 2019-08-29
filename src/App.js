@@ -35,18 +35,18 @@ class App extends React.Component {
       <Router>
         <div className="App">
           <div className="App-wrapper">
-          <Header updateSearch={this.updateSearch} language={language} extended={true} />
-          <Switch>
-            <Route exact path='/' component={() => <MoviesList search={search} language={language} />} />
-            <Route exact path='/watch/:id' component={(match) => <Movie {...match} language={language} />} />
-            <Route exact path='/user/:username' component={(match) => <User {...match} language={language} />} />
-            <Route exact path='/profile' component={() => <Profile language={language} />} />
-            <Route exact path='/settings' component={() => <Settings language={language} />} />
-            <Route exact path='/register' component={() => <Register language={language} />} />
-            <Route exact path='/login' component={() => <Login language={language} />} />
-            <Route exact path='/logout' component={() => <Logout language={language} />} />
-            <Route component={() => <NotFound language={language} />} />
-          </Switch>
+            <Header updateSearch={this.updateSearch} language={language} extended={true} />
+            <Switch>
+              <Route exact path='/' component={() => <MoviesList search={search} language={language} />} />
+              <Route exact path='/watch/:id' component={(match) => <Movie {...match} language={language} />} />
+              <Route exact path='/user/:username' component={(match) => <User {...match} language={language} />} />
+              <Route exact path='/profile' component={() => <Profile language={language} />} />
+              <Route exact path='/settings' component={() => <Settings language={language} />} />
+              <Route exact path='/register' component={() => <Register language={language} />} />
+              <Route exact path='/login' component={() => <Login language={language} />} />
+              <Route exact path='/logout' component={() => <Logout language={language} />} />
+              <Route component={() => <NotFound language={language} />} />
+            </Switch>
           </div>
           <Footer language={language} />
         </div>

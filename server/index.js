@@ -3,6 +3,10 @@ const cors = require('cors');
 const bodyParser = require("body-parser");
 const fileUpload = require('express-fileupload');
 
+const mongoose = require('mongoose');
+const User = require('./models/user');
+const Movie = require('./models/movie');
+
 const hostname = 'localhost'; 
 const port = 4001; 
 
@@ -13,6 +17,14 @@ app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use(fileUpload());
 app.use('/public', express.static(__dirname + '/public'));
+
+mongoose.connect('mongodb://localhost/hypertube', {useNewUrlParser: true});
+
+const db = mongoose.connection;
+db.on('error', console.error.bind(console, 'Database connection error:'));
+db.once('open', () => {
+  console.log('\x1b[36m%s\x1b[0m', '-> Database connection established');
+});
 
 let movies = [
   {
@@ -51,46 +63,62 @@ const api = express.Router();
 
 api.route('/')
 .all((req, res) => {
-  res.json({status: "HyperTube API", method: req.method});
+  res.json({ status: "HyperTube API", method: req.method });
 });
 
+// Upload Avatar - API
 api.route('/avatar/:username')
 .post((req, res) => {
   const imageFile = req.files.file;
   imageFile.mv(`${__dirname}/public/avatars/${req.params.username}.jpg`, (err) => {
-    if (err) { return res.status(500).send(err); }
-    res.json({file: `public/avatars/${req.params.username}.jpg`});
+    if (err)
+      res.json({ success: false })
+    else
+      res.json({ success: true, file: `public/avatars/${req.params.username}.jpg`});
   });
-  const userIndex = users.findIndex(user => user.username == req.params.username);
-  users[userIndex].avatar = `http://${hostname}:${port}/public/avatars/${req.params.username}.jpg`;
+  // Working only with callback
+  User.update({ username: req.params.username }, {
+      avatar: `http://${hostname}:${port}/public/avatars/${req.params.username}.jpg`
+  }, (a, b) => console.log(a, b));
 })
 
+// Movies - API
 api.route('/movies')
 .get((req, res) => {
-  res.json(movies);
+  Movie.find({}, (err, movies) => {
+    if (err)
+      res.json({ success: false });
+    else
+      res.json({ success: true, movies: movies });
+  });
 })
 .post((req, res) => {
-  const newMovie = {
-    id: movies.length + 1,
+	const newMovie = Movie({
     name_fr: req.body.name_fr, 
     name_en: req.body.name_en, 
-    poster: req.body.poster,
+    poster: `/posters/${req.body.poster}`,
     description_fr: req.body.description_fr,
     description_en: req.body.description_en,
     author: req.body.author,
     rating: req.body.rating
-  }
-  movies.push(newMovie);
-  res.json({
-    status: `Movie n°${newMovie.id} has been added`, 
-    movie: newMovie,
-    method: req.method
+  });
+
+  newMovie.save((err) => {
+    if (err)
+      res.json({ success: false });
+    else
+      res.json({ success: true, movie: newMovie });
   });
 })
 
 api.route('/movie/:id')
 .get((req, res) => {
-	res.json(movies.find(movie => movie.id == req.params.id));
+  Movie.find({ _id: req.params.id }, (err, movie) => {
+    if (err)
+      res.json({ success: false });
+    else
+      res.json({ success: true, movie: movie });
+  });
 })
 .put((req, res) => {
   let movie = movies.find(movie => movie.id == req.params.id);
@@ -108,8 +136,12 @@ api.route('/movie/:id')
 	res.json({status: `Movie n°${req.params.id} has been updated`, movie: movie});
 })
 .delete((req, res) => {
-  movies = movies.filter((movie) => movie.id != req.params.id);
-  res.json({status: `Movie n°${req.params.id} has been deleted`});
+  Movie.findOneAndRemove({ _id: req.params.id }, (err) => {
+    if (err)
+      res.json({ success: false });
+    else
+      res.json({ success: true });
+  });
 });
 
 api.route('/movie/:id/comments')
@@ -136,16 +168,76 @@ api.route('/movie/:id/comments')
   });
 })
 
+// Users - API
 api.route('/users')
 .get((req, res) => {
-	res.json(users);
+  User.find({}, (err, users) => {
+    if (err)
+      res.json({ success: false });
+    else
+      res.json({ success: true, users: users });
+  });
+})
+.post((req, res) => {
+	const newUser = User({
+    firstname: req.body.firstname,
+    lastname: req.body.lastname,
+    username: req.body.username,
+    password: req.body.password,
+    avatar: `http://${hostname}:${port}/public/avatars/${req.body.avatar}`,
+    cover: req.body.cover,
+    birthdate: req.body.birthdate,
+    age: req.body.age,
+    gender: req.body.gender,
+    language: req.body.language,
+    email: req.body.email,
+    phone: req.body.phone,
+    city: req.body.city,
+    country: req.body.country,
+    verified: false
+  });
+
+  newUser.save((err) => {
+    if (err)
+      res.json({ success: false });
+    else
+      res.json({ success: true, user: newUser });
+  });
 })
 
 api.route('/user/:username')
 .get((req, res) => {
-	res.json(users.find(user => user.username === req.params.username));
+  User.find({ username: req.params.username }, (err, user) => {
+    if (err)
+      res.json({ success: false });
+    else
+      res.json({ success: true, user: user });
+  });
+})
+.delete((req, res) => {
+  User.findOneAndRemove({ username: req.params.username }, (err) => {
+    if (err)
+      res.json({ success: false });
+    else
+      res.json({ success: true });
+  });
 })
 .put((req, res) => {
+  // User.findOne({ username: req.params.username }, (err, user) => {
+  //   user.username = req.body.username ? req.body.username : user.username,
+  //   user.password = req.body.password ? req.body.password : user.password
+ 
+  //   user.markModified(username);
+  //   user.markModified(password);
+  //   user.save((err) => {
+  //     if (err)
+  //       res.json({ status: 'error' });
+  //     else
+  //       res.json({ status: 'success', user: user });
+  //   });
+  // });
+
+
   let user = users.find(user => user.username == req.params.username);
   const userIndex = users.findIndex(user => user.username == req.params.username);
 
@@ -173,5 +265,5 @@ api.route('/user/:username')
 app.use(api);
 
 app.listen(port, hostname, () => {
-  console.log(`Server running on http://${hostname}:${port}/`);
+  console.log("\x1b[33m%s\x1b[0m", `Server running on http://${hostname}:${port}/`);
 });

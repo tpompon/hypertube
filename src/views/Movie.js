@@ -23,7 +23,7 @@ class Movie extends React.Component {
 
   componentWillMount() {
     axios.get(`http://${config.hostname}:${config.port}/movie/${this.props.match.params.id}`)
-      .then(res => this.setState({movie: res.data, loaded: true}))
+      .then(res => this.setState({movie: res.data.movie[0], loaded: true}))
       .then(() => {
         if (this.state.movie) {
           document.querySelector('.comment-input').addEventListener('keypress', (e) => {
@@ -97,7 +97,7 @@ class Movie extends React.Component {
                     <div>
                       <h2>{translations[language].movie.comments}</h2>
                       <div className="comments col">
-                      {
+                      {/* {
                         movie.comments.map((comment) => {
                           return (
                             <div className="comment">
@@ -107,7 +107,7 @@ class Movie extends React.Component {
                             </div>
                           )
                         })
-                      }
+                      } */}
                       </div>
                       <input className="dark-input comment-input" placeholder={translations[language].movie.reviewPlaceholder} style={{width: '100%', marginBottom: 20}} value={this.state.comment} onChange={e => this.setState({ comment: e.target.value })} />
                       <div style={{float: 'right'}} ref="reviewSubmit" onClick={() => this.addComment()}><Button content={translations[language].movie.reviewSubmit} /></div>

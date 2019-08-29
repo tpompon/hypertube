@@ -35,7 +35,11 @@ class User extends React.Component {
 
   componentWillMount() {
     axios.get(`http://${config.hostname}:${config.port}/user/${this.state.username}`)
-      .then(res => this.setState({user: res.data}));
+      .then(res => {
+        if (res.data.success) {
+          this.setState({user: res.data.user[0]});
+        }
+      });
   }
 
   copyProfileURL = () => {
