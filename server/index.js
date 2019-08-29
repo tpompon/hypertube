@@ -121,19 +121,29 @@ api.route('/movie/:id')
   });
 })
 .put((req, res) => {
-  let movie = movies.find(movie => movie.id == req.params.id);
-  const movieIndex = movies.findIndex(movie => movie.id == req.params.id);
+  const updateQuery = {};
 
-  movie.name_fr = req.body.name_fr ? req.body.name_fr : movie.name_fr;
-  movie.name_en = req.body.name_en ? req.body.name_en : movie.name_en;
-  movie.poster = req.body.poster ? req.body.poster : movie.poster;
-  movie.description_fr = req.body.description_fr ? req.body.description_fr : movie.description_fr;
-  movie.description_en = req.body.description_en ? req.body.description_en : movie.description_en;
-  movie.author = req.body.author ? req.body.author : movie.author;
-  movie.rating = req.body.rating ? req.body.rating : movie.rating;
+  if (req.body.name_fr)
+    updateQuery.name_fr = req.body.name_fr;
+  if (req.body.name_en)
+    updateQuery.name_en = req.body.name_en;
+  if (req.body.description_fr)
+    updateQuery.description_fr = req.body.description_fr;
+  if (req.body.description_en)
+    updateQuery.description_en = req.body.description_en;
+  if (req.body.poster)
+    updateQuery.poster = req.body.poster;
+  if (req.body.author)
+    updateQuery.author = req.body.author;
+  if (req.body.rating)
+    updateQuery.rating = req.body.rating;
 
-  movies[movieIndex] = movie;
-	res.json({status: `Movie n°${req.params.id} has been updated`, movie: movie});
+  Movie.findOneAndUpdate({ _id: req.params.id }, updateQuery, { upsert:true }, (err, movie) => {
+    if (err)
+      return res.json({ success: false });
+    else
+      return res.json({ success: true, updated: movie });
+  });
 })
 .delete((req, res) => {
   Movie.findOneAndRemove({ _id: req.params.id }, (err) => {
@@ -198,68 +208,72 @@ api.route('/users')
   });
 
   newUser.save((err) => {
-    if (err)
+    if (err) {
       res.json({ success: false });
-    else
+    } else {
       res.json({ success: true, user: newUser });
+    }
   });
 })
 
 api.route('/user/:username')
 .get((req, res) => {
   User.find({ username: req.params.username }, (err, user) => {
-    if (err)
+    if (err) {
       res.json({ success: false });
-    else
+    } else {
       res.json({ success: true, user: user });
+    }
   });
 })
 .delete((req, res) => {
   User.findOneAndRemove({ username: req.params.username }, (err) => {
-    if (err)
+    if (err) {
       res.json({ success: false });
-    else
+    } else {
       res.json({ success: true });
+    }
+
   });
 })
 .put((req, res) => {
-  // User.findOne({ username: req.params.username }, (err, user) => {
-  //   user.username = req.body.username ? req.body.username : user.username,
-  //   user.password = req.body.password ? req.body.password : user.password
- 
-  //   user.markModified(username);
-  //   user.markModified(password);
-  //   user.save((err) => {
-  //     if (err)
-  //       res.json({ status: 'error' });
-  //     else
-  //       res.json({ status: 'success', user: user });
-  //   });
-  // });
+  const updateQuery = {};
 
+  if (req.body.firstname)
+    updateQuery.firstname = req.body.firstname;
+  if (req.body.lastname)
+    updateQuery.lastname = req.body.lastname;
+  if (req.body.username)
+    updateQuery.username = req.body.username;
+  if (req.body.password)
+    updateQuery.password = req.body.password;
+  if (req.body.avatar)
+    updateQuery.avatar = req.body.avatar;
+  if (req.body.cover)
+    updateQuery.cover = req.body.cover;
+  if (req.body.birthdate)
+    updateQuery.birthdate = req.body.birthdate;
+  if (req.body.city)
+    updateQuery.city = req.body.city;
+  if (req.body.country)
+    updateQuery.country = req.body.country;
+  if (req.body.age)
+    updateQuery.age = req.body.age;
+  if (req.body.gender)
+    updateQuery.gender = req.body.gender;
+  if (req.body.language)
+    updateQuery.language = req.body.language;
+  if (req.body.email)
+    updateQuery.email = req.body.email;
+  if (req.body.phone)
+    updateQuery.phone = req.body.phone;
 
-  let user = users.find(user => user.username == req.params.username);
-  const userIndex = users.findIndex(user => user.username == req.params.username);
-
-  user.firstname = req.body.firstname ? req.body.firstname : user.firstname;
-  user.lastname = req.body.lastname ? req.body.lastname : user.lastname;
-  user.username = req.body.username ? req.body.username : user.username;
-  user.password = req.body.password ? req.body.password : user.password;
-  user.avatar = req.body.avatar ? req.body.avatar : user.avatar;
-  user.cover = req.body.cover ? req.body.cover : user.cover;
-  user.birthdate = req.body.birthdate ? req.body.birthdate : user.birthdate;
-  user.city = req.body.city ? req.body.city : user.city;
-  user.country = req.body.country ? req.body.country : user.country;
-  user.age = req.body.age ? req.body.age : user.age;
-  user.gender = req.body.gender ? req.body.gender : user.gender;
-  user.nationality = req.body.nationality ? req.body.nationality : user.nationality;
-  user.language = req.body.language ? req.body.language : user.language;
-  user.email = req.body.email ? req.body.email : user.email;
-  user.phone = req.body.phone ? req.body.phone : user.phone;
-  user.verified = req.body.verified ? req.body.verified : user.verified;
-
-  users[userIndex] = user;
-	res.json({status: `User n°${req.params.id} has been updated`, user: user});
+  User.findOneAndUpdate({ username: req.params.username }, updateQuery, { upsert:true }, (err, user) => {
+    if (err)
+      return res.json({ success: false });
+    else
+      return res.json({ success: true, updated: user });
+  });
 })
 
 app.use(api);

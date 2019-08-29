@@ -80,19 +80,19 @@ class Profile extends React.Component {
     if (cover === 'cinema' || cover === "url('/covers/cinema.svg')") {
       this.setState({cover: "url('/covers/cinema.svg')"});
       coversMenu[0].classList.add('cover-selected');
-      body = {cover: "url('/covers/cinema.svg')"};
+      body.cover = "url('/covers/cinema.svg')";
     } else if (cover === 'japan' || cover === "url('/covers/japan.svg')") {
       this.setState({cover: "url('/covers/japan.svg')"});
       coversMenu[1].classList.add('cover-selected');
-      body = {cover: "url('/covers/japan.svg')"};
+      body.cover = "url('/covers/japan.svg')";
     } else if (cover === 'animals' || cover === "url('/covers/animals.svg')") {
       this.setState({cover: "url('/covers/animals.svg')"});
       coversMenu[2].classList.add('cover-selected');
-      body = {cover: "url('/covers/animals.svg')"};
+      body.cover = "url('/covers/animals.svg')";
     } else if (cover === 'fruits' || cover === "url('/covers/fruits.svg')") {
       this.setState({cover: "url('/covers/fruits.svg')"});
       coversMenu[3].classList.add('cover-selected');
-      body = {cover: "url('/covers/fruits.svg')"};
+      body.cover = "url('/covers/fruits.svg')";
     }
 
     axios.put(`http://${config.hostname}:${config.port}/user/ipare`, body);
