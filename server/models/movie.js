@@ -9,6 +9,10 @@ const movieSchema = new Schema({
 	poster: String,
 	author: String,
 	rating: Number,
+	comments: [{
+		author: String,
+		content: String
+	}],
 	created_at: Date,
 	updated_at: Date
 });

@@ -18,7 +18,7 @@ app.use(bodyParser.json({ limit: '10mb' }));
 app.use(fileUpload());
 app.use('/public', express.static(__dirname + '/public'));
 
-mongoose.connect('mongodb://localhost/hypertube', {useNewUrlParser: true});
+mongoose.connect('mongodb://localhost/hypertube', {useNewUrlParser: true, useCreateIndex: true, useFindAndModify: false});
 
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'Database connection error:'));
@@ -26,38 +26,38 @@ db.once('open', () => {
   console.log('\x1b[36m%s\x1b[0m', '-> Database connection established');
 });
 
-let movies = [
-  {
-    id: 1,
-    en: {
-      name: "L'Arnacoeur",
-      description: "Un film sympa et cool"
-    },
-    fr: {
-      name: "L'Arnacoeur",
-      description: "A really nice movie, yeah"
-    },
-    poster: "/posters/arnacoeur.jpg",
-    author: "tpompon",
-    rating: 3.5,
-    comments: [{ id: 1, author: "tpompon", content: "ok salut" }, { id: 2, author: "ipare", content: "Franchement bon film ouais" }, { id: 3, author: "afortin", content: "So nice movie !!!!" }]
-  },
-  { id: 2, name_fr: "Hunger Games", name_en: "Hunger Games", poster: "/posters/hunger_games.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4, comments: [{ id: 1, author: "tpompon", content: "ok salut" }, { id: 2, author: "ipare", content: "Franchement bon film ouais" }, { id: 3, author: "afortin", content: "So nice movie !!!!" }] },
-  { id: 3, name_fr: "Le Monde de Narnia", name_en: "Narnia's World", poster: "/posters/narnia.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.5, comments: [{ id: 1, author: "tpompon", content: "ok salut" }, { id: 2, author: "ipare", content: "Franchement bon film ouais" }, { id: 3, author: "afortin", content: "So nice movie !!!!" }] },
-  { id: 4, name_fr: "Pirates des Caraïbes", name_en: "Pirates of Caraïbes", poster: "/posters/pirates_des_caraibes.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 3, comments: [{ id: 1, author: "tpompon", content: "ok salut" }, { id: 2, author: "ipare", content: "Franchement bon film ouais" }, { id: 3, author: "afortin", content: "So nice movie !!!!" }] },
-  { id: 5, name_fr: "Star Wars: Le Réveil de la Force", name_en: "Star Wars: Strength Awakening", poster: "/posters/star_wars.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 3.5, comments: [{ id: 1, author: "tpompon", content: "ok salut" }, { id: 2, author: "ipare", content: "Franchement bon film ouais" }, { id: 3, author: "afortin", content: "So nice movie !!!!" }] },
-  { id: 6, name_fr: "Sully", name_en: "Sully", poster: "/posters/sully.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4, comments: [{ id: 1, author: "tpompon", content: "ok salut" }, { id: 2, author: "ipare", content: "Franchement bon film ouais" }, { id: 3, author: "afortin", content: "So nice movie !!!!" }] },
-  { id: 7, name_fr: "Star Wars: Les Derniers Jedi", name_en: "Star Wars: The Last Jedi", poster: "/posters/star_wars2.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4, comments: [{ id: 1, author: "tpompon", content: "ok salut" }, { id: 2, author: "ipare", content: "Franchement bon film ouais" }, { id: 3, author: "afortin", content: "So nice movie !!!!" }] },
-  { id: 8, name_fr: "Titanic", name_en: "Titanic", poster: "/posters/titanic.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.5, comments: [{ id: 1, author: "tpompon", content: "ok salut" }, { id: 2, author: "ipare", content: "Franchement bon film ouais" }, { id: 3, author: "afortin", content: "So nice movie !!!!" }] },
-  { id: 9, name_fr: "Spiderman: Homecoming", name_en: "Spiderman: Homecoming", poster: "/posters/spiderman.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4, comments: [{ id: 1, author: "tpompon", content: "ok salut" }, { id: 2, author: "ipare", content: "Franchement bon film ouais" }, { id: 3, author: "afortin", content: "So nice movie !!!!" }] },
-  { id: 10, name_fr: "Dunkerque", name_en: "Dunkerque", poster: "/posters/dunkerque.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4, comments: [{ id: 1, author: "tpompon", content: "ok salut" }, { id: 2, author: "ipare", content: "Franchement bon film ouais" }, { id: 3, author: "afortin", content: "So nice movie !!!!" }] }
-]
+// let movies = [
+//   {
+//     id: 1,
+//     en: {
+//       name: "L'Arnacoeur",
+//       description: "Un film sympa et cool"
+//     },
+//     fr: {
+//       name: "L'Arnacoeur",
+//       description: "A really nice movie, yeah"
+//     },
+//     poster: "/posters/arnacoeur.jpg",
+//     author: "tpompon",
+//     rating: 3.5,
+//     comments: [{ id: 1, author: "tpompon", content: "ok salut" }, { id: 2, author: "ipare", content: "Franchement bon film ouais" }, { id: 3, author: "afortin", content: "So nice movie !!!!" }]
+//   },
+//   { id: 2, name_fr: "Hunger Games", name_en: "Hunger Games", poster: "/posters/hunger_games.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4, comments: [{ id: 1, author: "tpompon", content: "ok salut" }, { id: 2, author: "ipare", content: "Franchement bon film ouais" }, { id: 3, author: "afortin", content: "So nice movie !!!!" }] },
+//   { id: 3, name_fr: "Le Monde de Narnia", name_en: "Narnia's World", poster: "/posters/narnia.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.5, comments: [{ id: 1, author: "tpompon", content: "ok salut" }, { id: 2, author: "ipare", content: "Franchement bon film ouais" }, { id: 3, author: "afortin", content: "So nice movie !!!!" }] },
+//   { id: 4, name_fr: "Pirates des Caraïbes", name_en: "Pirates of Caraïbes", poster: "/posters/pirates_des_caraibes.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 3, comments: [{ id: 1, author: "tpompon", content: "ok salut" }, { id: 2, author: "ipare", content: "Franchement bon film ouais" }, { id: 3, author: "afortin", content: "So nice movie !!!!" }] },
+//   { id: 5, name_fr: "Star Wars: Le Réveil de la Force", name_en: "Star Wars: Strength Awakening", poster: "/posters/star_wars.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 3.5, comments: [{ id: 1, author: "tpompon", content: "ok salut" }, { id: 2, author: "ipare", content: "Franchement bon film ouais" }, { id: 3, author: "afortin", content: "So nice movie !!!!" }] },
+//   { id: 6, name_fr: "Sully", name_en: "Sully", poster: "/posters/sully.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4, comments: [{ id: 1, author: "tpompon", content: "ok salut" }, { id: 2, author: "ipare", content: "Franchement bon film ouais" }, { id: 3, author: "afortin", content: "So nice movie !!!!" }] },
+//   { id: 7, name_fr: "Star Wars: Les Derniers Jedi", name_en: "Star Wars: The Last Jedi", poster: "/posters/star_wars2.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4, comments: [{ id: 1, author: "tpompon", content: "ok salut" }, { id: 2, author: "ipare", content: "Franchement bon film ouais" }, { id: 3, author: "afortin", content: "So nice movie !!!!" }] },
+//   { id: 8, name_fr: "Titanic", name_en: "Titanic", poster: "/posters/titanic.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.5, comments: [{ id: 1, author: "tpompon", content: "ok salut" }, { id: 2, author: "ipare", content: "Franchement bon film ouais" }, { id: 3, author: "afortin", content: "So nice movie !!!!" }] },
+//   { id: 9, name_fr: "Spiderman: Homecoming", name_en: "Spiderman: Homecoming", poster: "/posters/spiderman.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4, comments: [{ id: 1, author: "tpompon", content: "ok salut" }, { id: 2, author: "ipare", content: "Franchement bon film ouais" }, { id: 3, author: "afortin", content: "So nice movie !!!!" }] },
+//   { id: 10, name_fr: "Dunkerque", name_en: "Dunkerque", poster: "/posters/dunkerque.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4, comments: [{ id: 1, author: "tpompon", content: "ok salut" }, { id: 2, author: "ipare", content: "Franchement bon film ouais" }, { id: 3, author: "afortin", content: "So nice movie !!!!" }] }
+// ]
 
-const users = [
-  { id: 1, firstname: 'Thomas', lastname: 'Pompon', username: 'tpompon', password: 'x24ze24zezE', avatar: `http://${hostname}:${port}/public/avatars/tpompon_def.jpg`, cover: "url('/covers/cinema.svg')", birthdate: '30/06/1999', city: 'Paris', country: 'France', age: '20', gender: 'male', language: 'fr', email: 'tpompon@hypertube.com', phone: '+33685589963', verified: true },
-  { id: 2, firstname: 'Irina', lastname: 'Paré', username: 'ipare', password: 'x24ze24zezE', avatar: `http://${hostname}:${port}/public/avatars/ipare_def.jpg`, cover: "url('/covers/cinema.svg')", birthdate: '01/01/1999', city: 'Reykjavik', country: 'Islande', age: '20', gender: 'female', language: 'fr', email: 'ipare@hypertube.com', phone: '+33785241441', verified: true },
-  { id: 3, firstname: 'Audrey', lastname: 'Fortin', username: 'afortin', password: 'x24ze24zezE', avatar: `http://${hostname}:${port}/public/avatars/afortin_def.jpg`, cover: "url('/covers/cinema.svg')", birthdate: '21/08/1998', city: 'Lyon', country: 'France', age: '21', gender: 'female', language: 'fr', email: 'afortin@hypertube.com', phone: '+33670405523', verified: false }
-]
+// const users = [
+//   { id: 1, firstname: 'Thomas', lastname: 'Pompon', username: 'tpompon', password: 'x24ze24zezE', avatar: `http://${hostname}:${port}/public/avatars/tpompon_def.jpg`, cover: "url('/covers/cinema.svg')", birthdate: '30/06/1999', city: 'Paris', country: 'France', age: '20', gender: 'male', language: 'fr', email: 'tpompon@hypertube.com', phone: '+33685589963', verified: true },
+//   { id: 2, firstname: 'Irina', lastname: 'Paré', username: 'ipare', password: 'x24ze24zezE', avatar: `http://${hostname}:${port}/public/avatars/ipare_def.jpg`, cover: "url('/covers/cinema.svg')", birthdate: '01/01/1999', city: 'Reykjavik', country: 'Islande', age: '20', gender: 'female', language: 'fr', email: 'ipare@hypertube.com', phone: '+33785241441', verified: true },
+//   { id: 3, firstname: 'Audrey', lastname: 'Fortin', username: 'afortin', password: 'x24ze24zezE', avatar: `http://${hostname}:${port}/public/avatars/afortin_def.jpg`, cover: "url('/covers/cinema.svg')", birthdate: '21/08/1998', city: 'Lyon', country: 'France', age: '21', gender: 'female', language: 'fr', email: 'afortin@hypertube.com', phone: '+33670405523', verified: false }
+// ]
 
 const api = express.Router(); 
 
@@ -70,15 +70,16 @@ api.route('/')
 api.route('/avatar/:username')
 .post((req, res) => {
   const imageFile = req.files.file;
-  imageFile.mv(`${__dirname}/public/avatars/${req.params.username}.jpg`, (err) => {
+  const timestamp = Date.now();
+  imageFile.mv(`${__dirname}/public/avatars/${req.params.username}_${timestamp}.jpg`, (err) => {
     if (err)
       res.json({ success: false })
     else
-      res.json({ success: true, file: `public/avatars/${req.params.username}.jpg`});
+      res.json({ success: true, file: `public/avatars/${req.params.username}_${timestamp}.jpg`});
   });
   // Working only with callback
   User.update({ username: req.params.username }, {
-      avatar: `http://${hostname}:${port}/public/avatars/${req.params.username}.jpg`
+      avatar: `http://${hostname}:${port}/public/avatars/${req.params.username}_${timestamp}.jpg`
   }, (a, b) => console.log(a, b));
 })
 
@@ -154,27 +155,155 @@ api.route('/movie/:id')
   });
 });
 
-api.route('/movie/:id/comments')
+// Movies lists
+api.route('/movie/:id/heartbeat')
 .get((req, res) => {
-  const movieIndex = movies.findIndex(movie => movie.id == req.params.id);
-  res.json({
-    status: `Comments of movie n°${movies[movieIndex].id}`,
-    comments: movies[movieIndex].comments,
-    method: req.method
+  const movie = { id: req.params.id };
+  User.findOne(
+    { _id: req.query.uid }, 
+    { heartbeat: { $elemMatch: { id: movie.id } } },
+    (err, result) => {
+      if (err) {
+        res.json({ success: false });
+      } else {
+        if (result) {
+          res.json({ success: true, found: result.heartbeat.length })
+        } else {
+          res.json({ success: true, found: 0 })
+        }
+      }
   });
 })
 .post((req, res) => {
-  const movieIndex = movies.findIndex(movie => movie.id == req.params.id);
-  const newComment = {
-    id: movies[movieIndex].comments.length + 1,
-    author: req.body.author,
-    content: req.body.content
-  }
-  movies[movieIndex].comments.push(newComment);
-  res.json({
-    status: `Comment on movie n°${movies[movieIndex].id} has been added`, 
-    comment: newComment,
-    method: req.method
+  const movie = { id: req.params.id };
+  User.findOneAndUpdate(
+    { _id: req.body.uid }, 
+    { $push: { heartbeat: movie } },
+    (err) => {
+      if (err) {
+        res.json({ success: false });
+      } else {
+        res.json({ success: true, movie: movie });
+      }
+  });
+})
+.delete((req, res) => {
+  const movie = { id: req.params.id };
+  User.findOneAndUpdate(
+    { _id: req.body.uid }, 
+    { $pull : { heartbeat: { id: movie.id }  } },
+    (err) => {
+      if (err) {
+        res.json({ success: false });
+      } else {
+        res.json({ success: true });
+      }
+  });
+})
+
+api.route('/movie/:id/recents')
+.get((req, res) => {
+  const movie = { id: req.params.id };
+  User.findOne(
+    { _id: req.query.uid }, 
+    { recents: { $elemMatch: { id: movie.id } } },
+    (err, result) => {
+      if (err) {
+        res.json({ success: false });
+      } else {
+        if (result) {
+          res.json({ success: true, found: result.recents.length })
+        } else {
+          res.json({ success: true, found: 0 })
+        }
+      }
+  });
+})
+.post((req, res) => {
+  const movie = { id: req.params.id };
+  User.findOneAndUpdate(
+    { _id: req.body.uid }, 
+    { $push: { recents: movie } },
+    (err) => {
+      if (err) {
+        res.json({ success: false });
+      } else {
+        res.json({ success: true, movie: movie });
+      }
+  });
+})
+.delete((req, res) => {
+  const movie = { id: req.params.id };
+  User.findOneAndUpdate(
+    { _id: req.body.uid }, 
+    { $pull : { recents: { id: movie.id }  } },
+    (err) => {
+      if (err) {
+        res.json({ success: false });
+      } else {
+        res.json({ success: true });
+      }
+  });
+})
+
+api.route('/movie/:id/inprogress')
+.get((req, res) => {
+  const movie = { id: req.params.id };
+  User.findOne(
+    { _id: req.query.uid }, 
+    { inProgress: { $elemMatch: { id: movie.id } } },
+    (err, result) => {
+      if (err) {
+        res.json({ success: false });
+      } else {
+        if (result) {
+          res.json({ success: true, found: result.inProgress.length })
+        } else {
+          res.json({ success: true, found: 0 })
+        }
+      }
+  });
+})
+.post((req, res) => {
+  const movie = { id: req.params.id };
+  User.findOneAndUpdate(
+    { _id: req.body.uid }, 
+    { $push: { inProgress: movie } },
+    (err) => {
+      if (err) {
+        res.json({ success: false });
+      } else {
+        res.json({ success: true, movie: movie });
+      }
+  });
+})
+.delete((req, res) => {
+  const movie = { id: req.params.id };
+  User.findOneAndUpdate(
+    { _id: req.body.uid }, 
+    { $pull : { inProgress: { id: movie.id }  } },
+    (err) => {
+      if (err) {
+        res.json({ success: false });
+      } else {
+        res.json({ success: true });
+      }
+  });
+})
+
+// Movies comments
+api.route('/movie/:id/comments')
+.post((req, res) => {
+  const newComment = { author: req.body.author, content: req.body.content };
+  Movie.findOneAndUpdate(
+    { _id: req.params.id }, 
+    { $push: { comments: newComment  } },
+    (err) => {
+      if (err) {
+        res.json({ success: false });
+      } else {
+        res.json({ success: true, comment: newComment });
+      }
   });
 })
 

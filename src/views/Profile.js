@@ -41,8 +41,24 @@ class Profile extends React.Component {
     super(props);
     this.state = {
       cover: "url('/covers/cinema.svg')",
-      user: {}
+      user: {},
+      heartbeat: [],
+      recents: [],
+      inProgress: []
     }
+  }
+
+  getMoviesList = (moviesListIds) => {
+    let array = [];
+    moviesListIds.map((movie) => {
+      axios.get(`http://${config.hostname}:${config.port}/movie/${movie.id}`)
+        .then(res => {
+          if (res.data.success && res.data.movie) {
+            array.push(res.data.movie[0]);
+          }
+        })
+    });
+    return array;
   }
 
   copyProfileURL = () => {
@@ -106,7 +122,6 @@ class Profile extends React.Component {
       data.append('filename', e.target.files[0].name);
       axios.post(`http://${config.hostname}:${config.port}/avatar/ipare`, data)
       .then((res) => {
-        console.log(`http://${config.hostname}:${config.port}/${res.data.file}`);
         this.setState({ user: { ...this.state.user, avatar: `http://${config.hostname}:${config.port}/${res.data.file}` }});
       });
     }
@@ -114,13 +129,14 @@ class Profile extends React.Component {
 
   componentWillMount() {
     axios.get(`http://${config.hostname}:${config.port}/user/ipare`)
-    .then(res => {
-      if (res.data.success) {
-        this.setState({user: res.data.user[0]});
-        this.setState({cover: this.state.user.cover});
-        this.updateCover(this.state.cover);
-      }
-    });
+      .then(res => {
+        if (res.data.success) {
+          this.setState({ user: res.data.user[0] }, () => {
+            this.setState({ heartbeat: this.getMoviesList(this.state.user.heartbeat) });
+          });
+          this.setState({ cover: this.state.user.cover }, () => this.updateCover(this.state.cover));
+        }
+      });
   }
 
   componentDidMount() {

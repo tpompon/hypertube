@@ -9,13 +9,17 @@ const languages = {
 			}
 		},
 		movie: {
-			userRating: "Your rating: ",
 			rating: "Rating",
 			watch: "Watch",
 			comments: "Comments",
 			reviewPlaceholder: "Leave your review...",
 			reviewSubmit: "Send",
-			noResults: "No results"
+			noComments: "There isn't any comment at the moment, become the first one",
+			noResults: "No results",
+			tooltip: {
+				heartbeatAdd: "Add to heartbeat list",
+				heartbeatRemove: "Remove from heartbeat list"
+			}
 		},
 		poster: {
 			rating: "Rating"
@@ -109,13 +113,17 @@ const languages = {
 			}
 		},
 		movie: {
-			userRating: "Votre note: ",
 			rating: "Note",
 			watch: "Regarder",
 			comments: "Commentaires",
 			reviewPlaceholder: "Laissez votre avis...",
 			reviewSubmit: "Envoyer",
-			noResults: "Aucun résultat"
+			noComments: "Il n'y a aucun commentaire actuellement, soyez le premier",
+			noResults: "Aucun résultat",
+			tooltip: {
+				heartbeatAdd: "Ajouter aux coups de cœur",
+				heartbeatRemove: "Retirer des coups de cœur"
+			}
 		},
 		poster: {
 			rating: "Note"
@@ -209,13 +217,17 @@ const languages = {
 			}
 		},
 		movie: {
-			userRating: "Tu nota: ",
 			rating: "Nota",
 			watch: "Mirar",
 			comments: "Comentarios",
 			reviewPlaceholder: "Deja tu opinión...",
 			reviewSubmit: "Enviar a",
-			noResults: "Ningún resultado"
+			noComments: "No hay comentarios actualmente, se el primero",
+			noResults: "Ningún resultado",
+			tooltip: {
+				heartbeatAdd: "Añadir a favoritos",
+				heartbeatRemove: "Eliminar de favoritos"
+			}
 		},
 		poster: {
 			rating: "Nota"
