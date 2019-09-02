@@ -13,8 +13,8 @@ class Register extends React.Component {
   }
 
   verifyPasswords = () => {
-    const passwordInput = document.getElementsByClassName('dark-input')[3];
-    const confirmPasswordInput = document.getElementsByClassName('dark-input')[7];
+    // const passwordInput = document.getElementsByClassName('dark-input')[3];
+    // const confirmPasswordInput = document.getElementsByClassName('dark-input')[7];
 
     const warnMatch = document.getElementsByClassName('warn')[0];
     const warnLength = document.getElementsByClassName('warn')[1];

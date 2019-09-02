@@ -69,7 +69,7 @@ const languages = {
 		login: {
 			title: "Log in",
 			inputs: {
-				username: "Username or e-mail",
+				username: "Username",
 				password: "Password",
 				submit: "Log in",
 				forgotPassword: "Forgot password",
@@ -173,7 +173,7 @@ const languages = {
 		login: {
 			title: "Se connecter",
 			inputs: {
-				username: "Nom d'utilisateur ou e-mail",
+				username: "Nom d'utilisateur",
 				password: "Mot de passe",
 				submit: "Se connecter",
 				forgotPassword: "Mot de passe oublié",
@@ -280,8 +280,7 @@ const languages = {
 				username: "Nombre del usuario",
 				password: "Contraseña",
 				submit: "Conectarse",
-				forgotPassword: "Contraseña olvidada",
-				submit: "Inscribirse"
+				forgotPassword: "Contraseña olvidada"
 			}
 		},
 		logout: {

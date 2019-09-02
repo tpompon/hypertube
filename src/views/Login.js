@@ -1,4 +1,6 @@
 import React from 'react';
+import axios from 'axios'
+import config from '../config'
 import translations from '../translations'
 import { Link } from "react-router-dom";
 import Button from '../components/Button'
@@ -6,13 +8,26 @@ import { ReactComponent as TwitterIcon } from '../svg/twitter.svg'
 import { ReactComponent as FourtyTwoIcon } from '../svg/42.svg'
 import { ReactComponent as FacebookIcon } from '../svg/facebook.svg'
 
+axios.defaults.withCredentials = true;
+
 class Login extends React.Component {
 
   constructor(props) {
     super(props);
+    this.usernameInput = React.createRef();
+    this.passwordInput = React.createRef();
     this.state = {
 
     }
+  }
+
+  authenticate() {
+    const body = {
+      username: this.usernameInput.current.value,
+      password: this.passwordInput.current.value
+    }
+    axios.post(`http://${config.hostname}:${config.port}/auth`, body)
+      .then((res) => alert(res.data.status));
   }
 
   render() {
@@ -26,10 +41,10 @@ class Login extends React.Component {
           <button className="oauth-btn oauth-btn-twitter" style={{width: '31%'}}><TwitterIcon fill="#fff" width="25" height="25" /></button>
           <button className="oauth-btn oauth-btn-facebook" style={{width: '31%'}}><FacebookIcon fill="#fff" width="25" height="25" /></button>
         </div>
-        <input className="dark-input" type="text" placeholder={translations[language].login.inputs.username} style={{width: '100%', marginTop: 5, marginBottom: 5}} />
-        <input className="dark-input" type="password" placeholder={translations[language].login.inputs.password} style={{width: '100%', marginTop: 5, marginBottom: 20}} />
+        <input ref={this.usernameInput} className="dark-input" type="text" placeholder={translations[language].login.inputs.username} style={{width: '100%', marginTop: 5, marginBottom: 5}} />
+        <input ref={this.passwordInput} className="dark-input" type="password" placeholder={translations[language].login.inputs.password} style={{width: '100%', marginTop: 5, marginBottom: 20}} />
         <div className="row" style={{ justifyContent: 'space-around' }}>
-          <Button content={translations[language].login.inputs.submit} />
+          <div style={{ display: 'table' }} onClick={() => this.authenticate() }><Button content={translations[language].login.inputs.submit} /></div>
         </div>
         <div className="row" style={{ marginTop: 20, fontSize: '.8em', opacity: .8 }}>
           <div className="link center" style={{marginRight: 5}}>{translations[language].login.inputs.forgotPassword}</div>/<div className="link center" style={{marginLeft: 5}}><Link to="/register">{translations[language].login.inputs.register}</Link></div>

@@ -14,7 +14,7 @@ class PostersSlider extends React.Component {
   }
 
   componentDidMount() {
-    const { number, language } = this.props;
+    const { number } = this.props;
 
     const controlLeft = document.getElementsByClassName('control-left')[number - 1];
     const controlRight = document.getElementsByClassName('control-right')[number - 1];
@@ -48,6 +48,7 @@ class PostersSlider extends React.Component {
 
   render() {
     const { movies, language } = this.props;
+    
     return (
       <div className="posters-slider-container row">
         <span className="control-left no-selection"><ArrowLeft fill="#fff" width="20" height="20" style={{ marginTop: 200, marginLeft: 20, backgroundColor: 'rgba(0, 0, 0, .7)', borderRadius: '50%', padding: 20 }} /></span>

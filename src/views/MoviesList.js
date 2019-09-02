@@ -39,7 +39,7 @@ class MoviesList extends React.Component {
     }
   }
 
-  componentWillMount() {
+  componentDidMount() {
     axios.get(`http://${config.hostname}:${config.port}/movies`)
     .then(res => {
       if (res.data.success) {

@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const movieSchema = new Schema({
+const MovieSchema = new Schema({
 	name_fr: { type: String, required: true },
 	name_en: { type: String, required: true },
 	description_fr: { type: String, required: true },
@@ -17,7 +17,7 @@ const movieSchema = new Schema({
 	updated_at: Date
 });
 
-movieSchema.pre('save', (next) => {
+MovieSchema.pre('save', (next) => {
 	const currentDate = new Date();
 	this.updated_at = currentDate;
 	if (!this.created_at)
@@ -25,6 +25,6 @@ movieSchema.pre('save', (next) => {
 	next();
 });
 
-const Movie = mongoose.model('Movie', movieSchema);
+const Movie = mongoose.model('Movie', MovieSchema);
 
 module.exports = Movie;

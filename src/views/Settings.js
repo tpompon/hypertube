@@ -14,7 +14,7 @@ class Settings extends React.Component {
     }
   }
 
-  componentWillMount() {
+  componentDidMount() {
     axios.get(`http://${config.hostname}:${config.port}/user/ipare`)
       .then(res => this.setState({user: res.data.user[0]}));
   }

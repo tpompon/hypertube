@@ -127,7 +127,7 @@ class Profile extends React.Component {
     }
   }
 
-  componentWillMount() {
+  componentDidMount() {
     axios.get(`http://${config.hostname}:${config.port}/user/ipare`)
       .then(res => {
         if (res.data.success) {
@@ -137,9 +137,6 @@ class Profile extends React.Component {
           this.setState({ cover: this.state.user.cover }, () => this.updateCover(this.state.cover));
         }
       });
-  }
-
-  componentDidMount() {
     const coversMenu = document.getElementsByClassName('covers-menu')[0];
     document.onclick = (e) => {
       if (e.target.classList[0] !== 'covers-menu' && e.target.classList[0] !== 'covers-menu-child' && e.target.classList[0] !== 'cover-icon') {

@@ -5,6 +5,8 @@ import translations from '../translations'
 import { ReactComponent as SearchIcon } from '../svg/search.svg'
 import { Link } from "react-router-dom";
 
+axios.defaults.withCredentials = true;
+
 class Header extends React.Component {
 
   constructor(props) {
@@ -16,18 +18,49 @@ class Header extends React.Component {
     }
   }
 
-  componentWillMount() {
+  componentDidMount() {
     axios.get(`http://${config.hostname}:${config.port}/user/ipare`)
-    .then(res => {
-      if (res.data.success) {
-        this.setState({user: res.data.user[0]});
-      }
-    });
+      .then(res => {
+        if (res.data.success) {
+          this.setState({user: res.data.user[0]});
+        }
+      });
     axios.get(`http://${config.hostname}:${config.port}/movies`)
-    .then(res => {
-      if (res.data.success)
-        this.setState({movies: res.data.movies});
-    });
+      .then(res => {
+        if (res.data.success)
+          this.setState({movies: res.data.movies}, () => {
+            const showSearchBar = document.getElementsByClassName('show-search-bar')[0];
+            const searchBarCollapse = document.getElementsByClassName('search-bar-collapse')[0];
+            const avatar = document.getElementsByClassName('avatar')[0];
+            const avatarDropdown = document.getElementsByClassName('avatar-dropdown')[0];
+        
+            document.onclick = (e) => {
+              if (e.target.classList[0] !== 'avatar-dropdown' && e.target.classList[0] !== 'avatar-dropdown-item') {
+                if (e.target.classList[0] !== 'avatar') {
+                  this.closeMenus();
+                }
+              } else if (e.target.classList[0] !== 'input-search-bar') {
+                this.closeMenus();
+              }
+            };
+        
+            showSearchBar.addEventListener("click", () => {
+              if (searchBarCollapse.style.display === "block") {
+                searchBarCollapse.style.display = "none";
+              } else {
+                searchBarCollapse.style.display = "block";
+              }
+            }, false);
+        
+            avatar.addEventListener("click", () => {
+              if (avatarDropdown.style.display === "block") {
+                avatarDropdown.style.display = "none";
+              } else {
+                avatarDropdown.style.display = "block";
+              }
+            }, false);
+          });
+      });
   }
 
   resetSearchBar = () => {
@@ -82,39 +115,6 @@ class Header extends React.Component {
 
     this.setState({ search: event.target.value });
     this.props.updateSearch(event.target.value);
-  }
-
-  componentDidMount() {
-    const showSearchBar = document.getElementsByClassName('show-search-bar')[0];
-    const searchBarCollapse = document.getElementsByClassName('search-bar-collapse')[0];
-    const avatar = document.getElementsByClassName('avatar')[0];
-    const avatarDropdown = document.getElementsByClassName('avatar-dropdown')[0];
-
-    document.onclick = (e) => {
-      if (e.target.classList[0] !== 'avatar-dropdown' && e.target.classList[0] !== 'avatar-dropdown-item') {
-        if (e.target.classList[0] !== 'avatar') {
-          this.closeMenus();
-        }
-      } else if (e.target.classList[0] !== 'input-search-bar') {
-        this.closeMenus();
-      }
-    };
-
-    showSearchBar.addEventListener("click", () => {
-      if (searchBarCollapse.style.display === "block") {
-        searchBarCollapse.style.display = "none";
-      } else {
-        searchBarCollapse.style.display = "block";
-      }
-    }, false);
-
-    avatar.addEventListener("click", () => {
-      if (avatarDropdown.style.display === "block") {
-        avatarDropdown.style.display = "none";
-      } else {
-        avatarDropdown.style.display = "block";
-      }
-    }, false);
   }
 
   render() {

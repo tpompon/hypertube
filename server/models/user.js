@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const userSchema = new Schema({
+const UserSchema = new Schema({
   firstname: { type: String, required: true },
   lastname: { type: String, required: true },
   username: { type: String, required: true, unique: true },
@@ -24,7 +24,7 @@ const userSchema = new Schema({
   updated_at: Date
 });
 
-userSchema.pre('save', (next) => {
+UserSchema.pre('save', (next) => {
 	const currentDate = new Date();
 	this.updated_at = currentDate;
 	if (!this.created_at)
@@ -32,6 +32,10 @@ userSchema.pre('save', (next) => {
 	next();
 });
 
-const User = mongoose.model('User', userSchema);
+UserSchema.methods.validPassword = function(password) {
+  return (this.password === password);
+};
+
+const User = mongoose.model('User', UserSchema);
 
 module.exports = User;

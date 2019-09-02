@@ -4,6 +4,7 @@ import config from '../config'
 import translations from '../translations'
 import Rating from 'react-rating'
 import Button from '../components/Button'
+import Loading from '../components/Loading'
 import { ReactComponent as StarFull } from '../svg/star-full.svg'
 import { ReactComponent as StarEmpty } from '../svg/star-empty.svg'
 import { ReactComponent as VerifiedIcon } from '../svg/verified.svg'
@@ -24,7 +25,7 @@ class Movie extends React.Component {
     }
   }
 
-  componentWillMount() {
+  componentDidMount() {
     axios.get(`http://${config.hostname}:${config.port}/movie/${this.props.match.params.id}`)
       .then(res => this.setState({movie: res.data.movie[0], loaded: true}))
       .then(() => {
@@ -75,18 +76,12 @@ class Movie extends React.Component {
   }
 
   toggleHeartbeat = () => {
-    const { language } = this.state;
-    const heartbeatTooltip = document.getElementsByClassName('tooltip-text')[0];
-
-    // Remplacer avec les traductions, object translations non accessible, pourquoi ?
     this.setState({ heartbeat: !this.state.heartbeat }, () => {
       if (this.state.heartbeat) {
         axios.post(`http://${config.hostname}:${config.port}/movie/${this.props.match.params.id}/heartbeat`, { uid: "5d682020d7bbba2a386edf74" }); // ipare ID (replace with logged user id)
-        heartbeatTooltip.innerHTML = "Remove"; //translations[language].movie.tooltip.heartbeatRemove
       } else {
         // Need data object for DELETE REQUEST cf. https://github.com/axios/axios/issues/736 (not working without)
         axios.delete(`http://${config.hostname}:${config.port}/movie/${this.props.match.params.id}/heartbeat`, { data: { uid: "5d682020d7bbba2a386edf74" } }); // ipare ID (replace with logged user id)
-        heartbeatTooltip.innerHTML = "Add"; //translations[language].movie.tooltip.heartbeatAdd
       }
     });
   }
@@ -133,7 +128,7 @@ class Movie extends React.Component {
                         movie.comments.length > 0 ? (
                           movie.comments.map((comment) => {
                             return (
-                              <div className="comment">
+                              <div className="comment" key={`comment-${comment._id}`}>
                                 <div className="report-flag"><ReportFlag width="20" height="20" /></div>
                                 <div className="comment-name">{comment.author}<span style={{marginLeft: 10}}><VerifiedIcon width="15" height="15" /></span></div>
                                 {comment.content}
@@ -180,7 +175,7 @@ class Movie extends React.Component {
                     movie.comments.length > 0 ? (
                       movie.comments.map((comment) => {
                         return (
-                          <div className="comment">
+                          <div className="comment" key={`comment-${comment._id}`}>
                             <div className="report-flag"><ReportFlag width="20" height="20" /></div>
                             <div className="comment-name">{comment.author}<span style={{marginLeft: 10}}><VerifiedIcon width="15" height="15" /></span></div>
                             {comment.content}
@@ -214,13 +209,7 @@ class Movie extends React.Component {
                   {translations[language].movie.noResults}
                 </div>
               ) : (
-                <div class="container">
-                  <div class="flex" style={{ marginTop: 300 }}>
-                    <div class="loader">
-                    </div>
-                  </div>
-                  <div class="load-text">Loading...</div>
-                </div>
+                <Loading />
               )
             }
             </div>

@@ -33,7 +33,7 @@ class User extends React.Component {
     }
   }
 
-  componentWillMount() {
+  componentDidMount() {
     axios.get(`http://${config.hostname}:${config.port}/user/${this.state.username}`)
       .then(res => {
         if (res.data.success) {
