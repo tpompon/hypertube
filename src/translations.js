@@ -221,7 +221,7 @@ const languages = {
 			watch: "Mirar",
 			comments: "Comentarios",
 			reviewPlaceholder: "Deja tu opinión...",
-			reviewSubmit: "Enviar a",
+			reviewSubmit: "Enviar",
 			noComments: "No hay comentarios actualmente, se el primero",
 			noResults: "Ningún resultado",
 			tooltip: {

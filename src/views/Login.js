@@ -26,7 +26,7 @@ class Login extends React.Component {
       username: this.usernameInput.current.value,
       password: this.passwordInput.current.value
     }
-    axios.post(`http://${config.hostname}:${config.port}/auth`, body)
+    axios.post(`http://${config.hostname}:${config.port}/auth/login`, body)
       .then((res) => alert(res.data.status));
   }
 

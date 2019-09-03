@@ -63,7 +63,6 @@ app.use(passport.session());
 
 app.use(cors({
   origin:['http://localhost:3000'], // front end
-  methods:['GET', 'POST'],
   credentials: true // enable set cookie
 }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
