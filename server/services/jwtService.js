@@ -1,0 +1,1 @@
+const passportJwt = require('passport-jwt');

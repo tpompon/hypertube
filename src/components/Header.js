@@ -14,12 +14,12 @@ class Header extends React.Component {
     this.state = {
       search: "",
       movies: [],
-      user: {}
+      user: { }
     }
   }
 
   componentDidMount() {
-    axios.get(`http://${config.hostname}:${config.port}/user/ipare`)
+    axios.get(`http://${config.hostname}:${config.port}/user/`)
       .then(res => {
         if (res.data.success) {
           this.setState({user: res.data.user[0]});
@@ -155,7 +155,7 @@ class Header extends React.Component {
           </div>
           <SearchIcon className="show-search-bar" style={{ fill: "#fff", width: 20, height: 20 }} />
           <div style={{position: 'relative'}}>
-            <img className="avatar" src={user.avatar} alt="Avatar" width="50" height="50" />
+            <img className="avatar" src={`${user.avatar}`} alt="Avatar" width="50" height="50" />
             <div className="avatar-dropdown">
               <Link to="/profile" onClick={() => this.closeMenus()}>
                 <div className="avatar-dropdown-item">

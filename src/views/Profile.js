@@ -35,13 +35,17 @@ const inProgress = [
   { id: 4, name_fr: "Pirates des Caraïbes", name_en: "Pirates of Caraïbes", poster: "/posters/pirates_des_caraibes.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.8 },
 ]
 
+const user = {
+  username: 'Nono'
+};
+
 class Profile extends React.Component {
 
   constructor(props) {
     super(props);
     this.state = {
       cover: "url('/covers/cinema.svg')",
-      user: {},
+      user: { user },
       heartbeat: [],
       recents: [],
       inProgress: []
@@ -111,7 +115,7 @@ class Profile extends React.Component {
       body.cover = "url('/covers/fruits.svg')";
     }
 
-    axios.put(`http://${config.hostname}:${config.port}/user/ipare`, body);
+    axios.put(`http://${config.hostname}:${config.port}/user/${user.username}`, body);
   }
 
   onChangeAvatar = (e) => {
@@ -120,7 +124,7 @@ class Profile extends React.Component {
       const data = new FormData();
       data.append('file', e.target.files[0]);
       data.append('filename', e.target.files[0].name);
-      axios.post(`http://${config.hostname}:${config.port}/avatar/ipare`, data)
+      axios.post(`http://${config.hostname}:${config.port}/avatar/${user.username}`, data)
       .then((res) => {
         this.setState({ user: { ...this.state.user, avatar: `http://${config.hostname}:${config.port}/${res.data.file}` }});
       });
@@ -128,7 +132,7 @@ class Profile extends React.Component {
   }
 
   componentDidMount() {
-    axios.get(`http://${config.hostname}:${config.port}/user/ipare`)
+    axios.get(`http://${config.hostname}:${config.port}/user/${user.username}`)
       .then(res => {
         if (res.data.success) {
           this.setState({ user: res.data.user[0] }, () => {
@@ -157,7 +161,7 @@ class Profile extends React.Component {
           <div className="profile-avatar center">
             <a className="profile-avatar-overlay" onClick={e => this.refs.uploadAvatar.click()}>{translations[language].profile.updateAvatar}</a>
             <input type="file" id="file" ref="uploadAvatar" onChange={this.onChangeAvatar} style={{display: "none"}}/>
-            <img src={user.avatar} alt={`Avatar ${user.username}`} />
+            <img src={`${user.avatar}`} alt={`Avatar ${user.username}`} />
           </div>
           <div style={{marginTop: 20}}>
             <div>{user.firstname} {user.lastname} <span style={{fontStyle: 'italic', fontSize: '.8em'}}>{translations[language].profile.you}</span></div>
