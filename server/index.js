@@ -13,41 +13,41 @@ const Movie = require("./models/movie");
 // Passport
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
-const JwtStrategy = require("passport-jwt").Strategy,
-  ExtractJwt = require("passport-jwt").ExtractJwt;
-
-// passport.use(new LocalStrategy(
-//   function(username, password, done) {
-//     User.findOne({ username: username }, function(err, user) {
-//       if (err) { return done(err); }
-//       if (!user) {
-//         return done(null, false, { message: 'Incorrect username.' });
-//       }
-//       if (!user.validPassword(password)) {
-//         return done(null, false, { message: 'Incorrect password.' });
+const jwt = require('jsonwebtoken');
+const flash = require('connect-flash');
+require('./controllers/Auth');
+const localSignup = require('./controllers/Auth');
+//    function(username, password, done) {
+//      User.findOne({ username: username }, function(err, user) {
+//        if (err) { return done(err); }
+//        if (!user) {
+//          return done(null, false, { message: 'Incorrect username.' });
+//        }
+//        if (!user.validPassword(password)) {
+//          return done(null, false, { message: 'Incorrect password.' });
 //       }
 //       return done(null, user);
 //     });
 //   }
 // ));
-let opts = {};
-opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
-opts.secretOrKey = "secret";
+// let opts = {};
+// opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
+// opts.secretOrKey = "secret";
 
-passport.use(
-  new JwtStrategy(opts, (jwt_payload, done) => {
-    User.findOne({ id: jwt_payload.sub }, function(err, user) {
-      if (err) {
-        return done(err);
-      }
-      if (user) {
-        return done(null, user);
-      } else {
-        return done(null, false);
-      }
-    });
-  })
-);
+// passport.use(
+//   new JwtStrategy(opts, (jwt_payload, done) => {
+//     User.findOne({ id: jwt_payload.sub }, function(err, user) {
+//       if (err) {
+//         return done(err);
+//       }
+//       if (user) {
+//         return done(null, user);
+//       } else {
+//         return done(null, false);
+//       }
+//     });
+//   })
+// );
 
 // Torrents
 const Protocol = require("bittorrent-protocol");
@@ -61,12 +61,12 @@ const port = 4001;
 const app = express();
 
 // Passport
-passport.serializeUser(function(user, done) {
-  done(null, user);
-});
-passport.deserializeUser(function(user, done) {
-  done(null, user);
-});
+// passport.serializeUser(function(user, done) {
+//   done(null, user);
+// });
+// passport.deserializeUser(function(user, done) {
+//   done(null, user);
+// });
 app.use(
   session({
     genid: req => {
@@ -399,11 +399,15 @@ api.route("/movie/:id/comments").post((req, res) => {
   );
 });
 
+
+// app.get('s')
+
+
 // Users - API
-api
-  .route("/users")
+ api
+   .route("/users")
   .get((req, res) => {
-    User.find({}, (err, users) => {
+    User.findOne({ username: req.username }, (err, users) => {
       if (err) res.json({ success: false });
       else res.json({ success: true, users: users });
     });
@@ -413,7 +417,7 @@ api
       firstname: req.body.firstname,
       lastname: req.body.lastname,
       username: req.body.username,
-      password: req.body.password,
+      password: req.body.password.generateHash(password),
       avatar: `http://${hostname}:${port}/public/avatars/afortin_def.jpg`,
       cover: req.body.cover,
       birthdate: req.body.birthdate,
@@ -425,7 +429,7 @@ api
       city: req.body.city,
       country: req.body.country,
       verified: false
-    });
+    })
 
     newUser.save(err => {
       if (err) {
@@ -434,8 +438,28 @@ api
         res.json({ success: true, user: newUser });
       }
     });
-  });
+  })
 
+  api
+  .route('/register')
+  .get((req, res) => {
+    User.findOne({ username: req.username }, (err, users) => {
+      if (err) res.json({ success: false });
+      else res.json({ success: true, users: users });
+    });
+  })
+  .post((req, res) => { localSignup(passport, {
+    successRedirect: '/profile',
+    failureRedirect: '/register',
+    failureFlash: 'Could not sign up. Please try again.',
+    successFlash: 'Welcome to Hypertube !'
+  })});
+  // app.post('/register', passport.authenticate('local-signup', {
+  //   successRedirect: '/profile',
+  //   failureRedirect: '/register',
+  //   failureFlash: 'Could not sign up. Please try again.',
+  //   successFlash: 'Welcome to Hypertube !'
+  // }));
 api
   .route("/user/:username")
   .get((req, res) => {

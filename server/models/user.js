@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
+const bcrypt = require("bcrypt");
 
 const UserSchema = new Schema({
   firstname: { type: String, required: true, minlength: 2, maxlength: 35 },
@@ -25,8 +26,10 @@ const UserSchema = new Schema({
   heartbeat: [{ id: String }],
   recents: [{ id: String }],
   inProgress: [{ id: String }],
-  // avatar: { type : String },
-  avatar: { type: String, default: 'http://localhost:4001/public/avatars/afortin_def.jpg' },
+  avatar: {
+    type: String,
+    default: "http://localhost:4001/public/avatars/afortin_def.jpg"
+  },
   cover: String,
   birthdate: String,
   age: String,
@@ -48,8 +51,12 @@ UserSchema.pre("save", next => {
   next();
 });
 
+UserSchema.methods.generateHash = function(password) {
+  return bcrypt.hashSync(password, bcrypt.genSaltSync(10), null);
+};
+
 UserSchema.methods.validPassword = function(password) {
-  return this.password === password;
+  return bcrypt.compareSync(password, this.password);
 };
 
 const User = mongoose.model("User", UserSchema);
