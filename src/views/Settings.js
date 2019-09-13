@@ -15,8 +15,8 @@ class Settings extends React.Component {
   }
 
   componentDidMount() {
-    axios.get(`http://${config.hostname}:${config.port}/user/ipare`)
-      .then(res => this.setState({user: res.data.user[0]}));
+    axios.get(`http://${config.hostname}:${config.port}/auth`)
+    .then(res => this.setState({ user: res.data.user }))
   }
 
   handleChangeFirstname = (event) => {
@@ -45,7 +45,8 @@ class Settings extends React.Component {
   }
 
   handleSubmit = () => {
-    axios.put(`http://${config.hostname}:${config.port}/user/ipare`, this.state.user);
+    axios.put(`http://${config.hostname}:${config.port}/user/${this.state.user.username}`, this.state.user)
+    .then(res => console.log(res.data))
   }
 
   render() {

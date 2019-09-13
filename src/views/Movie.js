@@ -20,49 +20,57 @@ class Movie extends React.Component {
     this.state = {
       id: parseInt(this.props.match.params.id),
       movie: {},
+      user: {},
       comment: "",
       heartbeat: false
     }
   }
 
   componentDidMount() {
-    axios.get(`http://${config.hostname}:${config.port}/movie/${this.props.match.params.id}`)
-      .then(res => this.setState({movie: res.data.movie[0], loaded: true}))
-      .then(() => {
-        if (this.state.movie) {
-          document.querySelector('.comment-input').addEventListener('keypress', (e) => {
-            var key = e.which || e.keyCode;
-            if (key === 13) {
-              this.refs.reviewSubmit.click();
-            }
-          });
-          document.addEventListener('keydown', (e) => {
-            var key = e.which || e.keyCode;
-            if (key === 27) {
-              this.hidePlayer();
-            }
-          });
-          // Remove les Events Listener dans le WillUnmount - sinon Memory Leaks -
-        }
-      })
-    axios.get(`http://${config.hostname}:${config.port}/movie/${this.props.match.params.id}/heartbeat`, { params: { uid: "5d682020d7bbba2a386edf74" } })
+    axios.get(`http://${config.hostname}:${config.port}/movies/${this.props.match.params.id}`)
+    .then(res => this.setState({movie: res.data.movie[0], loaded: true}))
+    .then(() => {
+      if (this.state.movie) {
+        document.querySelector('.comment-input').addEventListener('keypress', (e) => {
+          var key = e.which || e.keyCode;
+          if (key === 13) {
+            this.refs.reviewSubmit.click();
+          }
+        });
+        document.addEventListener('keydown', (e) => {
+          var key = e.which || e.keyCode;
+          if (key === 27) {
+            this.hidePlayer();
+          }
+        });
+        // Remove les Events Listener dans le WillUnmount - sinon Memory Leaks -
+      }
+    })
+    axios.get(`http://${config.hostname}:${config.port}/auth`)
+    .then(res => {
+      this.setState({ user: res.data.user });
+      axios.get(`http://${config.hostname}:${config.port}/movie/${this.props.match.params.id}/heartbeat`, { params: { uid: res.data.user.id } })
       .then((res) => {
         if (res.data.success && res.data.found > 0) {
           this.setState({ heartbeat: true });
         }
       });
+    })
   }
 
   addComment = () => {
+    const { user } = this.state;
     const newComment = {
-      author: "ipare",
+      author: user.username,
       content: this.state.comment
     }
 
-    axios.post(`http://${config.hostname}:${config.port}/movie/${this.props.match.params.id}/comments`, newComment)
+    if (newComment.content.trim() !== '') {
+      axios.post(`http://${config.hostname}:${config.port}/movie/${this.props.match.params.id}/comments`, newComment)
       .then(res => console.log(res.data));
   
-    this.state.movie.comments.push(newComment);
+      this.state.movie.comments.push(newComment);
+    }
     this.setState({comment: ""});
   }
 

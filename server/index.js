@@ -3,9 +3,10 @@ const cors = require('cors');
 const bodyParser = require("body-parser");
 const fileUpload = require('express-fileupload');
 const fs = require('fs');
-const uuid = require('uuid/v4')
-const session = require('express-session')
-const FileStore = require('session-file-store')(session);
+const uuid = require('uuid/v4');
+const session = require('express-session');
+const path = require('path');
+// const FileStore = require('session-file-store')(session);
 
 const mongoose = require('mongoose');
 const User = require('./models/user');
@@ -71,14 +72,15 @@ passport.deserializeUser(function(user, done) {
 });
 app.use(session({
   genid: (req) => {
-    console.log('Inside session middleware genid function')
-    console.log(`Request object sessionID from client: ${req.sessionID}`)
+    console.log(`${req.method} Request from client - SESSION_ID: ${req.sessionID}`)
     return uuid() // use UUIDs for session IDs
   },
-  store: new FileStore(),
   secret: "c+IoG?1:wih`],]L=XMlr'uYP~H,ac~3xTmq-Vb|Bn{)`$Oe?*GwT_/Mx2/#yy7",
+  cookie: {
+    maxAge: 1000 * 60 * 60 * 24 * 7 // 1 week (we can try with 5000 = 5s, cookie session will expire)
+  },
   resave: false,
-  saveUninitialized: true
+  saveUninitialized: false
 }))
 app.use(passport.initialize());
 app.use(passport.session());
@@ -91,6 +93,7 @@ app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use(fileUpload());
 app.use('/public', express.static(__dirname + '/public'));
+app.use('/torrents', express.static(__dirname + '/torrents'));
 
 mongoose.connect('mongodb://localhost/hypertube', {useNewUrlParser: true, useCreateIndex: true, useFindAndModify: false});
 
@@ -118,6 +121,20 @@ api.route('/auth/login')
       }
     })
   })(req, res, next);
+})
+
+api.route('/auth/logout')
+.get((req, res, next) => {
+  req.logout();
+  res.json({ disconnected: true });
+})
+
+api.route('/auth')
+.get((req, res) => {
+  if (req.isAuthenticated())
+    res.json({ auth: true, user: req.user });
+  else
+    res.json({ auth: false });
 })
 
 // Route with authentication - example
@@ -155,10 +172,10 @@ api.route('/torrents/download/:search')
   if (searchResults.length > 0) {
     movieArt(req.params.search, (error, response) => {
       const engine = torrentStream(searchResults[0].magnetLink);
-   
-      engine.on('ready', () => {
+
+      engine.on('ready', (moviePath) => {
           engine.files.forEach((file) => {
-              console.log('filename:', file.name);
+              // console.log('filename:', file.name);
               let stream = file.createReadStream();
               let writeStream = fs.createWriteStream(`./torrents/${file.name}`);
               stream.pipe(writeStream);
@@ -226,7 +243,7 @@ api.route('/movies')
   });
 })
 
-api.route('/movie/:id')
+api.route('/movies/:id')
 .get((req, res) => {
   Movie.find({ _id: req.params.id }, (err, movie) => {
     if (err)

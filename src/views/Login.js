@@ -2,7 +2,7 @@ import React from 'react';
 import axios from 'axios'
 import config from '../config'
 import translations from '../translations'
-import { Link } from "react-router-dom";
+import { Link, Redirect } from "react-router-dom";
 import Button from '../components/Button'
 import { ReactComponent as TwitterIcon } from '../svg/twitter.svg'
 import { ReactComponent as FourtyTwoIcon } from '../svg/42.svg'
@@ -16,9 +16,6 @@ class Login extends React.Component {
     super(props);
     this.usernameInput = React.createRef();
     this.passwordInput = React.createRef();
-    this.state = {
-
-    }
   }
 
   authenticate() {
@@ -27,8 +24,15 @@ class Login extends React.Component {
       password: this.passwordInput.current.value
     }
     axios.post(`http://${config.hostname}:${config.port}/auth/login`, body)
-      .then((res) => alert(res.data.status));
+      .then((res) => {
+        //alert(res.data.status);
+        if (res.data.success) {
+          // this.props.history.push('/');
+        }
+      });
   }
+
+
 
   render() {
     const { language } = this.props;

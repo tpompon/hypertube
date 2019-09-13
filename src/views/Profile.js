@@ -88,6 +88,8 @@ class Profile extends React.Component {
   }
 
   updateCover = (cover) => {
+    const { user } = this.state;
+
     const coversMenu = document.getElementsByClassName('covers-menu-child');
     const coverSelected = document.getElementsByClassName('cover-selected')[0];
     coverSelected.classList.remove('cover-selected');
@@ -111,16 +113,18 @@ class Profile extends React.Component {
       body.cover = "url('/covers/fruits.svg')";
     }
 
-    axios.put(`http://${config.hostname}:${config.port}/user/ipare`, body);
+    axios.put(`http://${config.hostname}:${config.port}/user/${user.username}`, body);
   }
 
   onChangeAvatar = (e) => {
+    const { user } = this.state;
+
     if (e.target.files[0]) {
       e.preventDefault();
       const data = new FormData();
       data.append('file', e.target.files[0]);
       data.append('filename', e.target.files[0].name);
-      axios.post(`http://${config.hostname}:${config.port}/avatar/ipare`, data)
+      axios.post(`http://${config.hostname}:${config.port}/avatar/${user.username}`, data)
       .then((res) => {
         this.setState({ user: { ...this.state.user, avatar: `http://${config.hostname}:${config.port}/${res.data.file}` }});
       });
@@ -128,7 +132,9 @@ class Profile extends React.Component {
   }
 
   componentDidMount() {
-    axios.get(`http://${config.hostname}:${config.port}/user/ipare`)
+    axios.get(`http://${config.hostname}:${config.port}/auth`)
+    .then(res => {
+      axios.get(`http://${config.hostname}:${config.port}/user/${res.data.user.username}`)
       .then(res => {
         if (res.data.success) {
           this.setState({ user: res.data.user[0] }, () => {
@@ -137,14 +143,15 @@ class Profile extends React.Component {
           this.setState({ cover: this.state.user.cover }, () => this.updateCover(this.state.cover));
         }
       });
-    const coversMenu = document.getElementsByClassName('covers-menu')[0];
-    document.onclick = (e) => {
-      if (e.target.classList[0] !== 'covers-menu' && e.target.classList[0] !== 'covers-menu-child' && e.target.classList[0] !== 'cover-icon') {
-        if (e.target.classList[0] !== 'edit-cover-box' && e.target.classList[0] !== 'pencil-icon') {
-          coversMenu.style.display = 'none';
+      const coversMenu = document.getElementsByClassName('covers-menu')[0];
+      document.onclick = (e) => {
+        if (e.target.classList[0] !== 'covers-menu' && e.target.classList[0] !== 'covers-menu-child' && e.target.classList[0] !== 'cover-icon') {
+          if (e.target.classList[0] !== 'edit-cover-box' && e.target.classList[0] !== 'pencil-icon') {
+            coversMenu.style.display = 'none';
+          }
         }
       }
-    }
+    })
   }
 
   render() {
