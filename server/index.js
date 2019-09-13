@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require('cors');
 const bodyParser = require("body-parser");
 const fileUpload = require('express-fileupload');
+const fs = require('fs');
 const uuid = require('uuid/v4')
 const session = require('express-session')
 const FileStore = require('session-file-store')(session);
@@ -9,6 +10,27 @@ const FileStore = require('session-file-store')(session);
 const mongoose = require('mongoose');
 const User = require('./models/user');
 const Movie = require('./models/movie');
+
+const torrentStream = require('torrent-stream');
+// const engine = torrentStream("magnet:?xt=urn:btih:b47882a62eedec7767aa86b7a866f1dd846c5357&dn=Harry+Potter+and+the+Sorcerers+Stone+%282001%29+1080p+BrRip+x264+-+1&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.openbittorrent.com%3A80&tr=udp%3A%2F%2Fopen.demonii.com%3A1337&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Fexodus.desync.com%3A6969");
+ 
+// engine.on('ready', () => {
+//     engine.files.forEach((file) => {
+//         console.log('filename:', file.name);
+//         let stream = file.createReadStream();
+//         let writeStream = fs.createWriteStream(`./torrents/${file.name}`);
+//         stream.pipe(writeStream);
+
+//         writeStream.on('finish', () => {
+//           console.log(writeStream.path);
+//           console.log("Write completed.");
+//         });
+      
+//         writeStream.on('error', (err) => {
+//           console.log(err.stack);
+//         });
+//     });
+// });
 
 // Passport
 const passport = require('passport')
@@ -108,16 +130,55 @@ api.route('/check')
 })
 // Route with authentication - example
 
+// Test with torrents
 api.route('/torrents/:search')
 .get(async (req, res) => {
   const searchResults = await PirateBay.search(req.params.search, {
     orderBy: 'seeds',
     sortBy: 'desc'
   }).catch((err) => console.log(err));
-  movieArt(req.params.search, (error, response) => {
-    res.json({ poster: response, results: searchResults });
-  });
+  if (searchResults.length > 0) {
+    movieArt(req.params.search, (error, response) => {
+      res.json({ success: true, poster: response, results: searchResults });
+    });
+  } else {
+    res.json({ success: false });
+  }
 })
+
+api.route('/torrents/download/:search')
+.get(async (req, res) => {
+  const searchResults = await PirateBay.search(req.params.search, {
+    orderBy: 'seeds',
+    sortBy: 'desc'
+  }).catch((err) => console.log(err));
+  if (searchResults.length > 0) {
+    movieArt(req.params.search, (error, response) => {
+      const engine = torrentStream(searchResults[0].magnetLink);
+   
+      engine.on('ready', () => {
+          engine.files.forEach((file) => {
+              console.log('filename:', file.name);
+              let stream = file.createReadStream();
+              let writeStream = fs.createWriteStream(`./torrents/${file.name}`);
+              stream.pipe(writeStream);
+  
+              writeStream.on('finish', () => {
+                console.log(writeStream.path);
+                console.log("Write completed.");
+              });
+              writeStream.on('error', (err) => {
+                console.log(err.stack);
+              });
+          });
+      });
+      res.json({ poster: response, result: searchResults[0] });
+    });
+  } else {
+    res.json({ success: false });
+  }
+})
+// Test with torrents
 
 // Upload Avatar - API
 api.route('/avatar/:username')

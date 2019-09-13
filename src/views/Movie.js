@@ -196,6 +196,12 @@ class Movie extends React.Component {
               <div className="player-container" style={{display: 'none', position: 'absolute', top: 100, width: '100%', backgroundColor: "black", height: '93vh'}}>
                 <div style={{position: 'relative', width: '100%', height: '100%'}}>
                   <span className="close-icon" onClick={() => this.hidePlayer()} style={{position: 'absolute', top: 25, right: 25}}><Close width="15" height="15" fill="#fff" /></span>
+                  <video width='100%' controls>
+                    <source
+                      src="http://techslides.com/demos/sample-videos/small.mp4"
+                      type="video/mp4"
+                    />
+                  </video>
                 </div>
               </div>
 
