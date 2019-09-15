@@ -2,6 +2,7 @@ import React from 'react';
 import axios from 'axios'
 import config from '../config'
 import Poster from '../components/Poster'
+import Loading from '../components/Loading'
 import { Link } from "react-router-dom";
 
 function compare_fr(a, b) {
@@ -35,7 +36,8 @@ class MoviesList extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      movies: []
+      movies: [],
+      _isLoaded: false
     }
   }
 
@@ -46,8 +48,10 @@ class MoviesList extends React.Component {
         this.setState({movies: res.data.movies}, () => {
           if (this.props.language === 'FR') {
             this.state.movies.sort(compare_fr);
+            this.setState({_isLoaded: true});
           } else {
             this.state.movies.sort(compare_en);
+            this.setState({_isLoaded: true});
           }
         });
       }
@@ -55,22 +59,28 @@ class MoviesList extends React.Component {
   }
 
   render() {
-    const { movies } = this.state;
+    const { movies, _isLoaded } = this.state;
     const { search, language } = this.props;
 
     return (
-      <div className="posters-list row wrap">
+      <div>
       {
-        movies.map((movie) => {
-          if (movie.name_fr.toLowerCase().trim().includes(search.toLowerCase().trim())) {
-            return (
-              <Link to={`/watch/${movie._id}`} key={`movie-${movie._id}`}>
-                <Poster movie={movie} language={language} />
-              </Link>
-            )
+        _isLoaded ? (
+          <div className="posters-list row wrap">
+          {
+            movies.map((movie) => {
+              if (movie.name_fr.toLowerCase().trim().includes(search.toLowerCase().trim())) {
+                return (
+                  <Link to={`/watch/${movie._id}`} key={`movie-${movie._id}`}>
+                    <Poster movie={movie} language={language} />
+                  </Link>
+                )
+              }
+              return null;
+            })
           }
-          return null;
-        })
+          </div>
+        ) : <Loading />
       }
       </div>
     );

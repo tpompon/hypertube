@@ -16,7 +16,12 @@ class Logout extends React.Component {
 
   componentDidMount() {
     axios.get(`http://${config.hostname}:${config.port}/auth/logout`)
-      .then(this.setState({disconnected: true}))
+      .then(() => {
+        this.setState({disconnected: true});
+        setTimeout(() => {
+          window.location.href = "http://localhost:3000/login";
+        }, 1000)
+      })
   }
 
   render() {

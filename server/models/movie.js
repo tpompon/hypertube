@@ -6,12 +6,20 @@ const MovieSchema = new Schema({
 	name_en: { type: String, required: true },
 	description_fr: { type: String, required: true },
 	description_en: { type: String, required: true },
+	path: String,
 	poster: String,
 	author: String,
-	rating: Number,
+	ratings: [{
+		uid: String,
+		rating: Number
+	}],
 	comments: [{
 		author: String,
-		content: String
+		content: String,
+		report: {
+			type: Number,
+			default: 0
+		}
 	}],
 	created_at: Date,
 	updated_at: Date

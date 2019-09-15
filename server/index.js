@@ -110,17 +110,26 @@ api.route('/')
   res.json({ status: "HyperTube API", method: req.method });
 });
 
-api.route('/auth/login')
+api.route('/auth/login/:strategy')
 .post((req, res, next) => {
-  passport.authenticate('local', (err, user, info) => {
-    req.login(user, (err) => {
-      if (user) {
-        res.json({ success: true, status: "Authentication success", user: req.user });
-      } else {
-        res.json({ success: false, status: "Authentication failed" });
-      }
-    })
-  })(req, res, next);
+  const strategy = req.params.strategy;
+  if (strategy === 'local') {
+    passport.authenticate('local', (err, user, info) => {
+      req.login(user, (err) => {
+        if (user) {
+          res.json({ success: true, status: "Authentication success", user: req.user });
+        } else {
+          res.json({ success: false, status: "Authentication failed" });
+        }
+      })
+    })(req, res, next);
+  } else if (strategy === '42') {
+
+  } else if (strategy === 'github') {
+  
+  } else {
+    res.json({ success: false, status: "Authentication failed, strategy error" });
+  }
 })
 
 api.route('/auth/logout')
@@ -177,7 +186,7 @@ api.route('/torrents/download/:search')
           engine.files.forEach((file) => {
               // console.log('filename:', file.name);
               let stream = file.createReadStream();
-              let writeStream = fs.createWriteStream(`./torrents/${file.name}`);
+              let writeStream = fs.createWriteStream(`./torrents/${req.params.search}${path.extname(file.name)}`);
               stream.pipe(writeStream);
   
               writeStream.on('finish', () => {
@@ -436,6 +445,71 @@ api.route('/movie/:id/comments')
         res.json({ success: true, comment: newComment });
       }
   });
+})
+
+
+// Movies ratings
+api.route('/movie/:id/ratings')
+.get((req, res) => {
+  Movie.findOne({ _id: req.params.id }, (err, result) => {
+    if (result) {
+      let count = 0;
+      let total = 0;
+      result.ratings.forEach((el) => {
+        total += el.rating;
+        count++;
+      })
+      res.json({ success: true, ratingAverage: Math.floor((total / count) * 100) / 100, ratingCount: count });
+    } else {
+      res.json({ success: false });
+    }
+  })
+})
+.post((req, res) => {
+  const newRating = { uid: req.body.uid, rating: req.body.rating };
+  console.log(newRating);
+  console.log(req.params.id);
+
+  Movie.findOne({ _id: req.params.id, 'ratings.uid': req.body.uid }, (err, result) => {
+    if (err) {
+      console.log(err);
+      res.json({ success: false });
+    } else if (result) {
+      console.log(result)
+      Movie.update({_id: req.params.id, 'ratings.uid': req.body.uid}, {'$set': {
+        'ratings.$.rating': req.body.rating
+      }}, (err) => {
+        if (err) {
+          console.log(err);
+          res.json({ success: false });
+        } else {
+          res.json({ success: true });
+        }
+      });
+    } else {
+      Movie.findOneAndUpdate(
+        { _id: req.params.id }, 
+        { $push: { ratings: newRating  } },
+        (err) => {
+          if (err) {
+            res.json({ success: false });
+          } else {
+            res.json({ success: true });
+          }
+      });
+    }
+  });
+})
+
+api.route('/movie/:id/ratings/:uid')
+.get((req, res) => {
+  Movie.findOne({ _id: req.params.id, 'ratings.uid': req.params.uid }, {'ratings.$' : 1}, (err, result) => {
+    if (result) {
+      res.json({ success:  true, rating: result.ratings[0].rating });
+    } else {
+      res.json({ success: false });
+    }
+  })
 })
 
 // Users - API

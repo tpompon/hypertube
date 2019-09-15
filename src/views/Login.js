@@ -18,16 +18,28 @@ class Login extends React.Component {
     this.passwordInput = React.createRef();
   }
 
+  componentDidMount() {
+    document.addEventListener('keydown', (e) => {
+      var key = e.which || e.keyCode;
+      if (key === 13) {
+        this.authenticate();
+      }
+    });
+  }
+
   authenticate() {
     const body = {
       username: this.usernameInput.current.value,
       password: this.passwordInput.current.value
     }
-    axios.post(`http://${config.hostname}:${config.port}/auth/login`, body)
+    axios.post(`http://${config.hostname}:${config.port}/auth/login/local`, body)
       .then((res) => {
         //alert(res.data.status);
         if (res.data.success) {
+          window.location.href = "http://localhost:3000/";
           // this.props.history.push('/');
+        } else {
+          alert('Wrong username or password')
         }
       });
   }

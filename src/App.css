@@ -637,7 +637,7 @@ App
 
 .close-icon {
   transition: all .3s ease;
-  z-index: 999;
+  z-index: 9;
 }
 .close-icon:hover {
   cursor: pointer;

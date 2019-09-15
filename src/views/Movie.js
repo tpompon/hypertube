@@ -22,7 +22,10 @@ class Movie extends React.Component {
       movie: {},
       user: {},
       comment: "",
-      heartbeat: false
+      heartbeat: false,
+      rating: 0,
+      ratingAverage: 0,
+      ratingCount: 0
     }
   }
 
@@ -49,12 +52,24 @@ class Movie extends React.Component {
     axios.get(`http://${config.hostname}:${config.port}/auth`)
     .then(res => {
       this.setState({ user: res.data.user });
-      axios.get(`http://${config.hostname}:${config.port}/movie/${this.props.match.params.id}/heartbeat`, { params: { uid: res.data.user.id } })
+      axios.get(`http://${config.hostname}:${config.port}/movie/${this.props.match.params.id}/heartbeat`, { params: { uid: res.data.user._id } })
       .then((res) => {
         if (res.data.success && res.data.found > 0) {
           this.setState({ heartbeat: true });
         }
       });
+      axios.get(`http://${config.hostname}:${config.port}/movie/${this.props.match.params.id}/ratings/${res.data.user._id}`)
+      .then(res => {
+        if (res.data.rating) {
+          this.setState({ rating: res.data.rating });
+        }
+      })
+      axios.get(`http://${config.hostname}:${config.port}/movie/${this.props.match.params.id}/ratings`)
+      .then(res => {
+        if (res.data.success) {
+          this.setState({ ratingAverage: res.data.ratingAverage, ratingCount: res.data.ratingCount });
+        }
+      })
     })
   }
 
@@ -74,22 +89,45 @@ class Movie extends React.Component {
     this.setState({comment: ""});
   }
 
+  updateRating = (value) => {
+    const { user } = this.state;
+    const newRating = {
+      uid: user._id,
+      rating: value
+    }
+    axios.post(`http://${config.hostname}:${config.port}/movie/${this.props.match.params.id}/ratings`, newRating)
+    .then(() => {
+      this.setState({ rating: value });
+      axios.get(`http://${config.hostname}:${config.port}/movie/${this.props.match.params.id}/ratings`)
+      .then(res => {
+        if (res.data.success) {
+          this.setState({ ratingAverage: res.data.ratingAverage, ratingCount: res.data.ratingCount });
+        }
+      })
+    })
+  }
+
   showPlayer = () => {
     const playerContainer = document.getElementsByClassName('player-container')[0];
+    const videoPlayer = document.getElementsByClassName('video-player')[0];
     playerContainer.style.display = 'block';
+    videoPlayer.play();
   }
   hidePlayer = () => {
     const playerContainer = document.getElementsByClassName('player-container')[0];
+    const videoPlayer = document.getElementsByClassName('video-player')[0];
     playerContainer.style.display = 'none';
+    videoPlayer.pause();
   }
 
   toggleHeartbeat = () => {
+    const { user } = this.state;
     this.setState({ heartbeat: !this.state.heartbeat }, () => {
       if (this.state.heartbeat) {
-        axios.post(`http://${config.hostname}:${config.port}/movie/${this.props.match.params.id}/heartbeat`, { uid: "5d682020d7bbba2a386edf74" }); // ipare ID (replace with logged user id)
+        axios.post(`http://${config.hostname}:${config.port}/movie/${this.props.match.params.id}/heartbeat`, { uid: user._id }); // ipare ID (replace with logged user id)
       } else {
         // Need data object for DELETE REQUEST cf. https://github.com/axios/axios/issues/736 (not working without)
-        axios.delete(`http://${config.hostname}:${config.port}/movie/${this.props.match.params.id}/heartbeat`, { data: { uid: "5d682020d7bbba2a386edf74" } }); // ipare ID (replace with logged user id)
+        axios.delete(`http://${config.hostname}:${config.port}/movie/${this.props.match.params.id}/heartbeat`, { data: { uid: user._id } }); // ipare ID (replace with logged user id)
       }
     });
   }
@@ -119,13 +157,14 @@ class Movie extends React.Component {
                       <div className="hr"></div>
                       <p>{(language === 'fr') ? movie.description_fr : movie.description_en}</p>
                       <Rating
-                        initialRating={0} // Put user notation
+                        onChange={(value) => this.updateRating(value)}
+                        initialRating={this.state.rating}
                         emptySymbol={<StarEmpty width="20" height="20" fill="#FFD700" />}
                         fullSymbol={<StarFull width="20" height="20" fill="#FFD700" />}
                         fractions={2}
                       />
                       <br />
-                      <span>{translations[language].movie.rating} - {movie.rating}</span>
+                      <span>{translations[language].movie.rating} - {this.state.ratingAverage} ({this.state.ratingCount})</span>
                     </div>
                     <span onClick={() => this.showPlayer()}><Button content={translations[language].movie.watch} /></span>
                     <div>
@@ -166,13 +205,14 @@ class Movie extends React.Component {
                   <div className="hr"></div>
                   <p>{(language === 'fr') ? movie.description_fr : movie.description_en}</p>
                   <Rating
-                    initialRating={0} // Put user notation
+                    onChange={(value) => this.updateRating(value)}
+                    initialRating={this.state.rating}
                     emptySymbol={<StarEmpty width="20" height="20" fill="#FFD700" />}
                     fullSymbol={<StarFull width="20" height="20" fill="#FFD700" />}
                     fractions={2}
                   />
                   <br />
-                  <span>{translations[language].movie.rating} - {movie.rating}</span>
+                  <span>{translations[language].movie.rating} - {this.state.ratingAverage} ({this.state.ratingCount})</span>
                 </div>
                 <Button content={translations[language].movie.watch} />
                 <div>
@@ -204,7 +244,7 @@ class Movie extends React.Component {
               <div className="player-container" style={{display: 'none', position: 'absolute', top: 100, width: '100%', backgroundColor: "black", height: '93vh'}}>
                 <div style={{position: 'relative', width: '100%', height: '100%'}}>
                   <span className="close-icon" onClick={() => this.hidePlayer()} style={{position: 'absolute', top: 25, right: 25}}><Close width="15" height="15" fill="#fff" /></span>
-                  <video width='100%' controls>
+                  <video className="video-player" width='100%' controls controlsList="nodownload">
                     <source
                       src="http://techslides.com/demos/sample-videos/small.mp4"
                       type="video/mp4"
