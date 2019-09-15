@@ -25,7 +25,8 @@ class Movie extends React.Component {
       heartbeat: false,
       rating: 0,
       ratingAverage: 0,
-      ratingCount: 0
+      ratingCount: 0,
+      moviePath: 'https://file-examples.com/wp-content/uploads/2017/04/file_example_MP4_1280_10MG.mp4'
     }
   }
 
@@ -47,6 +48,16 @@ class Movie extends React.Component {
           }
         });
         // Remove les Events Listener dans le WillUnmount - sinon Memory Leaks -
+        axios.get(`http://${config.hostname}:${config.port}/torrents/download/${this.state.movie.name_fr}`)
+        .then(res => {
+          this.setState({ moviePath: res.data.moviePath });
+          console.log(this.state.moviePath)
+          setTimeout(() => {
+            const videoPlayer = document.getElementsByClassName('video-player')[0];
+            videoPlayer.load();
+            alert('loaded');
+          }, 1000);
+        })
       }
     })
     axios.get(`http://${config.hostname}:${config.port}/auth`)
@@ -245,10 +256,14 @@ class Movie extends React.Component {
                 <div style={{position: 'relative', width: '100%', height: '100%'}}>
                   <span className="close-icon" onClick={() => this.hidePlayer()} style={{position: 'absolute', top: 25, right: 25}}><Close width="15" height="15" fill="#fff" /></span>
                   <video className="video-player" width='100%' controls controlsList="nodownload">
-                    <source
-                      src="http://techslides.com/demos/sample-videos/small.mp4"
-                      type="video/mp4"
-                    />
+                  {
+                    this.state.moviePath ? (
+                        <source
+                          src={this.state.moviePath}
+                          type="video/mp4"
+                        />
+                    ) : null
+                  }
                   </video>
                 </div>
               </div>

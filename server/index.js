@@ -182,13 +182,20 @@ api.route('/torrents/download/:search')
     movieArt(req.params.search, (error, response) => {
       const engine = torrentStream(searchResults[0].magnetLink);
 
-      engine.on('ready', (moviePath) => {
-          engine.files.forEach((file) => {
-              // console.log('filename:', file.name);
-              let stream = file.createReadStream();
-              let writeStream = fs.createWriteStream(`./torrents/${req.params.search}${path.extname(file.name)}`);
+      engine.on('download', (piece) => {
+        console.log(piece)
+      })
+
+      engine.on('ready', () => {
+          engine.files.forEach(async (file) => {
+            if (path.extname(file.name) === '.mp4' || path.extname(file.name) === '.mkv' || path.extname(file.name) === '.avi') {
+              let stream = await file.createReadStream();
+              let writeStream = await fs.createWriteStream(`./torrents/${req.params.search}${path.extname(file.name)}`);
               stream.pipe(writeStream);
-  
+
+              console.log('filename:', file.name);
+              res.json({ poster: response, result: searchResults[0], moviePath: `http://${hostname}:${port}/torrents/${req.params.search}${path.extname(file.name)}` });
+
               writeStream.on('finish', () => {
                 console.log(writeStream.path);
                 console.log("Write completed.");
@@ -196,9 +203,9 @@ api.route('/torrents/download/:search')
               writeStream.on('error', (err) => {
                 console.log(err.stack);
               });
+            }
           });
       });
-      res.json({ poster: response, result: searchResults[0] });
     });
   } else {
     res.json({ success: false });
