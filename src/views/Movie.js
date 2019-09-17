@@ -48,16 +48,18 @@ class Movie extends React.Component {
           }
         });
         // Remove les Events Listener dans le WillUnmount - sinon Memory Leaks -
-        axios.get(`http://${config.hostname}:${config.port}/torrents/download/${this.state.movie.name_fr}`)
-        .then(res => {
-          this.setState({ moviePath: res.data.moviePath });
-          console.log(this.state.moviePath)
-          setTimeout(() => {
-            const videoPlayer = document.getElementsByClassName('video-player')[0];
-            videoPlayer.load();
-            alert('loaded');
-          }, 1000);
-        })
+
+        // Download torrent and display
+        // axios.get(`http://${config.hostname}:${config.port}/torrents/download/${this.state.movie.name_fr}`)
+        // .then(res => {
+        //   this.setState({ moviePath: res.data.moviePath });
+        //   console.log(this.state.moviePath)
+        //   setTimeout(() => {
+        //     const videoPlayer = document.getElementsByClassName('video-player')[0];
+        //     videoPlayer.load();
+        //     alert('loaded');
+        //   }, 1000);
+        // })
       }
     })
     axios.get(`http://${config.hostname}:${config.port}/auth`)

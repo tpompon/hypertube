@@ -124,9 +124,11 @@ class Profile extends React.Component {
       const data = new FormData();
       data.append('file', e.target.files[0]);
       data.append('filename', e.target.files[0].name);
-      axios.post(`http://${config.hostname}:${config.port}/avatar/${user.username}`, data)
+      axios.post(`http://${config.hostname}:${config.port}/user/${user.username}/avatar`, data)
       .then((res) => {
-        this.setState({ user: { ...this.state.user, avatar: `http://${config.hostname}:${config.port}/${res.data.file}` }});
+        if (res.data.success) {
+          this.setState({ user: { ...this.state.user, avatar: `http://${config.hostname}:${config.port}/${res.data.file}` }});
+        }
       });
     }
   }
