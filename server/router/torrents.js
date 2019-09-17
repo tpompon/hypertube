@@ -7,22 +7,51 @@ const movieArt = require('movie-art');
 const path = require('path');
 const fs = require('fs');
 
+const request = require('request');
+
 const config = require('../config');
 
-router.route('/:search')
+router.route('/yts/:search')
 .get(async (req, res) => {
-	const searchResults = await PirateBay.search(req.params.search, {
-		orderBy: 'seeds',
-		sortBy: 'desc'
-	}).catch((err) => console.log(err));
-	if (searchResults.length > 0) {
-		movieArt(req.params.search, (error, response) => {
-			res.json({ success: true, poster: response, results: searchResults });
-		});
-	} else {
-		res.json({ success: false });
-	}
+	request.get({url: `https://yts.lt/api/v2/list_movies.json?query_term=${req.params.search}`}, (err, results, body) => {
+		if (err) {
+			res.json({ success: false });
+		} else {
+			const searchResults = JSON.parse(body);
+			if (searchResults.status === 'ok' && searchResults.data.movie_count !== 0) {
+
+				let movies = [];
+				searchResults.data.movies.forEach((movie) => {
+					movie.torrents.forEach((torrent) => {
+						torrent.magnet = `magnet:?xt=urn:btih:${movie.torrents[0].hash}&dn=${encodeURI(movie.title)}&tr=http://track.one:1234/announce&tr=udp://track.two:80`;
+						torrent.magnet2 = `magnet:?xt=urn:btih:${movie.torrents[0].hash}&dn=${encodeURI(movie.title)}&tr=http://track.one:1234/announce&tr=udp://tracker.openbittorrent.com:80`;
+					})
+				})
+
+				res.json({ success: true, count: searchResults.data.movie_count, results: searchResults });
+			} else if (searchResults.data.movie_count === 0) {
+				res.json({ success: true, count: 0 });
+			} else {
+				res.json({ success: false });
+			}
+		}
+	})
 })
+
+// router.route('/piratebay/:search')
+// .get(async (req, res) => {
+// 	const searchResults = await PirateBay.search(req.params.search, {
+// 		orderBy: 'seeds',
+// 		sortBy: 'desc'
+// 	}).catch((err) => console.log(err));
+// 	if (searchResults.length > 0) {
+// 		movieArt(req.params.search, (error, response) => {
+// 			res.json({ success: true, poster: response, results: searchResults });
+// 		});
+// 	} else {
+// 		res.json({ success: false });
+// 	}
+// })
 
 router.route('/download/:search')
 .get(async (req, res) => {

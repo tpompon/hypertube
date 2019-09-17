@@ -4,6 +4,9 @@ import config from './config'
 import './App.css';
 import Header from './components/Header'
 import Footer from './components/Footer'
+
+import Test from './views/Test'
+
 import Movie from './views/Movie'
 import MoviesList from './views/MoviesList'
 import Profile from './views/Profile'
@@ -74,6 +77,9 @@ class App extends React.Component {
                   )}/>
                   <Route exact path='/register' component={() => <Register language={language} />} />
                   <Route exact path='/login' component={() => <Login language={language} />} />
+
+                  <Route exact path='/test' component={() => <Test language={language} />} />
+
                   <Route component={() => <NotFound language={language} />} />
                 </Switch>
               ) : (

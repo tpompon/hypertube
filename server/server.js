@@ -29,16 +29,15 @@ passport.use(new LocalStrategy(
     });
   }
 ));
-
-const app = express();
-
-// Passport
 passport.serializeUser(function(user, done) {
   done(null, user);
 });
 passport.deserializeUser(function(user, done) {
   done(null, user);
 });
+
+const app = express();
+
 app.use(session({
   genid: (req) => {
     console.log(`${req.method} Request from client - SESSION_ID: ${req.sessionID}`)
@@ -53,7 +52,6 @@ app.use(session({
 }))
 app.use(passport.initialize());
 app.use(passport.session());
-
 app.use(cors({
   origin:[`http://${config.client.host}:${config.client.port}`], // front end
   credentials: true // enable set cookie
