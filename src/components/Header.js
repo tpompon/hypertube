@@ -85,20 +85,20 @@ class Header extends React.Component {
   }
 
   closeMenus = () => {
-    if (this.state._isAuth) {
-      const avatarDropdown = document.getElementsByClassName('avatar-dropdown')[0];
-      avatarDropdown.style.display = "none";
+    // if (this.state._isAuth) {
+    //   const avatarDropdown = document.getElementsByClassName('avatar-dropdown')[0];
+    //   avatarDropdown.style.display = "none";
   
-      const searchBarExtended = document.getElementsByClassName('search-bar-extended')[0];
-      const searchBarExtendedLowRes = document.getElementsByClassName('search-bar-extended')[1];
-      const searchBar = document.getElementsByClassName('search-bar')[0];
-      const searchBarCollapse = document.getElementsByClassName('search-bar-collapse')[0];
+    //   const searchBarExtended = document.getElementsByClassName('search-bar-extended')[0];
+    //   const searchBarExtendedLowRes = document.getElementsByClassName('search-bar-extended')[1];
+    //   const searchBar = document.getElementsByClassName('search-bar')[0];
+    //   const searchBarCollapse = document.getElementsByClassName('search-bar-collapse')[0];
   
-      searchBar.style.borderRadius = '20px 20px 20px 20px'
-      searchBarCollapse.style.borderRadius = '0px 0px 0px 0px'
-      searchBarExtended.style.display = 'none';
-      searchBarExtendedLowRes.style.display = 'none';
-    }
+    //   searchBar.style.borderRadius = '20px 20px 20px 20px'
+    //   searchBarCollapse.style.borderRadius = '0px 0px 0px 0px'
+    //   searchBarExtended.style.display = 'none';
+    //   searchBarExtendedLowRes.style.display = 'none';
+    // }
   }
 
   handleSearch = (event) => {

@@ -11,7 +11,7 @@ const request = require('request');
 
 const config = require('../config');
 
-router.route('/yts/:search')
+router.route('/yts/search/:search')
 .get(async (req, res) => {
 	request.get({url: `https://yts.lt/api/v2/list_movies.json?query_term=${req.params.search}`}, (err, results, body) => {
 		if (err) {
@@ -34,6 +34,18 @@ router.route('/yts/:search')
 			} else {
 				res.json({ success: false });
 			}
+		}
+	})
+})
+
+router.route('/yts/:id')
+.get((req, res) => {
+	request.get({ url: `https://yts.lt/api/v2/movie_details.json?movie_id=${req.params.id}&with_images=true&with_cast=true`}, (err, results, body) => {
+		if (err) {
+			res.json({ success: false });
+		} else {
+			const movieInfos = JSON.parse(body);
+			res.json({ success: true, result: movieInfos });
 		}
 	})
 })

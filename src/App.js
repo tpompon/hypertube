@@ -6,6 +6,7 @@ import Header from './components/Header'
 import Footer from './components/Footer'
 
 import Test from './views/Test'
+import MovieYTS from './views/MovieYTS'
 
 import Movie from './views/Movie'
 import MoviesList from './views/MoviesList'
@@ -78,7 +79,8 @@ class App extends React.Component {
                   <Route exact path='/register' component={() => <Register language={language} />} />
                   <Route exact path='/login' component={() => <Login language={language} />} />
 
-                  <Route exact path='/test' component={() => <Test language={language} />} />
+                  <Route exact path='/test' component={() => <Test search={search} language={language} />} />
+                  <Route exact path='/watchyts/:id' component={(match) => <MovieYTS {...match} language={language} />} />
 
                   <Route component={() => <NotFound language={language} />} />
                 </Switch>

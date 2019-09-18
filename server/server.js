@@ -247,15 +247,12 @@ api.route('/movie/:id/ratings')
 })
 .post((req, res) => {
   const newRating = { uid: req.body.uid, rating: req.body.rating };
-  console.log(newRating);
-  console.log(req.params.id);
 
   Movie.findOne({ _id: req.params.id, 'ratings.uid': req.body.uid }, (err, result) => {
     if (err) {
       console.log(err);
       res.json({ success: false });
     } else if (result) {
-      console.log(result)
       Movie.update({_id: req.params.id, 'ratings.uid': req.body.uid}, {'$set': {
         'ratings.$.rating': req.body.rating
       }}, (err) => {
