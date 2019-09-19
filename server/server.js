@@ -227,7 +227,6 @@ api.route('/movie/:id/comments')
   });
 })
 
-
 // Movies ratings
 api.route('/movie/:id/ratings')
 .get((req, res) => {

@@ -26,44 +26,45 @@ class Header extends React.Component {
         axios.get(`http://${config.hostname}:${config.port}/user/${res.data.user.username}`)
         .then(res => {
           if (res.data.success) {
-            this.setState({_isAuth: true, user: res.data.user[0]});
-          }
-        });
-        axios.get(`http://${config.hostname}:${config.port}/movies`)
-        .then(res => {
-          if (res.data.success)
-            this.setState({movies: res.data.movies}, () => {
-              const showSearchBar = document.getElementsByClassName('show-search-bar')[0];
-              const searchBarCollapse = document.getElementsByClassName('search-bar-collapse')[0];
-              const avatar = document.getElementsByClassName('avatar')[0];
-              const avatarDropdown = document.getElementsByClassName('avatar-dropdown')[0];
-          
-              document.onclick = (e) => {
-                if (e.target.classList[0] !== 'avatar-dropdown' && e.target.classList[0] !== 'avatar-dropdown-item') {
-                  if (e.target.classList[0] !== 'avatar') {
-                    this.closeMenus();
-                  }
-                } else if (e.target.classList[0] !== 'input-search-bar') {
-                  this.closeMenus();
-                }
-              };
-          
-              showSearchBar.addEventListener("click", () => {
-                if (searchBarCollapse.style.display === "block") {
-                  searchBarCollapse.style.display = "none";
-                } else {
-                  searchBarCollapse.style.display = "block";
-                }
-              }, false);
-          
-              avatar.addEventListener("click", () => {
-                if (avatarDropdown.style.display === "block") {
-                  avatarDropdown.style.display = "none";
-                } else {
-                  avatarDropdown.style.display = "block";
-                }
-              }, false);
+            this.setState({_isAuth: true, user: res.data.user[0]}, () => {
+              axios.get(`http://${config.hostname}:${config.port}/movies`)
+              .then(res => {
+                if (res.data.success)
+                  this.setState({movies: res.data.movies}, () => {
+                    const showSearchBar = document.getElementsByClassName('show-search-bar')[0];
+                    const searchBarCollapse = document.getElementsByClassName('search-bar-collapse')[0];
+                    const avatar = document.getElementsByClassName('avatar')[0];
+                    const avatarDropdown = document.getElementsByClassName('avatar-dropdown')[0];
+                
+                    document.onclick = (e) => {
+                      if (e.target.classList[0] !== 'avatar-dropdown' && e.target.classList[0] !== 'avatar-dropdown-item') {
+                        if (e.target.classList[0] !== 'avatar') {
+                          this.closeMenus();
+                        }
+                      } else if (e.target.classList[0] !== 'input-search-bar') {
+                        this.closeMenus();
+                      }
+                    };
+                
+                    showSearchBar.addEventListener("click", () => {
+                      if (searchBarCollapse.style.display === "block") {
+                        searchBarCollapse.style.display = "none";
+                      } else {
+                        searchBarCollapse.style.display = "block";
+                      }
+                    }, false);
+                
+                    avatar.addEventListener("click", () => {
+                      if (avatarDropdown.style.display === "block") {
+                        avatarDropdown.style.display = "none";
+                      } else {
+                        avatarDropdown.style.display = "block";
+                      }
+                    }, false);
+                  });
+              });
             });
+          }
         });
       }
     });

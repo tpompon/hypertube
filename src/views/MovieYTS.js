@@ -33,6 +33,28 @@ class MovieYTS extends React.Component {
       this.setState({movie: res.data.result.data.movie, _isLoaded: true}, () => {
 
         // Add movie to database if doesn't already exist in
+        if (this.state.movie.title) {
+          axios.get(`http://${config.hostname}:${config.port}/movies/${this.state.movie.id}`)
+          .then((res) => {
+            if (!res.data.success) {
+              const { movie } = this.state;
+              const newMovie = {
+                ytsId: movie.id,
+                name_fr: movie.title,
+                name_en: movie.title,
+                poster: movie.large_cover_image,
+                description_fr: movie.description_full,
+                description_en: movie.description_full,
+                author: 'Someone',
+                rating: movie.rating / 2
+              }
+              axios.post(`${config.serverURL}/movies`, newMovie)
+              .then((res) => {
+                console.log(res.data);
+              })
+            }
+          })
+        }
 
         document.addEventListener('keydown', (e) => {
           var key = e.which || e.keyCode;
@@ -42,6 +64,10 @@ class MovieYTS extends React.Component {
         });
       })
     })
+  }
+
+  componentWillUnmount() {
+    // Remove events listeners
   }
 
   showPlayer = () => {
@@ -97,7 +123,7 @@ class MovieYTS extends React.Component {
     return (
       <div>
         {
-          (movie && _isLoaded)
+          (movie.title && _isLoaded)
           ? (
             <div>
               <div className="movie-page">
@@ -118,7 +144,7 @@ class MovieYTS extends React.Component {
                         {
                           movie.cast.map((person) => {
                             return (
-                              <a className="pointer" href={`https://www.imdb.com/name/nm${person.imdb_code}`} target="_blank">
+                              <a className="pointer" href={`https://www.imdb.com/name/nm${person.imdb_code}`} target="_blank" key={person.name}>
                                 <img style={{ width: 75, height: 75, objectFit: 'cover', borderRadius: '50%', marginRight: -20 }} src={person.url_small_image ? person.url_small_image : `http://${config.hostname}:${config.port}/public/avatars/default_avatar.png`} alt={person.name} />
                               </a>
                             )
@@ -127,7 +153,7 @@ class MovieYTS extends React.Component {
                       </div>
                       <Rating
                         onChange={(value) => this.updateRating(value)}
-                        initialRating={this.state.rating}
+                        initialRating={rating}
                         emptySymbol={<StarEmpty width="30" height="30" fill="#FFD700" />}
                         fullSymbol={<StarFull width="30" height="30" fill="#FFD700" />}
                         fractions={2}
@@ -176,7 +202,7 @@ class MovieYTS extends React.Component {
                   <p>{movie.description_full}</p>
                   <Rating
                     onChange={(value) => this.updateRating(value)}
-                    initialRating={this.state.rating}
+                    initialRating={rating}
                     emptySymbol={<StarEmpty width="30" height="30" fill="#FFD700" />}
                     fullSymbol={<StarFull width="30" height="30" fill="#FFD700" />}
                     fractions={2}
@@ -231,16 +257,8 @@ class MovieYTS extends React.Component {
             </div>
           )
           : (
-            <div>
-            {
-              (!movie) ? (
-                <div style={{ color: 'white', textAlign: 'center' }}>
-                  {translations[language].movie.noResults}
-                </div>
-              ) : (
-                <Loading />
-              )
-            }
+            <div style={{ color: 'white', textAlign: 'center' }}>
+              {translations[language].movie.noResults}
             </div>
           )
         }

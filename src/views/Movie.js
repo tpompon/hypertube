@@ -36,13 +36,13 @@ class Movie extends React.Component {
     .then(() => {
       if (this.state.movie) {
         document.querySelector('.comment-input').addEventListener('keypress', (e) => {
-          var key = e.which || e.keyCode;
+          const key = e.which || e.keyCode;
           if (key === 13) {
             this.refs.reviewSubmit.click();
           }
         });
         document.addEventListener('keydown', (e) => {
-          var key = e.which || e.keyCode;
+          const key = e.which || e.keyCode;
           if (key === 27) {
             this.hidePlayer();
           }

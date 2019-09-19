@@ -14,10 +14,12 @@ router.route('/')
 	});
 })
 .post((req, res) => {
+
 	const newMovie = Movie({
+    _ytsId: req.body.ytsId,
 		name_fr: req.body.name_fr, 
 		name_en: req.body.name_en, 
-		poster: `/posters/${req.body.poster}`,
+		poster: req.body.poster,
 		description_fr: req.body.description_fr,
 		description_en: req.body.description_en,
 		author: req.body.author,
@@ -26,7 +28,7 @@ router.route('/')
 
 	newMovie.save((err) => {
 		if (err)
-			res.json({ success: false });
+			res.json({ success: false, error: err });
 		else
 			res.json({ success: true, movie: newMovie });
 	});

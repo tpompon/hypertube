@@ -67,6 +67,7 @@ class Test extends React.Component {
           {
             movies.map((movie) => {
                 return (
+                  // If doesn't exist in db create it and redirect on /watch/_id
                   <Link to={`/watchyts/${movie.id}`} key={`movie-${movie.slug}`}>
                     <Poster movie={movie} language={language} />
                   </Link>
