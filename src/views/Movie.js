@@ -35,6 +35,7 @@ class Movie extends React.Component {
     .then(res => this.setState({movie: res.data.movie[0], loaded: true}))
     .then(() => {
       if (this.state.movie) {
+        console.log(this.state.movie)
         document.querySelector('.comment-input').addEventListener('keypress', (e) => {
           const key = e.which || e.keyCode;
           if (key === 13) {
@@ -162,6 +163,7 @@ class Movie extends React.Component {
                     <div className="movie-infos" style={{marginBottom: 20}}>
                       <div className="row" style={{ alignItems: 'center' }}>
                         <h1>{(language === 'fr') ? movie.name_fr : movie.name_en}</h1>
+                        <span style={{marginTop: 10, marginLeft: 10}}>({movie.ytsData.year})</span>
                         <div className="tooltip toggle-heartbeat" onClick={() => this.toggleHeartbeat()}>
                           {(heartbeat) ? <RemoveFav width="25" height="25" fill="crimson" /> : <AddFav width="25" height="25" fill="crimson" />}
                           <span className="tooltip-text">{(heartbeat) ? translations[language].movie.tooltip.heartbeatRemove : translations[language].movie.tooltip.heartbeatAdd}</span>
@@ -169,11 +171,22 @@ class Movie extends React.Component {
                       </div>
                       <div className="hr"></div>
                       <p>{(language === 'fr') ? movie.description_fr : movie.description_en}</p>
+                      <div className="cast row">
+                        {
+                          movie.ytsData.cast.map((person) => {
+                            return (
+                              <a className="pointer" href={`https://www.imdb.com/name/nm${person.imdb_code}`} target="_blank" key={person.name}>
+                                <img style={{ width: 75, height: 75, objectFit: 'cover', borderRadius: '50%', marginRight: -20 }} src={person.url_small_image ? person.url_small_image : `http://${config.hostname}:${config.port}/public/avatars/default_avatar.png`} alt={person.name} />
+                              </a>
+                            )
+                          })
+                        }
+                      </div>
                       <Rating
                         onChange={(value) => this.updateRating(value)}
                         initialRating={this.state.rating}
-                        emptySymbol={<StarEmpty width="20" height="20" fill="#FFD700" />}
-                        fullSymbol={<StarFull width="20" height="20" fill="#FFD700" />}
+                        emptySymbol={<StarEmpty width="30" height="30" fill="#FFD700" />}
+                        fullSymbol={<StarFull width="30" height="30" fill="#FFD700" />}
                         fractions={2}
                       />
                       <br />
@@ -211,17 +224,29 @@ class Movie extends React.Component {
                   <img className="movie-page-poster-lowres" src={movie.poster} style={{ width: '100%' }} alt="poster" />
                   <div className="row" style={{ alignItems: 'center' }}>
                     <h1>{(language === 'fr') ? movie.name_fr : movie.name_en}</h1>
+                    <span style={{marginTop: 10, marginLeft: 10}}>({movie.ytsData.year})</span>
                     <div className="toggle-heartbeat" onClick={() => this.toggleHeartbeat()}>
                       {(heartbeat) ? <RemoveFav width="25" height="25" fill="crimson" /> : <AddFav width="25" height="25" fill="crimson" />}
                     </div>
                   </div>
                   <div className="hr"></div>
                   <p>{(language === 'fr') ? movie.description_fr : movie.description_en}</p>
+                  <div className="cast row">
+                    {
+                      movie.ytsData.cast.map((person) => {
+                        return (
+                          <a className="pointer" href={`https://www.imdb.com/name/nm${person.imdb_code}`} target="_blank" key={person.name}>
+                            <img style={{ width: 75, height: 75, objectFit: 'cover', borderRadius: '50%', marginRight: -20 }} src={person.url_small_image ? person.url_small_image : `http://${config.hostname}:${config.port}/public/avatars/default_avatar.png`} alt={person.name} />
+                          </a>
+                        )
+                      })
+                    }
+                  </div>
                   <Rating
                     onChange={(value) => this.updateRating(value)}
                     initialRating={this.state.rating}
-                    emptySymbol={<StarEmpty width="20" height="20" fill="#FFD700" />}
-                    fullSymbol={<StarFull width="20" height="20" fill="#FFD700" />}
+                    emptySymbol={<StarEmpty width="30" height="30" fill="#FFD700" />}
+                    fullSymbol={<StarFull width="30" height="30" fill="#FFD700" />}
                     fractions={2}
                   />
                   <br />

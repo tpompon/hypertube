@@ -5,7 +5,7 @@ import Poster from '../components/Poster2'
 import Loading from '../components/Loading'
 import { Link } from "react-router-dom";
 
-class Test extends React.Component {
+class Search extends React.Component {
 
   constructor(props) {
     super(props);
@@ -51,8 +51,36 @@ class Test extends React.Component {
     }
   }
 
-  componentWillReceiveProps() {
-    alert('received')
+  checkDatabase = (ytsID) => {
+    axios.get(`http://${config.hostname}:${config.port}/movies/yts/${ytsID}`)
+    .then((res) => {
+      if (!res.data.success) {
+        axios.get(`http://${config.hostname}:${config.port}/torrents/yts/${ytsID}`)
+        .then((res) => {
+          const movie = res.data.result.data.movie;
+          const newMovie = {
+            ytsId: movie.id,
+            name_fr: movie.title,
+            name_en: movie.title,
+            poster: movie.large_cover_image,
+            ytsData: movie,
+            description_fr: movie.description_full,
+            description_en: movie.description_full,
+            author: 'Someone',
+            rating: movie.rating / 2
+          }
+          axios.post(`${config.serverURL}/movies`, newMovie)
+          .then((res) => {
+            if (res.data.success)
+              this.props.history.push(`/watch/${res.data.movie._id}`);
+            else
+              alert('Could not create entry in Database for this movie');
+          })
+        });
+      } else {
+        this.props.history.push(`/watch/${res.data.movie._id}`);
+      }
+    })
   }
 
   render() {
@@ -66,11 +94,14 @@ class Test extends React.Component {
           <div className="posters-list row wrap">
           {
             movies.map((movie) => {
+                if (!movie.large_cover_image)
+                  movie.large_cover_image = 'http://story-one.com/wp-content/uploads/2016/02/Poster_Not_Available2.jpg';
                 return (
                   // If doesn't exist in db create it and redirect on /watch/_id
-                  <Link to={`/watchyts/${movie.id}`} key={`movie-${movie.slug}`}>
-                    <Poster movie={movie} language={language} />
-                  </Link>
+                  // <Link to={`/watchyts/${movie.id}`} key={`movie-${movie.slug}`}>
+                  //   <Poster movie={movie} language={language} />
+                  // </Link>
+                  <div onClick={() => this.checkDatabase(movie.id)}><Poster movie={movie} language={language} /></div>
                 )
             })
           }
@@ -116,4 +147,4 @@ class Test extends React.Component {
   }
 }
 
-export default Test;
+export default Search;

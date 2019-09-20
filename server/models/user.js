@@ -20,6 +20,8 @@ const UserSchema = new Schema({
   city: String,
   country: String,
   verified: Boolean,
+  confirmKey: String,
+  resetKey: String,
   created_at: Date,
   updated_at: Date
 });

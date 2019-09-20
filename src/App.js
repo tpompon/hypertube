@@ -5,8 +5,7 @@ import './App.css';
 import Header from './components/Header'
 import Footer from './components/Footer'
 
-import Test from './views/Test'
-import MovieYTS from './views/MovieYTS'
+import Search from './views/Search'
 
 import Movie from './views/Movie'
 import MoviesList from './views/MoviesList'
@@ -58,8 +57,8 @@ class App extends React.Component {
             {
               _isLoaded ? (
                 <Switch>
-                  <Route exact path='/' component={() => (
-                    _isAuth ? <MoviesList search={search} language={language} /> : <Redirect to="/login" />
+                  <Route exact path='/' component={(props) => (
+                    _isAuth ? <MoviesList {...props} search={search} language={language} /> : <Redirect to="/login" />
                   )}/>
                   <Route exact path='/watch/:id' component={(match) => (
                     _isAuth ? <Movie {...match} language={language} /> : <Redirect to="/login" />
@@ -67,20 +66,25 @@ class App extends React.Component {
                   <Route exact path='/user/:username' component={(match) => (
                     _isAuth ? <User {...match} language={language} /> : <Redirect to="/login" />
                   )}/>
-                  <Route exact path='/profile' component={() => (
-                    _isAuth ? <Profile language={language} /> : <Redirect to="/login" />
+                  <Route exact path='/profile' component={(props) => (
+                    _isAuth ? <Profile {...props} language={language} /> : <Redirect to="/login" />
                   )}/>
-                  <Route exact path='/settings' component={() => (
-                    _isAuth ? <Settings language={language} /> : <Redirect to="/login" />
+                  <Route exact path='/settings' component={(props) => (
+                    _isAuth ? <Settings {...props} language={language} /> : <Redirect to="/login" />
                   )}/>
-                  <Route exact path='/logout' component={() => (
-                    _isAuth ? <Logout language={language} /> : <Redirect to="/login" />
+                  <Route exact path='/logout' component={(props) => (
+                    _isAuth ? <Logout {...props} language={language} /> : <Redirect to="/login" />
                   )}/>
-                  <Route exact path='/register' component={() => <Register language={language} />} />
-                  <Route exact path='/login' component={() => <Login language={language} />} />
+                  <Route exact path='/register' component={(props) => (
+                    _isAuth ? <Redirect to ="/" /> : <Register {...props} language={language} />
+                  )}/>
+                  <Route exact path='/login' component={(props) => (
+                    _isAuth ? <Redirect to ="/" /> : <Login {...props} language={language} />
+                  )}/>
 
-                  <Route exact path='/test' component={() => <Test search={search} language={language} />} />
-                  <Route exact path='/watchyts/:id' component={(match) => <MovieYTS {...match} language={language} />} />
+                  <Route exact path='/search' component={(props) => (
+                    _isAuth ? <Search {...props} search={search} language={language} /> : <Redirect to="/login" />
+                  )}/>
 
                   <Route component={() => <NotFound language={language} />} />
                 </Switch>

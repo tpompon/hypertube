@@ -23,7 +23,7 @@ class Header extends React.Component {
     axios.get(`http://${config.hostname}:${config.port}/auth`)
     .then(res => {
       if (res.data.auth) {
-        axios.get(`http://${config.hostname}:${config.port}/user/${res.data.user.username}`)
+        axios.get(`http://${config.hostname}:${config.port}/user/${res.data.user._id}`)
         .then(res => {
           if (res.data.success) {
             this.setState({_isAuth: true, user: res.data.user[0]}, () => {

@@ -19,7 +19,8 @@ router.route('/')
     _ytsId: req.body.ytsId,
 		name_fr: req.body.name_fr, 
 		name_en: req.body.name_en, 
-		poster: req.body.poster,
+    poster: req.body.poster,
+    ytsData: req.body.ytsData,
 		description_fr: req.body.description_fr,
 		description_en: req.body.description_en,
 		author: req.body.author,
@@ -39,8 +40,10 @@ router.route('/:id')
   Movie.find({ _id: req.params.id }, (err, movie) => {
     if (err)
       res.json({ success: false });
-    else
+    else if (movie.length !== 0)
       res.json({ success: true, movie: movie });
+    else
+      res.json({ success: false });
   });
 })
 .put((req, res) => {
@@ -76,5 +79,18 @@ router.route('/:id')
       res.json({ success: true });
   });
 });
+
+router.route('/yts/:id')
+.get((req, res) => {
+  Movie.findOne({ _ytsId: req.params.id }, (err, movie) => {
+    if (err)
+      res.json({ success: false, err: err });
+    else if (movie && movie.length !== 0) {
+      res.json({ success: true, movie: movie });
+    } else {
+      res.json({ success: false });
+    }
+  });
+})
 
 module.exports = router;

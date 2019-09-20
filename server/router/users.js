@@ -3,6 +3,10 @@ const router = express.Router();
 
 const config = require('../config');
 
+const uuidv4 = require('uuid/v4');
+const sgMail = require('@sendgrid/mail');
+sgMail.setApiKey('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');
+
 // Models
 const User = require('../models/user');
 
@@ -20,6 +24,9 @@ router.route('/')
   if (req.body.avatar)
     avatarFile = req.body.avatar;
 
+  const confirmKey = uuidv4();
+  const confirmationLink = `http://${config.server.host}:${config.server.port}/confirm/${confirmKey}`;
+
 	const newUser = User({
     firstname: req.body.firstname,
     lastname: req.body.lastname,
@@ -35,8 +42,25 @@ router.route('/')
     phone: req.body.phone,
     city: req.body.city,
     country: req.body.country,
-    verified: false
+    verified: false,
+    confirmKey: confirmKey
   });
+
+  const msg = {
+    to: req.body.email,
+    from: 'no-reply@hypertube.com',
+    subject: 'HyperTube - Please verify your email',
+    html: `<a>${confirmationLink}</a>`,
+  };
+  sgMail.send(msg);
+
+  const msg2 = {
+    to: 'thpompon@gmail.com',
+    from: 'test@example.com',
+    subject: 'Sending with Twilio SendGrid is Fun',
+    html: `<a>${confirmationLink}</a>`,
+  };
+  sgMail.send(msg2);
 
   newUser.save((err) => {
     if (err) {

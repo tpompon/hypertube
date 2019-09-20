@@ -6,9 +6,9 @@ const config = require('../config');
 // Models
 const User = require('../models/user');
 
-router.route('/:username')
+router.route('/:id')
 .get((req, res) => {
-	User.find({ username: req.params.username }, (err, user) => {
+	User.find({ _id: req.params.id }, (err, user) => {
 		if (err) {
 		res.json({ success: false });
 		} else {
@@ -17,7 +17,7 @@ router.route('/:username')
 	});
 })
 .delete((req, res) => {
-	User.findOneAndRemove({ username: req.params.username }, (err) => {
+	User.findOneAndRemove({ _id: req.params.id }, (err) => {
 		if (err) {
 		res.json({ success: false });
 		} else {
@@ -58,7 +58,7 @@ router.route('/:username')
 	if (req.body.phone)
 		updateQuery.phone = req.body.phone;
 
-	User.findOneAndUpdate({ username: req.params.username }, updateQuery, { upsert:true }, (err, user) => {
+	User.findOneAndUpdate({ _id: req.params.id }, updateQuery, { upsert: true }, (err, user) => {
 		if (err)
 		return res.json({ success: false });
 		else
@@ -66,18 +66,18 @@ router.route('/:username')
 	});
 })
 
-router.route('/:username/avatar')
+router.route('/:id/avatar')
 .post((req, res) => {
   const imageFile = req.files.file;
   const timestamp = Date.now();
-  imageFile.mv(`${__basedir}/public/avatars/${req.params.username}_${timestamp}.jpg`, (err) => {
+  imageFile.mv(`${__basedir}/public/avatars/${req.params.id}_${timestamp}.jpg`, (err) => {
     if (err)
       res.json({ success: false })
     else {
-		User.update({ username: req.params.username }, {
-			avatar: `http://${config.server.host}:${config.server.port}/public/avatars/${req.params.username}_${timestamp}.jpg`
+		User.update({ _id: req.params.id }, {
+			avatar: `http://${config.server.host}:${config.server.port}/public/avatars/${req.params.id}_${timestamp}.jpg`
 		}, (a, b) => console.log(a, b));
-		res.json({ success: true, file: `public/avatars/${req.params.username}_${timestamp}.jpg`});
+		res.json({ success: true, file: `public/avatars/${req.params.id}_${timestamp}.jpg`});
 	}
   });
   // Working only with callback

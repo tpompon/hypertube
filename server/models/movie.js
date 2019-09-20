@@ -7,9 +7,11 @@ const MovieSchema = new Schema({
 	name_en: { type: String, required: true },
 	description_fr: { type: String, required: true },
 	description_en: { type: String, required: true },
-	path: String,
+	ytsData: {},
+	torrentPath: String,
 	poster: String,
 	author: String,
+	genres: [String],
 	ratings: [{
 		uid: String,
 		rating: Number

@@ -58,8 +58,8 @@ class Settings extends React.Component {
   }
 
   handleSubmit = () => {
-    axios.put(`http://${config.hostname}:${config.port}/user/${this.state.user.username}`, this.state.user)
-    .then(res => alert('Informations updated'))
+    axios.put(`http://${config.hostname}:${config.port}/user/${this.state.user._id}`, this.state.user)
+    .then(res => console.log(res.data))
   }
 
   render() {

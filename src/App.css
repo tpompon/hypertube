@@ -5,6 +5,14 @@
   -ms-user-select: none; /* IE10+ */
 }
 
+::placeholder {
+  color: rgba(255, 255, 255, .3);
+}
+
+::selection {
+  background: rgba(123, 169, 247, .3);
+}
+
 /*
 ==========
 Responsive

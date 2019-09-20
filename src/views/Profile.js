@@ -113,7 +113,7 @@ class Profile extends React.Component {
       body.cover = "url('/covers/fruits.svg')";
     }
 
-    axios.put(`http://${config.hostname}:${config.port}/user/${user.username}`, body);
+    axios.put(`http://${config.hostname}:${config.port}/user/${user._id}`, body);
   }
 
   onChangeAvatar = (e) => {
@@ -124,7 +124,7 @@ class Profile extends React.Component {
       const data = new FormData();
       data.append('file', e.target.files[0]);
       data.append('filename', e.target.files[0].name);
-      axios.post(`http://${config.hostname}:${config.port}/user/${user.username}/avatar`, data)
+      axios.post(`http://${config.hostname}:${config.port}/user/${user._id}/avatar`, data)
       .then((res) => {
         if (res.data.success) {
           this.setState({ user: { ...this.state.user, avatar: `http://${config.hostname}:${config.port}/${res.data.file}` }});
@@ -136,7 +136,8 @@ class Profile extends React.Component {
   componentDidMount() {
     axios.get(`http://${config.hostname}:${config.port}/auth`)
     .then(res => {
-      axios.get(`http://${config.hostname}:${config.port}/user/${res.data.user.username}`)
+      console.log(res.data.user)
+      axios.get(`http://${config.hostname}:${config.port}/user/${res.data.user._id}`)
       .then(res => {
         if (res.data.success) {
           this.setState({ user: res.data.user[0] }, () => {
