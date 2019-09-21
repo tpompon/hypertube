@@ -24,6 +24,7 @@ class Register extends React.Component {
   register = () => {
     if (this.verifyPasswords()) {
       const body = {
+        origin: window.location.origin,
         firstname: this.firstname.current.value,
         lastname: this.lastname.current.value,
         username: this.username.current.value,

@@ -38,6 +38,10 @@ UserSchema.methods.validPassword = function(password) {
   return (this.password === password);
 };
 
+UserSchema.methods.isMailConfirmed = function() {
+  return (this.confirmKey === 'confirmed');
+};
+
 const User = mongoose.model('User', UserSchema);
 
 module.exports = User;

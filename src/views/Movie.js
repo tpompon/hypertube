@@ -35,7 +35,7 @@ class Movie extends React.Component {
     .then(res => this.setState({movie: res.data.movie[0], loaded: true}))
     .then(() => {
       if (this.state.movie) {
-        console.log(this.state.movie)
+        // console.log(this.state.movie)
         document.querySelector('.comment-input').addEventListener('keypress', (e) => {
           const key = e.which || e.keyCode;
           if (key === 13) {
@@ -146,6 +146,13 @@ class Movie extends React.Component {
     });
   }
 
+  reportComment = (id) => {
+    axios.post(`${config.serverURL}/movie/${this.state.movie._id}/comments/report`, { commId: id })
+    .then((res) => {
+      console.log(res.data);
+    })
+  }
+
   render() {
     const { movie, loaded, heartbeat } = this.state;
     const { language } = this.props;
@@ -202,7 +209,7 @@ class Movie extends React.Component {
                           movie.comments.map((comment) => {
                             return (
                               <div className="comment" key={`comment-${comment._id}`}>
-                                <div className="report-flag"><ReportFlag width="20" height="20" /></div>
+                                <div onClick={() => this.reportComment(`${comment._id}`)} className="report-flag"><ReportFlag width="20" height="20" /></div>
                                 <div className="comment-name">{comment.author}<span style={{marginLeft: 10}}><VerifiedIcon width="15" height="15" /></span></div>
                                 {comment.content}
                               </div>
@@ -262,7 +269,7 @@ class Movie extends React.Component {
                       movie.comments.map((comment) => {
                         return (
                           <div className="comment" key={`comment-${comment._id}`}>
-                            <div className="report-flag"><ReportFlag width="20" height="20" /></div>
+                            <div onClick={() => this.reportComment(comment._id)} className="report-flag"><ReportFlag width="20" height="20" /></div>
                             <div className="comment-name">{comment.author}<span style={{marginLeft: 10}}><VerifiedIcon width="15" height="15" /></span></div>
                             {comment.content}
                           </div>

@@ -15,6 +15,7 @@ import Settings from './views/Settings'
 import Register from './views/Register'
 import Login from './views/Login'
 import Logout from './views/Logout'
+import Confirm from './views/Confirm'
 import NotFound from './views/NotFound'
 import Loading from './components/Loading'
 
@@ -85,6 +86,8 @@ class App extends React.Component {
                   <Route exact path='/search' component={(props) => (
                     _isAuth ? <Search {...props} search={search} language={language} /> : <Redirect to="/login" />
                   )}/>
+
+                  <Route exact path='/confirm/:key' component={(match) => <Confirm {...match} language={language} />} />
 
                   <Route component={() => <NotFound language={language} />} />
                 </Switch>

@@ -25,6 +25,9 @@ passport.use(new LocalStrategy(
       if (!user.validPassword(password)) {
         return done(null, false, { message: 'Incorrect password.' });
       }
+      if (!user.isMailConfirmed()) {
+        return done(null, false, { message: 'Please confirm your email before' });
+      }
       return done(null, user);
     });
   }
@@ -226,6 +229,20 @@ api.route('/movie/:id/comments')
       }
   });
 })
+
+api.route('/movie/:id/comments/report')
+.post((req, res) => {
+  Movie.update({_id: req.params.id, 'comments._id': req.body.commId}, {'$set': {
+    'comments.$.report': 1
+  }}, (err) => {
+    if (err) {
+      console.log(err);
+      res.json({ success: false, error: err });
+    } else {
+      res.json({ success: true });
+    }
+  });
+});
 
 // Movies ratings
 api.route('/movie/:id/ratings')
