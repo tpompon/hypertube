@@ -35,7 +35,26 @@ class Movie extends React.Component {
     .then(res => this.setState({movie: res.data.movie[0], loaded: true}))
     .then(() => {
       if (this.state.movie) {
-        // console.log(this.state.movie)
+
+        // Download torrent
+        // const { movie } = this.state;
+        // const body = {
+        //   name: movie.ytsData.slug,
+        //   magnet: movie.ytsData.torrents[0].magnet
+        // }
+        // axios.post(`${config.serverURL}/torrents/download`, body)
+        // .then((res) => {
+        //   console.log(res.data);
+        //   this.setState({moviePath: res.data.moviePath}, () => {
+        //     const videoPlayer = document.getElementsByClassName('video-player')[0];
+        //     videoPlayer.load();
+        //     videoPlayer.addEventListener('timeupdate', (ret) => {
+        //       console.log('Actual time showing:', videoPlayer.currentTime)
+        //       console.log('Duration:', videoPlayer.duration)
+        //     });
+        //   })
+        // })
+
         document.querySelector('.comment-input').addEventListener('keypress', (e) => {
           const key = e.which || e.keyCode;
           if (key === 13) {
@@ -168,7 +187,7 @@ class Movie extends React.Component {
                   <img className="movie-page-poster center" src={movie.poster} alt="Movie poster" />
                   <div className="col center" style={{ width: '45%', padding: 50, backgroundColor: '#16162e', wordBreak: 'break-word', borderRadius: 20 }}>
                     <div className="movie-infos" style={{marginBottom: 20}}>
-                      <div className="row" style={{ alignItems: 'center' }}>
+                      <div className="row" style={{ alignItems: 'center', flexWrap: 'wrap' }}>
                         <h1>{(language === 'fr') ? movie.name_fr : movie.name_en}</h1>
                         <span style={{marginTop: 10, marginLeft: 10}}>({movie.ytsData.year})</span>
                         <div className="tooltip toggle-heartbeat" onClick={() => this.toggleHeartbeat()}>
@@ -177,6 +196,10 @@ class Movie extends React.Component {
                         </div>
                       </div>
                       <div className="hr"></div>
+                      <div class="container-ytb">
+                        <iframe src={`//www.youtube.com/embed/${movie.ytsData.yt_trailer_code}?autoplay=1`}
+                        allow="autoplay" frameborder="0" allowfullscreen class="video-ytb"></iframe>
+                      </div>
                       <p>{(language === 'fr') ? movie.description_fr : movie.description_en}</p>
                       <div className="cast row">
                         {
@@ -237,6 +260,10 @@ class Movie extends React.Component {
                     </div>
                   </div>
                   <div className="hr"></div>
+                  <div class="container-ytb">
+                    <iframe src={`//www.youtube.com/embed/${movie.ytsData.yt_trailer_code}?autoplay=1`}
+                    allow="autoplay" frameborder="0" allowfullscreen class="video-ytb"></iframe>
+                  </div>
                   <p>{(language === 'fr') ? movie.description_fr : movie.description_en}</p>
                   <div className="cast row">
                     {

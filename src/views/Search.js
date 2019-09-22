@@ -58,6 +58,12 @@ class Search extends React.Component {
         axios.get(`http://${config.hostname}:${config.port}/torrents/yts/${ytsID}`)
         .then((res) => {
           const movie = res.data.result.data.movie;
+
+          movie.torrents.forEach((torrent) => {
+						torrent.magnet = `magnet:?xt=urn:btih:${movie.torrents[0].hash}&dn=${encodeURI(movie.title)}&tr=http://track.one:1234/announce&tr=udp://track.two:80`;
+						torrent.magnet2 = `magnet:?xt=urn:btih:${movie.torrents[0].hash}&dn=${encodeURI(movie.title)}&tr=http://track.one:1234/announce&tr=udp://tracker.openbittorrent.com:80`;
+          })
+
           const newMovie = {
             ytsId: movie.id,
             name_fr: movie.title,

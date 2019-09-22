@@ -19,7 +19,10 @@ class Confirm extends React.Component {
     axios.post(`${config.serverURL}/auth/confirm`, { key: this.state.key })
     .then((res) => {
       if (res.data.success) {
-        this.setState({ status: 'ok', _isLoaded: true })
+        this.setState({ status: 'ok', _isLoaded: true });
+        setTimeout(() => {
+          window.location.href = "http://localhost:3000/login";
+        }, 1000);
       } else {
         this.setState({ status: 'not_found', _isLoaded: true })
       }

@@ -65,44 +65,66 @@ router.route('/yts/:id')
 // 	}
 // })
 
-router.route('/download/:search')
-.get(async (req, res) => {
-	const searchResults = await PirateBay.search(req.params.search, {
-	  orderBy: 'seeds',
-	  sortBy: 'desc'
-	}).catch((err) => console.log(err));
-	if (searchResults.length > 0) {
-	  movieArt(req.params.search, (error, response) => {
-		const engine = torrentStream(searchResults[0].magnetLink);
+// router.route('/download/:search')
+// .get(async (req, res) => {
+// 	const searchResults = await PirateBay.search(req.params.search, {
+// 	  orderBy: 'seeds',
+// 	  sortBy: 'desc'
+// 	}).catch((err) => console.log(err));
+// 	if (searchResults.length > 0) {
+// 	  movieArt(req.params.search, (error, response) => {
+// 		const engine = torrentStream(searchResults[0].magnetLink);
   
-		engine.on('download', (piece) => {
-		  console.log(piece)
-		})
+// 		engine.on('ready', () => {
+// 			engine.files.forEach(async (file) => {
+// 			  if (path.extname(file.name) === '.mp4' || path.extname(file.name) === '.mkv' || path.extname(file.name) === '.avi') {
+// 				let stream = await file.createReadStream();
+// 				let writeStream = await fs.createWriteStream(__basedir + `/torrents/${req.params.search}${path.extname(file.name)}`);
+// 				stream.pipe(writeStream);
   
-		engine.on('ready', () => {
-			engine.files.forEach(async (file) => {
-			  if (path.extname(file.name) === '.mp4' || path.extname(file.name) === '.mkv' || path.extname(file.name) === '.avi') {
-				let stream = await file.createReadStream();
-				let writeStream = await fs.createWriteStream(__basedir + `/torrents/${req.params.search}${path.extname(file.name)}`);
-				stream.pipe(writeStream);
+// 				console.log('filename:', file.name);
+// 				res.json({ poster: response, result: searchResults[0], moviePath: `http://${config.server.host}:${config.server.port}/torrents/${req.params.search}${path.extname(file.name)}` });
   
-				console.log('filename:', file.name);
-				res.json({ poster: response, result: searchResults[0], moviePath: `http://${config.server.host}:${config.server.port}/torrents/${req.params.search}${path.extname(file.name)}` });
-  
-				writeStream.on('finish', () => {
-				  console.log(writeStream.path);
-				  console.log("Write completed.");
-				});
-				writeStream.on('error', (err) => {
-				  console.log(err.stack);
-				});
-			  }
+// 				writeStream.on('finish', () => {
+// 				  console.log(writeStream.path);
+// 				  console.log("Write completed.");
+// 				});
+// 				writeStream.on('error', (err) => {
+// 				  console.log(err.stack);
+// 				});
+// 			  }
+// 			});
+// 		});
+// 	  });
+// 	} else {
+// 	  res.json({ success: false });
+// 	}
+// })
+
+router.route('/download')
+.post(async (req, res) => {
+	const engine = torrentStream('magnet:?xt=urn:btih:4d5d1fb084d04418576c025c585814decff31662&dn=SpiderMan+Far+From+Home+2019+720p+NEW+HDCAM-1XBET&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.openbittorrent.com%3A80&tr=udp%3A%2F%2Fopen.demonii.com%3A1337&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Fexodus.desync.com%3A6969');
+
+	engine.on('ready', () => {
+		engine.files.forEach(async (file) => {
+			if (path.extname(file.name) === '.mp4' || path.extname(file.name) === '.mkv' || path.extname(file.name) === '.avi') {
+			let stream = await file.createReadStream();
+			let writeStream = await fs.createWriteStream(__basedir + `/torrents/${req.body.name}${path.extname(file.name)}`);
+			stream.pipe(writeStream);
+
+			console.log('filename:', file.name);
+			res.json({ moviePath: `http://${config.server.host}:${config.server.port}/torrents/${req.body.name}${path.extname(file.name)}` });
+
+			writeStream.on('finish', () => {
+				console.log(writeStream.path);
+				console.log("Write completed.");
 			});
+			writeStream.on('error', (err) => {
+				console.log(err.stack);
+			});
+			}
 		});
-	  });
-	} else {
-	  res.json({ success: false });
-	}
+	});
 })
 
 module.exports = router;

@@ -11,7 +11,6 @@ const MovieSchema = new Schema({
 	torrentPath: String,
 	poster: String,
 	author: String,
-	genres: [String],
 	ratings: [{
 		uid: String,
 		rating: Number

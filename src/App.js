@@ -16,6 +16,7 @@ import Register from './views/Register'
 import Login from './views/Login'
 import Logout from './views/Logout'
 import Confirm from './views/Confirm'
+import Forgot from './views/Forgot'
 import NotFound from './views/NotFound'
 import Loading from './components/Loading'
 
@@ -88,6 +89,7 @@ class App extends React.Component {
                   )}/>
 
                   <Route exact path='/confirm/:key' component={(match) => <Confirm {...match} language={language} />} />
+                  <Route exact path='/forgot/:key' component={(match) => <Forgot {...match} language={language} />} />
 
                   <Route component={() => <NotFound language={language} />} />
                 </Switch>

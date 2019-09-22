@@ -21,7 +21,7 @@ const UserSchema = new Schema({
   country: String,
   verified: Boolean,
   confirmKey: String,
-  resetKey: String,
+  forgotKey: String,
   created_at: Date,
   updated_at: Date
 });
