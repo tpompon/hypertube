@@ -1,20 +1,47 @@
 import React from 'react';
-import translations from '../translations'
+import axios from 'axios';
+import config from '../config';
+import translations from '../translations';
+import Rating from 'react-rating'
+import { ReactComponent as StarFull } from '../svg/star-full.svg'
+import { ReactComponent as StarEmpty } from '../svg/star-empty.svg'
 
-function Poster(props) {
+class Poster extends React.Component {
 
-  const { movie, language } = props;
+  constructor(props) {
+    super(props);
+    this.state = {
+      ratingAverage: 0,
+      ratingCount: 0
+    }
+  }
 
-  return (
-    <div className="poster-container">
-      <img className="movie-poster" src={movie.poster} alt={(language === 'FR') ? movie.name_fr : movie.name_en} />
-      <div className="poster-content">
-        <h3>{(language === 'FR') ? movie.name_fr : movie.name_en}</h3>
-        <p>{(language === 'FR') ? movie.description_fr : movie.description_en}</p>
-        <span>{translations[language].poster.rating} - {movie.rating}</span>
+  componentDidMount() {
+    axios.get(`${config.serverURL}/movie/${this.props.movie._id}/ratings`)
+    .then(res => {
+      if (res.data.success) {
+        this.setState({ ratingAverage: res.data.ratingAverage, ratingCount: res.data.ratingCount });
+      }
+    })
+  }
+
+  render() {
+    const { movie, language } = this.props;
+    const { ratingAverage, ratingCount } = this.state;
+
+    return (
+      <div className="poster-container">
+        <img className="movie-poster" src={movie.poster} alt={(language === 'FR') ? movie.name_fr : movie.name_en} />
+        <div className="poster-overlay">
+          <div className="poster-content">
+            <h3>{(language === 'FR') ? movie.name_fr : movie.name_en}</h3>
+            <p>{(language === 'FR') ? movie.description_fr : movie.description_en}</p>
+            <span>{translations[language].poster.rating} - <Rating readonly={true} initialRating={ratingAverage} emptySymbol={<StarEmpty width="15" height="15" fill="#FFD700" />} fullSymbol={<StarFull width="15" height="15" fill="#FFD700" />} fractions={2} /> ({ratingCount})</span>
+          </div>
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
 }
 
 export default Poster;

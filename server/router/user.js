@@ -60,9 +60,20 @@ router.route('/:id')
 
 	User.findOneAndUpdate({ _id: req.params.id }, updateQuery, { upsert: true }, (err, user) => {
 		if (err)
-		return res.json({ success: false });
+			return res.json({ success: false });
 		else
-		return res.json({ success: true, updated: user });
+			return res.json({ success: true, updated: user });
+	});
+})
+
+router.route('/username/:username')
+.get((req, res) => {
+	User.find({ username: req.params.username }, (err, user) => {
+		if (err) {
+			res.json({ success: false });
+		} else {
+			res.json({ success: true, user: user });
+		}
 	});
 })
 

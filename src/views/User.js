@@ -3,6 +3,7 @@ import axios from 'axios'
 import config from '../config'
 import translations from '../translations'
 import MoviesSlider from '../components/MoviesSlider'
+import Loading from '../components/Loading'
 import { ReactComponent as VerifiedIcon } from '../svg/verified.svg'
 
 const heartbeat = [
@@ -29,15 +30,16 @@ class User extends React.Component {
     super(props);
     this.state = {
       username: this.props.match.params.username,
-      user: {}
+      user: null,
+      _isLoaded: false
     }
   }
 
   componentDidMount() {
-    axios.get(`http://${config.hostname}:${config.port}/user/${this.state.username}`)
+    axios.get(`http://${config.hostname}:${config.port}/user/username/${this.state.username}`)
       .then(res => {
         if (res.data.success) {
-          this.setState({user: res.data.user[0]});
+          this.setState({user: res.data.user[0], _isLoaded: true});
         }
       });
   }
@@ -65,35 +67,43 @@ class User extends React.Component {
 
   render() {
     
-    const { user } = this.state;
+    const { user, _isLoaded } = this.state;
     const { language } = this.props;
 
     return (
-      <div className="text-center">
-        {
-          user ? (
-            <div>
-              <div style={{backgroundImage: user.cover, paddingTop: 40, paddingBottom: 50, marginTop: -20}}>
-                <div className="profile-avatar center">
-                  <img src={user.avatar} alt={`Avatar ${user.username}`} />
-                </div>
-                <div style={{marginTop: 20}}>
-                  <div>{user.firstname} {user.lastname}</div>
-                  <div className="tooltip">
-                    <div className="username" onClick={() => this.copyProfileURL()} onMouseLeave={() => this.resetTooltip()}>@{user.username} {user.verified ? <div className="verified" style={{marginBottom: 2}}><VerifiedIcon width="15" height="15" /></div> : null}</div>
-                    <span className="tooltip-text">{translations[language].user.tooltip.copy}</span>
+      <div>
+      {
+        _isLoaded ? (
+          <div className="text-center">
+            {
+              user ? (
+                <div>
+                  <div style={{backgroundImage: user.cover, paddingTop: 40, paddingBottom: 50, marginTop: -20}}>
+                    <div className="profile-avatar center">
+                      <img src={user.avatar} alt={`Avatar ${user.username}`} />
+                    </div>
+                    <div style={{marginTop: 20}}>
+                      <div>{user.firstname} {user.lastname}</div>
+                      <div className="tooltip">
+                        <div className="username" onClick={() => this.copyProfileURL()} onMouseLeave={() => this.resetTooltip()}>@{user.username} {user.verified ? <div className="verified" style={{marginBottom: 2}}><VerifiedIcon width="15" height="15" /></div> : null}</div>
+                        <span className="tooltip-text">{translations[language].user.tooltip.copy}</span>
+                      </div>
+                    </div>
                   </div>
+                  <h2>{translations[language].user.list.heartbeat}</h2>
+                  <MoviesSlider number={1} movies={heartbeat} language={language} />
+                  <h2>{translations[language].user.list.recents}</h2>
+                  <MoviesSlider number={2} movies={recents} language={language} />
                 </div>
-              </div>
-              <h2>{translations[language].user.list.heartbeat}</h2>
-              <MoviesSlider number={1} movies={heartbeat} language={language} />
-              <h2>{translations[language].user.list.recents}</h2>
-              <MoviesSlider number={2} movies={recents} language={language} />
-            </div>
-          ) : (
-            <h2>{translations[language].user.notFound}</h2>
-          )
-        }
+              ) : (
+                <h2>{translations[language].user.notFound}</h2>
+              )
+            }
+          </div>
+        ) : (
+          <Loading />
+        )
+      }
       </div>
     );
   }

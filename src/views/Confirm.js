@@ -41,9 +41,7 @@ class Confirm extends React.Component {
                 <div>Account confirmed</div>
               </div>
             ) : (
-              <div>
-                Key doesn't exist
-              </div>
+              this.props.history.push('/')
             )
           }
         </div>

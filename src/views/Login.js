@@ -2,7 +2,7 @@ import React from 'react';
 import axios from 'axios'
 import config from '../config'
 import translations from '../translations'
-import { Link, Redirect } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Button from '../components/Button'
 import { ReactComponent as TwitterIcon } from '../svg/twitter.svg'
 import { ReactComponent as FourtyTwoIcon } from '../svg/42.svg'
@@ -17,6 +17,7 @@ class Login extends React.Component {
     this.state = {
       error: 'none',
       error2: 'none',
+      forgot: false,
       link: translations[this.props.language].login.inputs.forgotPassword
     }
     this.usernameInput = React.createRef();
@@ -25,13 +26,26 @@ class Login extends React.Component {
   }
 
   componentDidMount() {
-    document.addEventListener('keydown', (e) => {
-      var key = e.which || e.keyCode;
-      if (key === 13) {
-        this.authenticate();
-      }
-    });
+    document.addEventListener('keydown', this.onEnter, false);
   }
+
+  componentWillUnmount() {
+    document.removeEventListener('keydown', this.onEnter, false);
+  }
+
+  onEnter = (e) => {
+    const { forgot } = this.state;
+    if (e.keyCode === 13) {
+      forgot ? this.sendResetLink() : this.authenticate();
+    }
+  }
+
+  toggleForgot = () => {
+    this.setState({
+      forgot: !this.state.forgot,
+      link: this.state.forgot ? translations[this.props.language].login.inputs.forgotPassword : translations[this.props.language].login.title
+    })
+  };
 
   authenticate = () => {
     const body = {
@@ -45,24 +59,10 @@ class Login extends React.Component {
           window.location.href = "http://localhost:3000/";
           // this.props.history.push('/');
         } else {
-          //console.log(res.data.status)
-          this.setState({ error: res.data.status});
+          this.setState({ error: res.data.status });
           document.getElementById('error').style.display = 'block';
         }
       });
-  }
-
-  toggleForgot = () => {
-    const forgotForm = document.getElementById('forgot-form');
-    const loginForm = document.getElementById('login-form');
-
-    if (forgotForm.style.display === 'none') {
-      forgotForm.style.display = 'block';
-      loginForm.style.display = 'none';
-    } else {
-      forgotForm.style.display = 'none';
-      loginForm.style.display = 'block';
-    }
   }
 
   sendResetLink = () => {
@@ -82,40 +82,50 @@ class Login extends React.Component {
   }
 
   render() {
+    const { forgot } = this.state;
     const { language } = this.props;
 
     return (
       <div className="dark-card center text-center">
         <h2>{translations[language].login.title}</h2>
-        <div id="success" className="success" onClick={() => document.getElementById('success').style.display = 'none'}>
-          Mail has been sent
-        </div>
-        <div id="error2" className="error" onClick={() => document.getElementById('error2').style.display = 'none'}>
-          {this.state.error2}
-        </div>
-        <div id="forgot-form" style={{display: 'none', width: 420}}>
-          <input ref={this.forgotInput} className="dark-input" type="text" placeholder='E-mail' style={{width: '100%', marginTop: 20, marginBottom: 20 }} />
-          <div className="row" style={{ justifyContent: 'space-around' }}>
-            <div style={{ display: 'table' }} onClick={() => this.sendResetLink()}><Button content='Send reset link' /></div>
-          </div>
-        </div>
-        <div id="error" className="error" onClick={() => document.getElementById('error').style.display = 'none'}>
-          {this.state.error}
-        </div>
-        <div id="login-form">
-          <div className="row" style={{ justifyContent: 'space-between', marginBottom: 20 }}>
-            <button className="oauth-btn oauth-btn-42" style={{width: '31%'}}><FourtyTwoIcon fill="#fff" width="25" height="25" /></button>
-            <button className="oauth-btn oauth-btn-twitter" style={{width: '31%'}}><TwitterIcon fill="#fff" width="25" height="25" /></button>
-            <button className="oauth-btn oauth-btn-facebook" style={{width: '31%'}}><FacebookIcon fill="#fff" width="25" height="25" /></button>
-          </div>
-          <input ref={this.usernameInput} className="dark-input" type="text" placeholder={translations[language].login.inputs.username} style={{width: '100%', marginTop: 5, marginBottom: 5}} />
-          <input ref={this.passwordInput} className="dark-input" type="password" placeholder={translations[language].login.inputs.password} style={{width: '100%', marginTop: 5, marginBottom: 20}} />
-          <div className="row" style={{ justifyContent: 'space-around' }}>
-            <div style={{ display: 'table' }} onClick={() => this.authenticate()}><Button content={translations[language].login.inputs.submit} /></div>
-          </div>
-        </div>
+        {
+          forgot ? (
+            <div>
+              <div id="success" className="success" onClick={() => document.getElementById('success').style.display = 'none'}>
+                Mail has been sent
+              </div>
+              <div id="error2" className="error" onClick={() => document.getElementById('error2').style.display = 'none'}>
+                {this.state.error2}
+              </div>
+              <div id="forgot-form" style={{ width: 420}}>
+                <input ref={this.forgotInput} className="dark-input" type="email" placeholder='E-mail' style={{width: '100%', marginBottom: 20 }} />
+                <div className="row" style={{ justifyContent: 'space-around' }}>
+                  <div style={{ display: 'table' }} onClick={() => this.sendResetLink()}><Button content='Send reset link' /></div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div>
+              <div id="error" className="error" onClick={() => document.getElementById('error').style.display = 'none'}>
+                {this.state.error}
+              </div>
+              <div id="login-form">
+                <div className="row" style={{ justifyContent: 'space-between', marginBottom: 20 }}>
+                  <button className="oauth-btn oauth-btn-42" style={{width: '31%'}}><FourtyTwoIcon fill="#fff" width="25" height="25" /></button>
+                  <button className="oauth-btn oauth-btn-twitter" style={{width: '31%'}}><TwitterIcon fill="#fff" width="25" height="25" /></button>
+                  <button className="oauth-btn oauth-btn-facebook" style={{width: '31%'}}><FacebookIcon fill="#fff" width="25" height="25" /></button>
+                </div>
+                <input ref={this.usernameInput} className="dark-input" type="text" placeholder={translations[language].login.inputs.username} style={{width: '100%', marginTop: 5, marginBottom: 5}} />
+                <input ref={this.passwordInput} className="dark-input" type="password" placeholder={translations[language].login.inputs.password} style={{width: '100%', marginTop: 5, marginBottom: 20}} />
+                <div className="row" style={{ justifyContent: 'space-around' }}>
+                  <div style={{ display: 'table' }} onClick={() => this.authenticate()}><Button content={translations[language].login.inputs.submit} /></div>
+                </div>
+              </div>
+            </div>
+          )
+        }
         <div className="row" style={{ marginTop: 20, fontSize: '.8em', opacity: .8 }}>
-          <div className="link center" style={{marginRight: 5}} onClick={() => { this.toggleForgot(); this.setState({link: 'Login'})} }>{this.state.link}</div>/<div className="link center" style={{marginLeft: 5}}><Link to="/register">{translations[language].login.inputs.register}</Link></div>
+          <div className="link center" style={{marginRight: 5}} onClick={() => this.toggleForgot() }>{this.state.link}</div>/<div className="link center" style={{marginLeft: 5}}><Link to="/register">{translations[language].login.inputs.register}</Link></div>
         </div>
       </div>
     );

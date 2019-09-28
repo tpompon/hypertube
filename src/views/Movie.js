@@ -5,6 +5,7 @@ import translations from '../translations'
 import Rating from 'react-rating'
 import Button from '../components/Button'
 import Loading from '../components/Loading'
+import Counter from '../components/Counter'
 import { ReactComponent as StarFull } from '../svg/star-full.svg'
 import { ReactComponent as StarEmpty } from '../svg/star-empty.svg'
 import { ReactComponent as VerifiedIcon } from '../svg/verified.svg'
@@ -55,18 +56,9 @@ class Movie extends React.Component {
         //   })
         // })
 
-        document.querySelector('.comment-input').addEventListener('keypress', (e) => {
-          const key = e.which || e.keyCode;
-          if (key === 13) {
-            this.refs.reviewSubmit.click();
-          }
-        });
-        document.addEventListener('keydown', (e) => {
-          const key = e.which || e.keyCode;
-          if (key === 27) {
-            this.hidePlayer();
-          }
-        });
+        document.querySelector('.comment-input').addEventListener('keydown', this.onEnter, false);
+        document.addEventListener('keydown', this.onEscape, false);
+
         // Remove les Events Listener dans le WillUnmount - sinon Memory Leaks -
 
         // Download torrent and display
@@ -104,6 +96,21 @@ class Movie extends React.Component {
         }
       })
     })
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('keydown', this.onEnter, false);
+    document.removeEventListener('keydown', this.onEscape, false);
+  }
+
+  onEnter = (e) => {
+    if (e.keyCode === 13)
+      this.addComment();
+  }
+  onEscape = (e) => {
+    if (e.keyCode === 27) {
+      this.hidePlayer();
+    }
   }
 
   addComment = () => {
@@ -176,6 +183,9 @@ class Movie extends React.Component {
     const { movie, loaded, heartbeat } = this.state;
     const { language } = this.props;
 
+    if (movie.ytsData)
+      console.log(movie.ytsData.torrents)
+
     return (
       <div>
         {
@@ -196,31 +206,52 @@ class Movie extends React.Component {
                         </div>
                       </div>
                       <div className="hr"></div>
-                      <div class="container-ytb">
+                      <div class="container-ytb" style={{marginBottom: 20}}>
                         <iframe src={`//www.youtube.com/embed/${movie.ytsData.yt_trailer_code}?autoplay=1`}
                         allow="autoplay" frameborder="0" allowfullscreen class="video-ytb"></iframe>
                       </div>
+                      {
+                        movie.ytsData.genres ? (
+                          <div className="genres row wrap" style={{marginBottom: 20}}>
+                          {
+                            movie.ytsData.genres.map((genre) => {
+                              return (
+                                <div className="genre">{genre}</div>
+                              )
+                            })
+                          }
+                          </div>
+                        ) : null
+                      }
                       <p>{(language === 'fr') ? movie.description_fr : movie.description_en}</p>
-                      <div className="cast row">
+                      <div className="wrap" style={{ display: 'flex', justifyContent: 'space-between' }}>
                         {
-                          movie.ytsData.cast.map((person) => {
-                            return (
-                              <a className="pointer" href={`https://www.imdb.com/name/nm${person.imdb_code}`} target="_blank" key={person.name}>
-                                <img style={{ width: 75, height: 75, objectFit: 'cover', borderRadius: '50%', marginRight: -20 }} src={person.url_small_image ? person.url_small_image : `http://${config.hostname}:${config.port}/public/avatars/default_avatar.png`} alt={person.name} />
-                              </a>
-                            )
-                          })
+                          movie.ytsData.cast ? (
+                            <div className="cast row" style={{marginBottom: 20}}>
+                            {
+                              movie.ytsData.cast.map((person) => {
+                                return (
+                                  <a className="pointer" href={`https://www.imdb.com/name/nm${person.imdb_code}`} target="_blank" key={person.name}>
+                                    <img style={{ width: 75, height: 75, objectFit: 'cover', borderRadius: '50%', marginRight: -20 }} src={person.url_small_image ? person.url_small_image : `http://${config.hostname}:${config.port}/public/avatars/default_avatar.png`} alt={person.name} />
+                                  </a>
+                                )
+                              })
+                            }
+                            </div>
+                          ) : null
                         }
+                        <div>
+                          <Rating
+                            onChange={(value) => this.updateRating(value)}
+                            initialRating={this.state.rating}
+                            emptySymbol={<StarEmpty width="30" height="30" fill="#FFD700" />}
+                            fullSymbol={<StarFull width="30" height="30" fill="#FFD700" />}
+                            fractions={2}
+                          />
+                          <br />
+                          <span>{translations[language].movie.rating} - {this.state.ratingAverage} ({this.state.ratingCount})</span>
+                        </div>
                       </div>
-                      <Rating
-                        onChange={(value) => this.updateRating(value)}
-                        initialRating={this.state.rating}
-                        emptySymbol={<StarEmpty width="30" height="30" fill="#FFD700" />}
-                        fullSymbol={<StarFull width="30" height="30" fill="#FFD700" />}
-                        fractions={2}
-                      />
-                      <br />
-                      <span>{translations[language].movie.rating} - {this.state.ratingAverage} ({this.state.ratingCount})</span>
                     </div>
                     <span onClick={() => this.showPlayer()}><Button content={translations[language].movie.watch} /></span>
                     <div>
@@ -260,31 +291,52 @@ class Movie extends React.Component {
                     </div>
                   </div>
                   <div className="hr"></div>
-                  <div class="container-ytb">
+                  <div class="container-ytb" style={{marginBottom: 20}}>
                     <iframe src={`//www.youtube.com/embed/${movie.ytsData.yt_trailer_code}?autoplay=1`}
                     allow="autoplay" frameborder="0" allowfullscreen class="video-ytb"></iframe>
                   </div>
+                  {
+                    movie.ytsData.genres ? (
+                      <div className="genres row wrap" style={{marginBottom: 20}}>
+                      {
+                        movie.ytsData.genres.map((genre) => {
+                          return (
+                            <div className="genre">{genre}</div>
+                          )
+                        })
+                      }
+                      </div>
+                    ) : null
+                  }
                   <p>{(language === 'fr') ? movie.description_fr : movie.description_en}</p>
-                  <div className="cast row">
+                  <div className="wrap" style={{ display: 'flex', justifyContent: 'space-between' }}>
                     {
-                      movie.ytsData.cast.map((person) => {
-                        return (
-                          <a className="pointer" href={`https://www.imdb.com/name/nm${person.imdb_code}`} target="_blank" key={person.name}>
-                            <img style={{ width: 75, height: 75, objectFit: 'cover', borderRadius: '50%', marginRight: -20 }} src={person.url_small_image ? person.url_small_image : `http://${config.hostname}:${config.port}/public/avatars/default_avatar.png`} alt={person.name} />
-                          </a>
-                        )
-                      })
+                      movie.ytsData.cast ? (
+                        <div className="cast row" style={{marginBottom: 20}}>
+                        {
+                          movie.ytsData.cast.map((person) => {
+                            return (
+                              <a className="pointer" href={`https://www.imdb.com/name/nm${person.imdb_code}`} target="_blank" key={person.name}>
+                                <img style={{ width: 75, height: 75, objectFit: 'cover', borderRadius: '50%', marginRight: -20 }} src={person.url_small_image ? person.url_small_image : `http://${config.hostname}:${config.port}/public/avatars/default_avatar.png`} alt={person.name} />
+                              </a>
+                            )
+                          })
+                        }
+                        </div>
+                      ) : null
                     }
+                    <div>
+                      <Rating
+                        onChange={(value) => this.updateRating(value)}
+                        initialRating={this.state.rating}
+                        emptySymbol={<StarEmpty width="30" height="30" fill="#FFD700" />}
+                        fullSymbol={<StarFull width="30" height="30" fill="#FFD700" />}
+                        fractions={2}
+                      />
+                      <br />
+                      <span>{translations[language].movie.rating} - {this.state.ratingAverage} ({this.state.ratingCount})</span>
+                    </div>
                   </div>
-                  <Rating
-                    onChange={(value) => this.updateRating(value)}
-                    initialRating={this.state.rating}
-                    emptySymbol={<StarEmpty width="30" height="30" fill="#FFD700" />}
-                    fullSymbol={<StarFull width="30" height="30" fill="#FFD700" />}
-                    fractions={2}
-                  />
-                  <br />
-                  <span>{translations[language].movie.rating} - {this.state.ratingAverage} ({this.state.ratingCount})</span>
                 </div>
                 <Button content={translations[language].movie.watch} />
                 <div>

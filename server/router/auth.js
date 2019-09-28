@@ -31,7 +31,9 @@ router.route('/login/:strategy')
   if (strategy === 'local') {
     passport.authenticate('local', (err, user, info) => {
       req.login(user, (err) => {
-        if (user) {
+        if (err) {
+          res.json({ success: false, status: info.message });
+        } else if (user) {
           res.json({ success: true, status: "Authentication success", user: req.user });
         } else {
           res.json({ success: false, status: info.message });
@@ -50,12 +52,14 @@ router.route('/login/:strategy')
 router.route('/confirm')
 .post((req, res) => {
   const key = req.body.key;
-  User.findOneAndUpdate({ confirmKey: key }, { confirmKey: 'confirmed' }, { upsert: true }, (err, user) => {
+  User.findOneAndUpdate({ confirmKey: key }, { confirmKey: 'confirmed' }, (err, user) => {
 		if (err)
-		  return res.json({ success: false });
-		else
-		  return res.json({ success: true, updated: user });
-	});
+		  return res.json({ success: false, error: err });
+		else if (user)
+		  return res.json({ success: true });
+    else
+      return res.json({ success: false })
+  });
 })
 
 router.route('/forgot')
@@ -119,12 +123,13 @@ router.route('/forgot/:key')
     password: req.body.passwd
   }
 
-  User.findOneAndUpdate({ forgotKey: req.params.key }, updateQuery, { upsert: true }, (err, user) => {
-    console.log(user)
+  User.findOneAndUpdate({ forgotKey: req.params.key }, updateQuery, (err, user) => {
     if (err)
-      res.json({ success: false });
-    else
+      res.json({ success: false, error: err });
+    else if (user)
       res.json({ success: true });
+    else
+      res.json({ success: false })
   });
 })
 

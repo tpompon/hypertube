@@ -169,6 +169,11 @@ class Header extends React.Component {
                   <div style={{position: 'relative'}}>
                     <img className="avatar" src={user.avatar} alt="Avatar" width="50" height="50" />
                     <div className="avatar-dropdown">
+                      <Link to="/search" onClick={() => this.closeMenus()}>
+                        <div className="avatar-dropdown-item">
+                          Search
+                        </div>
+                      </Link>
                       <Link to="/profile" onClick={() => this.closeMenus()}>
                         <div className="avatar-dropdown-item">
                           {translations[language].header.avatarMenu.profile}

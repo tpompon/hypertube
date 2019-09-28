@@ -2,7 +2,9 @@ import React from 'react';
 import axios from 'axios';
 import config from '../config'
 import MoviesSlider from '../components/MoviesSlider'
+import MoviesSlider2 from '../components/MoviesSlider2'
 import translations from '../translations'
+import Loading from '../components/Loading'
 import { ReactComponent as VerifiedIcon } from '../svg/verified.svg'
 import { ReactComponent as PencilIcon } from '../svg/pencil.svg'
 import { ReactComponent as CinemaIcon } from '../svg/cinema-icon.svg'
@@ -51,7 +53,7 @@ class Profile extends React.Component {
   getMoviesList = (moviesListIds) => {
     let array = [];
     moviesListIds.map((movie) => {
-      axios.get(`http://${config.hostname}:${config.port}/movie/${movie.id}`)
+      axios.get(`${config.serverURL}/movies/${movie.id}`)
         .then(res => {
           if (res.data.success && res.data.movie) {
             array.push(res.data.movie[0]);
@@ -124,7 +126,7 @@ class Profile extends React.Component {
       const data = new FormData();
       data.append('file', e.target.files[0]);
       data.append('filename', e.target.files[0].name);
-      axios.post(`http://${config.hostname}:${config.port}/user/${user._id}/avatar`, data)
+      axios.post(`${config.serverURL}/user/${user._id}/avatar`, data)
       .then((res) => {
         if (res.data.success) {
           this.setState({ user: { ...this.state.user, avatar: `http://${config.hostname}:${config.port}/${res.data.file}` }});
@@ -134,16 +136,17 @@ class Profile extends React.Component {
   }
 
   componentDidMount() {
-    axios.get(`http://${config.hostname}:${config.port}/auth`)
+    axios.get(`${config.serverURL}/auth`)
     .then(res => {
-      console.log(res.data.user)
-      axios.get(`http://${config.hostname}:${config.port}/user/${res.data.user._id}`)
+      axios.get(`${config.serverURL}/user/${res.data.user._id}`)
       .then(res => {
         if (res.data.success) {
           this.setState({ user: res.data.user[0] }, () => {
             this.setState({ heartbeat: this.getMoviesList(this.state.user.heartbeat) });
           });
-          this.setState({ cover: this.state.user.cover }, () => this.updateCover(this.state.cover));
+          this.setState({ cover: this.state.user.cover, _isLoaded: true }, () => {
+            this.updateCover(this.state.cover);
+          });
         }
       });
       const coversMenu = document.getElementsByClassName('covers-menu')[0];
@@ -159,40 +162,46 @@ class Profile extends React.Component {
 
   render() {
     const { language } = this.props;
-    const { user } = this.state;
+    const { user, _isLoaded } = this.state;
 
     return (
-      <div className="text-center">
-        <div className="cover" style={{backgroundImage: `${this.state.cover}`, paddingTop: 40, paddingBottom: 50, marginTop: -20}}>
-          <div className="profile-avatar center">
-            <a className="profile-avatar-overlay" onClick={e => this.refs.uploadAvatar.click()}>{translations[language].profile.updateAvatar}</a>
-            <input type="file" id="file" ref="uploadAvatar" onChange={this.onChangeAvatar} style={{display: "none"}}/>
-            <img src={user.avatar} alt={`Avatar ${user.username}`} />
-          </div>
-          <div style={{marginTop: 20}}>
-            <div>{user.firstname} {user.lastname} <span style={{fontStyle: 'italic', fontSize: '.8em'}}>{translations[language].profile.you}</span></div>
-            <div className="tooltip">
-              <div className="username" onClick={() => this.copyProfileURL()} onMouseLeave={() => this.resetTooltip()}>@{user.username} {user.verified ? <div className="verified" style={{marginBottom: 2}}><VerifiedIcon width="15" height="15" /></div> : null}</div>
-              <span className="tooltip-text">{translations[language].profile.tooltip.copy}</span>
+      <div>
+      {
+        _isLoaded ? (
+          <div className="text-center">
+            <div className="cover" style={{backgroundImage: `${this.state.cover}`, paddingTop: 40, paddingBottom: 50, marginTop: -20}}>
+              <div className="profile-avatar center">
+                <a className="profile-avatar-overlay" onClick={() => this.refs.uploadAvatar.click()}>{translations[language].profile.updateAvatar}</a>
+                <input type="file" id="file" ref="uploadAvatar" onChange={this.onChangeAvatar} style={{display: "none"}}/>
+                <img src={user.avatar} alt={`Avatar ${user.username}`} />
+              </div>
+              <div style={{marginTop: 20}}>
+                <div>{user.firstname} {user.lastname} <span style={{fontStyle: 'italic', fontSize: '.8em'}}>{translations[language].profile.you}</span></div>
+                <div className="tooltip">
+                  <div className="username" onClick={() => this.copyProfileURL()} onMouseLeave={() => this.resetTooltip()}>@{user.username} {user.verified ? <div className="verified" style={{marginBottom: 2}}><VerifiedIcon width="15" height="15" /></div> : null}</div>
+                  <span className="tooltip-text">{translations[language].profile.tooltip.copy}</span>
+                </div>
+              </div>
+              <div className="edit-cover-box tooltip-left" onClick={() => this.openCoversMenu()}>
+                <PencilIcon className="pencil-icon" fill="#fff" width="15" height="15" style={{marginTop: 10 }} />
+                <span className="tooltip-text-left">{translations[language].profile.editCover}</span>
+                <div className="covers-menu" style={{ position: 'absolute', display: 'none', backgroundColor: '#04050C', borderRadius: 10, width: 100, marginBottom: 10, bottom: 50, right: 0, zIndex: 9 }}>
+                  <div className="covers-menu-child cover-selected" onClick={() => this.updateCover('cinema')}><CinemaIcon width="25" height="25" /></div>
+                  <div className="covers-menu-child" onClick={() => this.updateCover('japan')}><JapanIcon width="25" height="25" /></div>
+                  <div className="covers-menu-child" onClick={() => this.updateCover('animals')}><AnimalsIcon width="25" height="25" /></div>
+                  <div className="covers-menu-child" onClick={() => this.updateCover('fruits')}><FruitsIcon width="25" height="25" /></div>
+                </div>
+              </div>
             </div>
+            <h2>{translations[language].profile.list.heartbeat}</h2>
+            <MoviesSlider2 number={1} movies={this.state.heartbeat} language={language} />
+            <h2>{translations[language].profile.list.recents}</h2>
+            <MoviesSlider number={2} movies={recents} language={language} />
+            <h2>{translations[language].profile.list.continue}</h2>
+            <MoviesSlider number={3} movies={inProgress} language={language} />
           </div>
-          <div className="edit-cover-box tooltip-left" onClick={() => this.openCoversMenu()}>
-            <PencilIcon className="pencil-icon" fill="#fff" width="15" height="15" style={{marginTop: 10 }} />
-            <span className="tooltip-text-left">{translations[language].profile.editCover}</span>
-            <div className="covers-menu" style={{ position: 'absolute', display: 'none', backgroundColor: '#04050C', borderRadius: 10, width: 100, marginBottom: 10, bottom: 50, right: 0, zIndex: 9 }}>
-              <div className="covers-menu-child cover-selected" onClick={() => this.updateCover('cinema')}><CinemaIcon width="25" height="25" /></div>
-              <div className="covers-menu-child" onClick={() => this.updateCover('japan')}><JapanIcon width="25" height="25" /></div>
-              <div className="covers-menu-child" onClick={() => this.updateCover('animals')}><AnimalsIcon width="25" height="25" /></div>
-              <div className="covers-menu-child" onClick={() => this.updateCover('fruits')}><FruitsIcon width="25" height="25" /></div>
-            </div>
-          </div>
-        </div>
-        <h2>{translations[language].profile.list.heartbeat}</h2>
-        <MoviesSlider number={1} movies={heartbeat} language={language} />
-        <h2>{translations[language].profile.list.recents}</h2>
-        <MoviesSlider number={2} movies={recents} language={language} />
-        <h2>{translations[language].profile.list.continue}</h2>
-        <MoviesSlider number={3} movies={inProgress} language={language} />
+        ) : <Loading />
+      }
       </div>
     );
   }

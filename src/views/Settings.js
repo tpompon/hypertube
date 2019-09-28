@@ -19,7 +19,7 @@ class Settings extends React.Component {
   componentDidMount() {
     axios.get(`http://${config.hostname}:${config.port}/auth`)
     .then((res) => {
-      axios.get(`http://${config.hostname}:${config.port}/user/${res.data.user.username}`)
+      axios.get(`http://${config.hostname}:${config.port}/user/${res.data.user._id}`)
       .then((res) => {
         this.setState({ user: res.data.user[0], _isLoaded: true });
         document.addEventListener('keydown', (e) => {

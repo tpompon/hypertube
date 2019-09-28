@@ -3,6 +3,7 @@ import axios from 'axios'
 import config from '../config'
 import translations from '../translations'
 import Button from '../components/Button'
+import { Link } from "react-router-dom";
 
 class Register extends React.Component {
 
@@ -18,6 +19,20 @@ class Register extends React.Component {
     this.state = {
       password: '',
       confirmPassword: ''
+    }
+  }
+
+  componentDidMount() {
+    document.addEventListener('keydown', this.onEnter, false);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('keydown', this.onEnter, false);
+  }
+
+  onEnter = (e) => {
+    if (e.keyCode === 13) {
+      this.register();
     }
   }
 
@@ -42,7 +57,7 @@ class Register extends React.Component {
       }
   
       axios.post(`http://${config.hostname}:${config.port}/users`, body)
-      .then(res => console.log(res.data))
+      .then(res => document.getElementById('success').style.display = 'block')
     } else {
       console.log('Invalid password');
     }
@@ -90,6 +105,9 @@ class Register extends React.Component {
     return (
       <div className="dark-card center text-center">
         <h2>{translations[language].register.title}</h2>
+        <div id="success" className="success" onClick={() => document.getElementById('success').style.display = 'none'}>
+          Account created, confirmation email has been sent
+        </div>
         <input className="dark-input" ref={this.firstname} type="text" placeholder={translations[language].register.firstname} style={{marginRight: 10, marginTop: 5, marginBottom: 5}} />
         <input className="dark-input" ref={this.lastname} type="text" placeholder={translations[language].register.lastname} style={{marginLeft: 10, marginTop: 5, marginBottom: 5}} />
         <br />
@@ -109,6 +127,9 @@ class Register extends React.Component {
         </div>
         <div className="row" style={{ justifyContent: 'space-around' }} onClick={() => this.register()}>
           <Button content={translations[language].register.submit} />
+        </div>
+        <div className="link center" style={{ marginTop: 20, fontSize: '.8em', opacity: .8 }}>
+          <Link to="/login">Login</Link>
         </div>
       </div>
     );

@@ -66,19 +66,34 @@ class MoviesList extends React.Component {
       <div>
       {
         _isLoaded ? (
-          <div className="posters-list row wrap">
-          {
-            movies.map((movie) => {
-              if (movie.name_fr.toLowerCase().trim().includes(search.toLowerCase().trim())) {
-                return (
-                  <Link to={`/watch/${movie._id}`} key={`movie-${movie._id}`}>
-                    <Poster movie={movie} language={language} />
-                  </Link>
-                )
-              }
-              return null;
-            })
-          }
+          <div className="col">
+            <div className="row wrap" style={{ justifyContent: 'center', marginBottom: 20 }}>
+              <input className="dark-input" type="number" placeholder="Min. Year" />
+              <input className="dark-input" type="number" placeholder="Max. Year" style={{marginLeft: 10, marginRight: 30}} />
+              <select className="dark-input">
+                <option value="0">Genre:</option>
+                <option value="1">Action</option>
+                <option value="2">Aventure</option>
+                <option value="3">Sci-fi</option>
+                <option value="4">Comédie</option>
+              </select>
+              <input className="dark-input" type="number" placeholder="Min. Rating" style={{marginLeft: 30}} />
+              <input className="dark-input" type="number" placeholder="Max. Rating" style={{marginLeft: 10}} />
+            </div>
+            <div className="posters-list row wrap">
+            {
+              movies.map((movie) => {
+                if (movie.name_fr.toLowerCase().trim().includes(search.toLowerCase().trim())) {
+                  return (
+                    <Link to={`/watch/${movie._id}`} key={`movie-${movie._id}`}>
+                      <Poster movie={movie} language={language} />
+                    </Link>
+                  )
+                }
+                return null;
+              })
+            }
+            </div>
           </div>
         ) : <Loading />
       }
