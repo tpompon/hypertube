@@ -23,7 +23,6 @@ passport.use(new TwitterStrategy({
     passReqToCallback: true
   },
   function(req, token, tokenSecret, profile, done) {
-    // console.log(profile)
     User.findOne({ _twitterID: profile.id }, function(err, user) {
       if (err) {
         return done(err);
@@ -31,10 +30,10 @@ passport.use(new TwitterStrategy({
         const newUser = User({
           _twitterID: profile.id,
           firstname: profile.displayName,
-          lastname: "TwitterUser",
+          lastname: "",
           username: profile.username,
           cover: 'cinema',
-          avatar: profile.photos[0].value
+          avatar: profile.photos[0].value.replace("_normal", "")
         });
 
         newUser.save((err) => {
@@ -113,7 +112,6 @@ app.get('/oauth/twitter',
 app.get('/oauth/twitter/callback', 
   passport.authenticate('twitter', { failureRedirect: `http://${config.client.host}:${config.client.port}/login` }),
   (req, res) => {
-    // Successful authentication, redirect home.
     req.login(req.user, (err) => {
       if (err) {
         res.redirect(`http://${config.client.host}:${config.client.port}/login`);
@@ -124,6 +122,10 @@ app.get('/oauth/twitter/callback',
       }
     })
 });
+
+// app.get('/oauth/42/redirect', (req, res) => {
+//   res.json({ apiCode42: req.query.code });
+// })
 
 app.use('/auth', require('./router/auth'));
 app.use('/users', require('./router/users'));
