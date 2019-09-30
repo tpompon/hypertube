@@ -3,6 +3,7 @@ import axios from 'axios'
 import config from '../config'
 import Poster from '../components/Poster'
 import Loading from '../components/Loading'
+import { UserConsumer } from '../store';
 import { Link } from "react-router-dom";
 
 function compare_fr(a, b) {
@@ -33,6 +34,8 @@ function compare_en(a, b) {
 
 class MoviesList extends React.Component {
 
+  static contextType = UserConsumer
+
   constructor(props) {
     super(props);
     this.state = {
@@ -49,6 +52,7 @@ class MoviesList extends React.Component {
   }
 
   componentDidMount() {
+    console.log("test")
     axios.get(`http://${config.hostname}:${config.port}/movies`)
     .then(res => {
       if (res.data.success) {
@@ -64,7 +68,7 @@ class MoviesList extends React.Component {
       }
     });
   }
-
+  
   updateFilter = () => {
     const fGenre = document.getElementById("filter_genre");
     const fMinYear = document.getElementById("filter_minyear");
@@ -103,8 +107,8 @@ class MoviesList extends React.Component {
 
   render() {
     const { movies, _isLoaded } = this.state;
-    const { search, language } = this.props;
-
+    const { language } = this.props;
+    const { search } = this.context
     return (
       <div>
       {

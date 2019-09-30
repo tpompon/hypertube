@@ -149,14 +149,14 @@ class Profile extends React.Component {
           });
         }
       });
-      const coversMenu = document.getElementsByClassName('covers-menu')[0];
-      document.onclick = (e) => {
-        if (e.target.classList[0] !== 'covers-menu' && e.target.classList[0] !== 'covers-menu-child' && e.target.classList[0] !== 'cover-icon') {
-          if (e.target.classList[0] !== 'edit-cover-box' && e.target.classList[0] !== 'pencil-icon') {
-            coversMenu.style.display = 'none';
-          }
-        }
-      }
+      // const coversMenu = document.getElementsByClassName('covers-menu')[0];
+      // document.onclick = (e) => {
+      //   if (e.target.classList[0] !== 'covers-menu' && e.target.classList[0] !== 'covers-menu-child' && e.target.classList[0] !== 'cover-icon') {
+      //     if (e.target.classList[0] !== 'edit-cover-box' && e.target.classList[0] !== 'pencil-icon') {
+      //       coversMenu.style.display = 'none';
+      //     }
+      //   }
+      // }
     })
   }
 

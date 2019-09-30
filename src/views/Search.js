@@ -4,13 +4,17 @@ import config from '../config'
 import Poster from '../components/Poster2'
 import Loading from '../components/Loading'
 import { Link } from "react-router-dom";
+import { UserConsumer } from '../store';
 
 class Search extends React.Component {
 
+  static contextType = UserConsumer
+
   constructor(props) {
     super(props);
-    this.search = React.createRef();
+    //this.search = React.createRef();
     this.state = {
+      search: "",
       movies: [],
       _isLoaded: false,
       _status: undefined
@@ -18,7 +22,7 @@ class Search extends React.Component {
   }
 
   componentDidMount() {
-    const search = this.props.search;
+    const search = this.context.search;
     if (search.trim() !== '') {
       axios.get(`http://${config.hostname}:${config.port}/torrents/yts/search/${search}`)
       .then((res) => {
@@ -36,7 +40,7 @@ class Search extends React.Component {
   }
 
   fetchMovies = () => {
-    const search = this.search.current.value;
+    const { search } = this.state
     if (search.trim() !== '') {
       axios.get(`http://${config.hostname}:${config.port}/torrents/yts/search/${search}`)
       .then((res) => {

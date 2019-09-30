@@ -5,7 +5,6 @@ import translations from '../translations'
 import Rating from 'react-rating'
 import Button from '../components/Button'
 import Loading from '../components/Loading'
-import Counter from '../components/Counter'
 import { ReactComponent as StarFull } from '../svg/star-full.svg'
 import { ReactComponent as StarEmpty } from '../svg/star-empty.svg'
 import { ReactComponent as VerifiedIcon } from '../svg/verified.svg'
@@ -184,9 +183,6 @@ class Movie extends React.Component {
     const { movie, loaded, heartbeat } = this.state;
     const { language } = this.props;
 
-    if (movie.ytsData)
-      console.log(movie.ytsData.torrents)
-
     return (
       <div>
         {
@@ -207,18 +203,17 @@ class Movie extends React.Component {
                         </div>
                       </div>
                       <div className="hr"></div>
-                      <Counter />
-                      <div class="container-ytb" style={{marginBottom: 20}}>
+                      <div className="container-ytb" style={{marginBottom: 20}}>
                         <iframe src={`//www.youtube.com/embed/${movie.ytsData.yt_trailer_code}?autoplay=1`}
-                        allow="autoplay" frameborder="0" allowfullscreen class="video-ytb"></iframe>
+                        allow="autoplay" frameBorder="0" allowFullScreen className="video-ytb"></iframe>
                       </div>
                       {
                         movie.ytsData.genres ? (
                           <div className="genres row wrap" style={{marginBottom: 20}}>
                           {
-                            movie.ytsData.genres.map((genre) => {
+                            movie.ytsData.genres.map((genre, index) => {
                               return (
-                                <div className="genre">{genre}</div>
+                                <div key={index} className="genre">{genre}</div>
                               )
                             })
                           }
@@ -293,17 +288,17 @@ class Movie extends React.Component {
                     </div>
                   </div>
                   <div className="hr"></div>
-                  <div class="container-ytb" style={{marginBottom: 20}}>
+                  <div className="container-ytb" style={{marginBottom: 20}}>
                     <iframe src={`//www.youtube.com/embed/${movie.ytsData.yt_trailer_code}?autoplay=1`}
-                    allow="autoplay" frameborder="0" allowfullscreen class="video-ytb"></iframe>
+                    allow="autoplay" frameBorder="0" allowFullScreen className="video-ytb"></iframe>
                   </div>
                   {
                     movie.ytsData.genres ? (
                       <div className="genres row wrap" style={{marginBottom: 20}}>
                       {
-                        movie.ytsData.genres.map((genre) => {
+                        movie.ytsData.genres.map((genre, index) => {
                           return (
-                            <div className="genre">{genre}</div>
+                            <div key={ index } className="genre">{genre}</div>
                           )
                         })
                       }
