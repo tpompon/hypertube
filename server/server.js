@@ -19,18 +19,21 @@ const passport = require('passport')
 passport.use(new TwitterStrategy({
     consumerKey: process.env.TWITTER_CONSUMER_KEY,
     consumerSecret: process.env.TWITTER_CONSUMER_SECRET,
-    callbackURL: "http://127.0.0.1:4001/oauth/twitter/callback"
+    callbackURL: `http://${config.server.host}:${config.server.port}/oauth/twitter/callback`,
+    passReqToCallback: true
   },
-  (token, tokenSecret, profile, done) => {
+  function(req, token, tokenSecret, profile, done) {
     // console.log(profile)
-    User.findOne({ _twitterID: profile.id }, (err, user) => {
+    User.findOne({ _twitterID: profile.id }, function(err, user) {
       if (err) {
         return done(err);
       } else if (!user) {
         const newUser = User({
+          _twitterID: profile.id,
           firstname: profile.displayName,
           lastname: "TwitterUser",
           username: profile.username,
+          cover: 'cinema',
           avatar: profile.photos[0].value
         });
 
@@ -81,6 +84,7 @@ app.use(session({
   },
   secret: "c+IoG?1:wih`],]L=XMlr'uYP~H,ac~3xTmq-Vb|Bn{)`$Oe?*GwT_/Mx2/#yy7",
   cookie: {
+    secure: 'auto',
     maxAge: 1000 * 60 * 60 * 24 * 7 // 1 week (we can try with 5000 = 5s, cookie session will expire)
   },
   resave: false,
@@ -110,8 +114,15 @@ app.get('/oauth/twitter/callback',
   passport.authenticate('twitter', { failureRedirect: `http://${config.client.host}:${config.client.port}/login` }),
   (req, res) => {
     // Successful authentication, redirect home.
-    console.log(req)
-    res.redirect(`http://${config.client.host}:${config.client.port}/`)
+    req.login(req.user, (err) => {
+      if (err) {
+        res.redirect(`http://${config.client.host}:${config.client.port}/login`);
+      } else if (user) {
+        res.redirect(`http://${config.client.host}:${config.client.port}/`);
+      } else {
+        res.redirect(`http://${config.client.host}:${config.client.port}/login`);
+      }
+    })
 });
 
 app.use('/auth', require('./router/auth'));

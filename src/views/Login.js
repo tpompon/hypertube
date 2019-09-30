@@ -49,7 +49,7 @@ class Login extends React.Component {
 
   authenticate = (strategy) => {
     if (strategy === 'twitter') {
-      window.location.href = "http://127.0.0.1:4001/oauth/twitter/";
+      window.location.href = `http://${config.hostname}:${config.port}/oauth/twitter/`;
     } else {
       const body = {
         username: this.usernameInput.current.value,
@@ -59,7 +59,7 @@ class Login extends React.Component {
         .then((res) => {
           //alert(res.data.status);
           if (res.data.success) {
-            window.location.href = "http://localhost:3000/";
+            window.location.href = `http://${config.hostname}:${config.port}/`;
             // this.props.history.push('/');
           } else {
             this.setState({ error: res.data.status });

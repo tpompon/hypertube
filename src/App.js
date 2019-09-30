@@ -4,6 +4,7 @@ import config from './config'
 import './App.css';
 import Header from './components/Header'
 import Footer from './components/Footer'
+import Terminal from './components/Terminal'
 
 import Search from './views/Search'
 
@@ -90,6 +91,9 @@ const App = () => {
             )
           }
         </div>
+
+        {/* <Terminal /> */}
+
         <Footer language={language} />
       </div>
     </Router>

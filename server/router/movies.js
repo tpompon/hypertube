@@ -6,7 +6,7 @@ const Movie = require('../models/movie');
 
 router.route('/')
 .get((req, res) => {
-  console.log(req.query)
+  console.log('Movies Filters', req.query)
 	Movie.find({}, (err, movies) => {
 		if (err)
 			res.json({ success: false });
