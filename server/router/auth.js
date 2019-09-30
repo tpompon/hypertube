@@ -40,10 +40,6 @@ router.route('/login/:strategy')
         }
       })
     })(req, res, next);
-  } else if (strategy === '42') {
-
-  } else if (strategy === 'github') {
-  
   } else {
     res.json({ success: false, status: "Authentication failed, strategy error" });
   }

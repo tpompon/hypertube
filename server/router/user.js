@@ -23,7 +23,6 @@ router.route('/:id')
 		} else {
 		res.json({ success: true });
 		}
-
 	});
 })
 .put((req, res) => {

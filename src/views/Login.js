@@ -47,22 +47,26 @@ class Login extends React.Component {
     })
   };
 
-  authenticate = () => {
-    const body = {
-      username: this.usernameInput.current.value,
-      password: this.passwordInput.current.value
+  authenticate = (strategy) => {
+    if (strategy === 'twitter') {
+      window.location.href = "http://127.0.0.1:4001/oauth/twitter/";
+    } else {
+      const body = {
+        username: this.usernameInput.current.value,
+        password: this.passwordInput.current.value
+      }
+      axios.post(`http://${config.hostname}:${config.port}/auth/login/local`, body)
+        .then((res) => {
+          //alert(res.data.status);
+          if (res.data.success) {
+            window.location.href = "http://localhost:3000/";
+            // this.props.history.push('/');
+          } else {
+            this.setState({ error: res.data.status });
+            document.getElementById('error').style.display = 'block';
+          }
+        });
     }
-    axios.post(`http://${config.hostname}:${config.port}/auth/login/local`, body)
-      .then((res) => {
-        //alert(res.data.status);
-        if (res.data.success) {
-          window.location.href = "http://localhost:3000/";
-          // this.props.history.push('/');
-        } else {
-          this.setState({ error: res.data.status });
-          document.getElementById('error').style.display = 'block';
-        }
-      });
   }
 
   sendResetLink = () => {
@@ -112,7 +116,7 @@ class Login extends React.Component {
               <div id="login-form">
                 <div className="row" style={{ justifyContent: 'space-between', marginBottom: 20 }}>
                   <button className="oauth-btn oauth-btn-42" style={{width: '31%'}}><FourtyTwoIcon fill="#fff" width="25" height="25" /></button>
-                  <button className="oauth-btn oauth-btn-twitter" style={{width: '31%'}}><TwitterIcon fill="#fff" width="25" height="25" /></button>
+                  <button onClick={() => this.authenticate('twitter')} className="oauth-btn oauth-btn-twitter" style={{width: '31%'}}><TwitterIcon fill="#fff" width="25" height="25" /></button>
                   <button className="oauth-btn oauth-btn-facebook" style={{width: '31%'}}><FacebookIcon fill="#fff" width="25" height="25" /></button>
                 </div>
                 <input ref={this.usernameInput} className="dark-input" type="text" placeholder={translations[language].login.inputs.username} style={{width: '100%', marginTop: 5, marginBottom: 5}} />

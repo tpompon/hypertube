@@ -13,7 +13,40 @@ global.__basedir = __dirname;
 
 // Passport
 const passport = require('passport')
-  , LocalStrategy = require('passport-local').Strategy;
+  , LocalStrategy = require('passport-local').Strategy
+  , TwitterStrategy = require('passport-twitter').Strategy;
+
+passport.use(new TwitterStrategy({
+    consumerKey: process.env.TWITTER_CONSUMER_KEY,
+    consumerSecret: process.env.TWITTER_CONSUMER_SECRET,
+    callbackURL: "http://127.0.0.1:4001/oauth/twitter/callback"
+  },
+  (token, tokenSecret, profile, done) => {
+    // console.log(profile)
+    User.findOne({ _twitterID: profile.id }, (err, user) => {
+      if (err) {
+        return done(err);
+      } else if (!user) {
+        const newUser = User({
+          firstname: profile.displayName,
+          lastname: "TwitterUser",
+          username: profile.username,
+          avatar: profile.photos[0].value
+        });
+
+        newUser.save((err) => {
+          if (err) {
+            return done(null, false, { error: err });
+          } else {
+            return done(null, newUser);
+          }
+        });
+      } else {
+        return done(null, user);
+      }
+    });
+  }
+));
 
 passport.use(new LocalStrategy(
   function(username, password, done) {
@@ -69,6 +102,16 @@ const db = require('./db')
 db.on('error', console.error.bind(console, 'Database connection error:'));
 db.once('open', () => {
   console.log('\x1b[36m%s\x1b[0m', '-> Database connection established');
+});
+
+app.get('/oauth/twitter',
+  passport.authenticate('twitter'));
+app.get('/oauth/twitter/callback', 
+  passport.authenticate('twitter', { failureRedirect: `http://${config.client.host}:${config.client.port}/login` }),
+  (req, res) => {
+    // Successful authentication, redirect home.
+    console.log(req)
+    res.redirect(`http://${config.client.host}:${config.client.port}/`)
 });
 
 app.use('/auth', require('./router/auth'));

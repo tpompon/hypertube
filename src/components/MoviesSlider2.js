@@ -48,17 +48,27 @@ class PostersSlider extends React.Component {
     return (
       <div className="posters-slider-container row">
         <span className="control-left no-selection"><ArrowLeft fill="#fff" width="20" height="20" style={{ marginTop: 200, marginLeft: 20, backgroundColor: 'rgba(0, 0, 0, .7)', borderRadius: '50%', padding: 20 }} /></span>
-          <div className="posters-slider row center no-selection">
           {
-            movies.map((movie) => {
-              return (
-                <Link to={`/watch/${movie._id}`} key={`movie-${movie._id}`}>
-                  <Poster movie={movie} language={language} />
-                </Link>
-              )
-            })
+            movies.length > 0 ? (
+              <div className="posters-slider row center no-selection">
+              {
+                movies.map((movie) => {
+                  return (
+                    <Link to={`/watch/${movie._id}`} key={`movie-${movie._id}`}>
+                      <Poster movie={movie} language={language} />
+                    </Link>
+                  )
+                })
+              }
+              </div>
+            ) : (
+              <div className="posters-slider row center no-selection">
+                <div className="no-movie-poster">
+                  No movies has been added to this list
+                </div>
+              </div>
+            )
           }
-          </div>
         <span className="control-right"><ArrowRight fill="#fff" width="20" height="20" style={{ marginTop: 200, marginRight: 20, backgroundColor: 'rgba(0, 0, 0, .7)', borderRadius: '50%', padding: 20 }} /></span>
       </div>
     );

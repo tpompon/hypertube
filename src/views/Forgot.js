@@ -20,9 +20,6 @@ class Forgot extends React.Component {
   }
 
   componentDidMount() {
-    // check if key exist
-    // display form to reset or not
-    // request to delete key and update password
     axios.get(`${config.serverURL}/auth/forgot/${this.state.key}`)
     .then((res) => {
       if (res.data.success) {

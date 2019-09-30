@@ -32,6 +32,7 @@ class Movie extends React.Component {
   }
 
   componentDidMount() {
+    window.scrollTo(0, 0);
     axios.get(`http://${config.hostname}:${config.port}/movies/${this.props.match.params.id}`)
     .then(res => this.setState({movie: res.data.movie[0], loaded: true}))
     .then(() => {
@@ -206,6 +207,7 @@ class Movie extends React.Component {
                         </div>
                       </div>
                       <div className="hr"></div>
+                      <Counter />
                       <div class="container-ytb" style={{marginBottom: 20}}>
                         <iframe src={`//www.youtube.com/embed/${movie.ytsData.yt_trailer_code}?autoplay=1`}
                         allow="autoplay" frameborder="0" allowfullscreen class="video-ytb"></iframe>
