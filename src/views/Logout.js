@@ -1,45 +1,35 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios'
 import config from '../config'
 import translations from '../translations'
 import Loading from '../components/Loading'
 import { ReactComponent as CheckMark } from '../svg/checkmark.svg'
 
-class Logout extends React.Component {
+const Logout = (props) => {
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      disconnected: false
-    }
-  }
+  const [disconnected, updateDisconnected] = useState(false)
 
-  componentDidMount() {
+  useEffect(() => {
     axios.get(`http://${config.hostname}:${config.port}/auth/logout`)
-      .then(() => {
-        this.setState({disconnected: true});
-        setTimeout(() => {
-          window.location.href = "http://localhost:3000/login";
-        }, 1000)
-      })
-  }
+    updateDisconnected(true)
+    setTimeout(() => {
+      window.location.href = "http://localhost:3000/login";
+    }, 1000)
+  }, [])
 
-  render() {
-    const { language } = this.props;
+  return (
+    <div className="text-center">
+      {
+        (disconnected) ? (
+          <div>
+            <CheckMark width="50" height="50" fill="#5CB85C" />
+            <p>{translations[props.language].logout.title}</p>
+          </div>
+        ) : <Loading />
+      }
+    </div>
+  );
 
-    return (
-      <div className="text-center">
-        {
-          (this.state.disconnected) ? (
-            <div>
-              <CheckMark width="50" height="50" fill="#5CB85C" />
-              <p>{translations[language].logout.title}</p>
-            </div>
-          ) : <Loading />
-        }
-      </div>
-    );
-  }
 }
 
 export default Logout;

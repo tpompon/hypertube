@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import config from '../config'
 import translations from '../translations'
@@ -24,29 +24,23 @@ const recents = [
   { id: 4, name_fr: "Pirates des Caraïbes", name_en: "Pirates of Caraïbes", poster: "/posters/pirates_des_caraibes.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.8 },
 ]
 
-class User extends React.Component {
+const User = (props) => {
+  const [user, updateUser] = useState(null)
+  const [_isLoaded, updateIsLoaded] = useState(false)
+  const { language, match } = props
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      username: this.props.match.params.username,
-      user: null,
-      _isLoaded: false
-    }
-  }
-
-  componentDidMount() {
-    axios.get(`http://${config.hostname}:${config.port}/user/username/${this.state.username}`)
+  useEffect(() => {
+    axios.get(`http://${config.hostname}:${config.port}/user/username/${match.params.username}`)
       .then(res => {
         if (res.data.success) {
-          this.setState({user: res.data.user[0], _isLoaded: true});
+          updateUser(res.data.user[0])
+          updateIsLoaded(true)
         }
       });
-  }
+  }, [])
 
-  copyProfileURL = () => {
-    const { user } = this.state;
-    const { language } = this.props;
+  const copyProfileURL = () => {
+    const { language } = props;
     const profileURL = document.createElement('textarea');
     const tooltipText = document.getElementsByClassName("tooltip-text")[0];
     tooltipText.innerHTML = translations[language].user.tooltip.copied;
@@ -59,16 +53,11 @@ class User extends React.Component {
     document.body.removeChild(profileURL);
   }
 
-  resetTooltip = () => {
-    const { language } = this.props;
+  const resetTooltip = () => {
+    const { language } = props;
     const tooltipText = document.getElementsByClassName("tooltip-text")[0];
     tooltipText.innerHTML = translations[language].user.tooltip.copy;
   }
-
-  render() {
-    
-    const { user, _isLoaded } = this.state;
-    const { language } = this.props;
 
     return (
       <div>
@@ -85,7 +74,7 @@ class User extends React.Component {
                     <div style={{marginTop: 20}}>
                       <div>{user.firstname} {user.lastname}</div>
                       <div className="tooltip">
-                        <div className="username" onClick={() => this.copyProfileURL()} onMouseLeave={() => this.resetTooltip()}>@{user.username} {user.verified ? <div className="verified" style={{marginBottom: 2}}><VerifiedIcon width="15" height="15" /></div> : null}</div>
+                        <div className="username" onClick={() => copyProfileURL()} onMouseLeave={() => resetTooltip()}>@{user.username} {user.verified ? <div className="verified" style={{marginBottom: 2}}><VerifiedIcon width="15" height="15" /></div> : null}</div>
                         <span className="tooltip-text">{translations[language].user.tooltip.copy}</span>
                       </div>
                     </div>
@@ -106,7 +95,7 @@ class User extends React.Component {
       }
       </div>
     );
-  }
+
 }
 
 export default User;

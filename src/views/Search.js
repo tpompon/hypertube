@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios'
 import config from '../config'
 import Poster from '../components/Poster2'
@@ -6,99 +6,88 @@ import Loading from '../components/Loading'
 import { Link } from "react-router-dom";
 import { UserConsumer } from '../store';
 
-class Search extends React.Component {
+const Search = (props) => {
 
-  static contextType = UserConsumer
+  const [search, updateSearch] = useState("")
+  const [movies, updateMovies] = useState([])
+  const [_isLoaded, updateIsLoaded] = useState(false)
+  const [_status, updateStatus] = useState(undefined)
+  const { language } = props
+  const context = useContext(UserConsumer)
 
-  constructor(props) {
-    super(props);
-    //this.search = React.createRef();
-    this.state = {
-      search: "",
-      movies: [],
-      _isLoaded: false,
-      _status: undefined
-    }
-  }
-
-  componentDidMount() {
-    const search = this.context.search;
+  useEffect(() => {
+    const search = context.search;
     if (search.trim() !== '') {
       axios.get(`http://${config.hostname}:${config.port}/torrents/yts/search/${search}`)
-      .then((res) => {
-        if (res.data.count !== 0) {
-          this.setState({ movies: res.data.results.data.movies, _isLoaded: true, _status: 'no_result' });
-        } else {
-          //alert('No result');
-          this.setState({ _isLoaded: true, _status: 'no_result' });
-        }
-      })
+        .then((res) => {
+          if (res.data.count !== 0) {
+            updateMovies(res.data.results.data.movies)
+          }
+          updateStatus("no results")
+        })
     } else {
-      this.setState({ _isLoaded: true, _status: 'empty' });
+      updateStatus("empty")
       //alert('empty search');
     }
-  }
+    updateIsLoaded(true)
+  }, [])
 
-  fetchMovies = () => {
-    const { search } = this.state
+  // Voir si on garde ou pas
+  const fetchMovies = () => {
     if (search.trim() !== '') {
       axios.get(`http://${config.hostname}:${config.port}/torrents/yts/search/${search}`)
-      .then((res) => {
-        if (res.data.count !== 0) {
-          this.setState({ movies: res.data.results.data.movies });
-        } else {
-          alert('No result');
-        }
-      })
+        .then((res) => {
+          if (res.data.count !== 0) {
+            updateMovies(res.data.results.data.movies)
+          } else {
+            alert('No result');
+          }
+        })
     } else {
       alert('empty search');
     }
   }
 
-  checkDatabase = (ytsID) => {
+  const checkDatabase = (ytsID) => {
     axios.get(`http://${config.hostname}:${config.port}/movies/yts/${ytsID}`)
-    .then((res) => {
-      if (!res.data.success) {
-        axios.get(`http://${config.hostname}:${config.port}/torrents/yts/${ytsID}`)
-        .then((res) => {
-          const movie = res.data.result.data.movie;
-
-          movie.torrents.forEach((torrent) => {
-						torrent.magnet = `magnet:?xt=urn:btih:${movie.torrents[0].hash}&dn=${encodeURI(movie.title)}&tr=http://track.one:1234/announce&tr=udp://track.two:80`;
-						torrent.magnet2 = `magnet:?xt=urn:btih:${movie.torrents[0].hash}&dn=${encodeURI(movie.title)}&tr=http://track.one:1234/announce&tr=udp://tracker.openbittorrent.com:80`;
-          })
-
-          const newMovie = {
-            ytsId: movie.id,
-            name_fr: movie.title,
-            name_en: movie.title,
-            poster: movie.large_cover_image,
-            ytsData: movie,
-            description_fr: movie.description_full,
-            description_en: movie.description_full,
-            author: 'Someone',
-            rating: movie.rating / 2
-          }
-          axios.post(`${config.serverURL}/movies`, newMovie)
+      .then((res) => {
+        if (!res.data.success) {
+          axios.get(`http://${config.hostname}:${config.port}/torrents/yts/${ytsID}`)
           .then((res) => {
-            if (res.data.success)
-              this.props.history.push(`/watch/${res.data.movie._id}`);
-            else
-              alert('Could not create entry in Database for this movie');
-          })
-        });
-      } else {
-        this.props.history.push(`/watch/${res.data.movie._id}`);
-      }
-    })
+            const movie = res.data.result.data.movie;
+
+            movie.torrents.forEach((torrent) => {
+              torrent.magnet = `magnet:?xt=urn:btih:${movie.torrents[0].hash}&dn=${encodeURI(movie.title)}&tr=http://track.one:1234/announce&tr=udp://track.two:80`;
+              torrent.magnet2 = `magnet:?xt=urn:btih:${movie.torrents[0].hash}&dn=${encodeURI(movie.title)}&tr=http://track.one:1234/announce&tr=udp://tracker.openbittorrent.com:80`;
+            })
+
+            const newMovie = {
+              ytsId: movie.id,
+              name_fr: movie.title,
+              name_en: movie.title,
+              poster: movie.large_cover_image,
+              ytsData: movie,
+              description_fr: movie.description_full,
+              description_en: movie.description_full,
+              author: 'Someone',
+              rating: movie.rating / 2
+            }
+            axios.post(`${config.serverURL}/movies`, newMovie)
+              .then((res) => {
+                if (res.data.success)
+                  props.history.push(`/watch/${res.data.movie._id}`);
+                else
+                  alert('Could not create entry in Database for this movie');
+              })
+          });
+        } else {
+          props.history.push(`/watch/${res.data.movie._id}`);
+        }
+      })
   }
 
-  render() {
-    const { movies, _isLoaded } = this.state
-    const { language } = this.props
-
-    return (
-      <div>
+  return (
+    <div>
       {
         _isLoaded ? (
           <div className="posters-list row wrap">
@@ -111,7 +100,7 @@ class Search extends React.Component {
                   // <Link to={`/watchyts/${movie.id}`} key={`movie-${movie.slug}`}>
                   //   <Poster movie={movie} language={language} />
                   // </Link>
-                  <div onClick={() => this.checkDatabase(movie.id)}><Poster movie={movie} language={language} /></div>
+                  <div onClick={() => checkDatabase(movie.id)}><Poster movie={movie} language={language} /></div>
                 )
             })
           }
@@ -153,8 +142,8 @@ class Search extends React.Component {
       //     })
       //   }
       // </div>
-    );
-  }
+    )
+
 }
 
 export default Search;
