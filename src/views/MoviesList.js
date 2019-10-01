@@ -139,7 +139,7 @@ class MoviesList extends React.Component {
               </select>
               <input id="filter_minrating" onChange={() => this.updateFilter()} className="dark-input" type="number" placeholder="Min. Rating" style={{marginLeft: 30}} />
               <input id="filter_maxrating" onChange={() => this.updateFilter()} className="dark-input" type="number" placeholder="Max. Rating" style={{marginLeft: 10}} />
-              <Button action={() => this.searchRequest()} content="Search" />
+              <Button style={{marginLeft: 20}} action={() => this.searchRequest()} content="Search" />
             </div>
             <div className="posters-list row wrap">
             {

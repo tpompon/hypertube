@@ -7,7 +7,9 @@ const Movie = require('../models/movie');
 router.route('/')
 .get((req, res) => {
   console.log('Movies Filters', req.query)
-	Movie.find({}, (err, movies) => {
+  // Query for genre + years
+  // "ytsData.genres": /.*Horror.*/i, $and: [ { "ytsData.year": { $gte: 1990 } }, { "ytsData.year": { $lte: 2010 } } ]
+	Movie.find({ }, (err, movies) => {
 		if (err)
 			res.json({ success: false });
 		else

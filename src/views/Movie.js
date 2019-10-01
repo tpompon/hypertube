@@ -56,6 +56,7 @@ class Movie extends React.Component {
         //   })
         // })
 
+        document.addEventListener('scroll', this.handleScroll, false);
         document.querySelector('.comment-input').addEventListener('keydown', this.onEnter, false);
         document.addEventListener('keydown', this.onEscape, false);
 
@@ -101,6 +102,7 @@ class Movie extends React.Component {
   componentWillUnmount() {
     document.removeEventListener('keydown', this.onEnter, false);
     document.removeEventListener('keydown', this.onEscape, false);
+    document.removeEventListener('scroll', this.handleScroll, false);
   }
 
   onEnter = (e) => {
@@ -112,6 +114,15 @@ class Movie extends React.Component {
       this.hidePlayer();
     }
   }
+
+  // handleScroll = (e) => {
+  //   const moviePoster = document.getElementById('movie-page-poster-fullsize');
+  //   const movieInfos = document.getElementById('movie-infos-fullsize');
+  //   const top = window.pageYOffset || document.documentElement.scrollTop;
+
+  //   if (top < movieInfos.offsetHeight)
+  //     moviePoster.style.marginTop = `${top}px`;
+  // }
 
   addComment = () => {
     const { user } = this.state;
@@ -191,9 +202,9 @@ class Movie extends React.Component {
             <div>
               <div className="movie-page">
                 <div className="row wrap">
-                  <img className="movie-page-poster center" src={movie.poster} alt="Movie poster" />
+                  <img id="movie-page-poster-fullsize" className="movie-page-poster center" src={movie.poster} alt="Movie poster" />
                   <div className="col center" style={{ width: '45%', padding: 50, backgroundColor: '#16162e', wordBreak: 'break-word', borderRadius: 20 }}>
-                    <div className="movie-infos" style={{marginBottom: 20}}>
+                    <div id="movie-infos-fullsize" className="movie-infos" style={{marginBottom: 20}}>
                       <div className="row" style={{ alignItems: 'center', flexWrap: 'wrap' }}>
                         <h1>{(language === 'fr') ? movie.name_fr : movie.name_en}</h1>
                         <span style={{marginTop: 10, marginLeft: 10}}>({movie.ytsData.year})</span>

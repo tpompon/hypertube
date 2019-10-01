@@ -92,7 +92,7 @@ const App = () => {
           }
         </div>
 
-        {/* <Terminal /> */}
+        <Terminal />
 
         <Footer language={language} />
       </div>
