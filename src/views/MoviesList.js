@@ -1,6 +1,7 @@
 import React from 'react';
 import axios from 'axios'
 import config from '../config'
+import Button from '../components/Button'
 import Poster from '../components/Poster'
 import Loading from '../components/Loading'
 import { UserConsumer } from '../store';
@@ -138,7 +139,7 @@ class MoviesList extends React.Component {
               </select>
               <input id="filter_minrating" onChange={() => this.updateFilter()} className="dark-input" type="number" placeholder="Min. Rating" style={{marginLeft: 30}} />
               <input id="filter_maxrating" onChange={() => this.updateFilter()} className="dark-input" type="number" placeholder="Max. Rating" style={{marginLeft: 10}} />
-              <button onClick={() => this.searchRequest()}>Search</button>
+              <Button action={() => this.searchRequest()} content="Search" />
             </div>
             <div className="posters-list row wrap">
             {

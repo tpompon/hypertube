@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 import Button from '../components/Button'
 import { ReactComponent as TwitterIcon } from '../svg/twitter.svg'
 import { ReactComponent as FourtyTwoIcon } from '../svg/42.svg'
-import { ReactComponent as FacebookIcon } from '../svg/facebook.svg'
+import { ReactComponent as GoogleIcon } from '../svg/google.svg'
 
 axios.defaults.withCredentials = true;
 
@@ -52,6 +52,8 @@ class Login extends React.Component {
       window.location.href = `http://${config.hostname}:${config.port}/oauth/twitter/`;
     } else if (strategy === '42') {
       window.location.href = `http://${config.hostname}:${config.port}/oauth/42/`;
+    } else if (strategy === 'google') {
+      window.location.href = `http://${config.hostname}:${config.port}/oauth/google/`;
     } else {
       const body = {
         username: this.usernameInput.current.value,
@@ -119,7 +121,7 @@ class Login extends React.Component {
                 <div className="row" style={{ justifyContent: 'space-between', marginBottom: 20 }}>
                   <button onClick={() => this.authenticate('42')} className="oauth-btn oauth-btn-42" style={{width: '31%'}}><FourtyTwoIcon fill="#fff" width="25" height="25" /></button>
                   <button onClick={() => this.authenticate('twitter')} className="oauth-btn oauth-btn-twitter" style={{width: '31%'}}><TwitterIcon fill="#fff" width="25" height="25" /></button>
-                  <button className="oauth-btn oauth-btn-facebook" style={{width: '31%'}}><FacebookIcon fill="#fff" width="25" height="25" /></button>
+                  <button onClick={() => this.authenticate('google')} className="oauth-btn oauth-btn-google" style={{width: '31%'}}><GoogleIcon fill="#fff" width="25" height="25" /></button>
                 </div>
                 <input ref={this.usernameInput} className="dark-input" type="text" placeholder={translations[language].login.inputs.username} style={{width: '100%', marginTop: 5, marginBottom: 5}} />
                 <input ref={this.passwordInput} className="dark-input" type="password" placeholder={translations[language].login.inputs.password} style={{width: '100%', marginTop: 5, marginBottom: 20}} />

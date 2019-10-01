@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const UserSchema = new Schema({
+  _googleID: String,
   _fourtytwoID: String,
   _twitterID: String,
   firstname: { type: String, required: true },

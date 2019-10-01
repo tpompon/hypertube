@@ -15,7 +15,43 @@ global.__basedir = __dirname;
 const passport = require('passport')
   , LocalStrategy = require('passport-local').Strategy
   , TwitterStrategy = require('passport-twitter').Strategy
-  , FourtyTwoStrategy = require('passport-42').Strategy;
+  , FourtyTwoStrategy = require('passport-42').Strategy
+  , GoogleStrategy = require('passport-google-oauth20').Strategy;
+
+  passport.use(new GoogleStrategy({
+    clientID: process.env.GOOGLE_CONSUMER_KEY,
+    clientSecret: process.env.GOOGLE_CONSUMER_SECRET,
+    callbackURL: "http://localhost:4001/oauth/google/redirect"
+  },
+  function(accessToken, refreshToken, profile, done) {
+    User.findOne({ _googleID: profile.id }, function(err, user) {
+      if (err) {
+        return done(err);
+      } else if (!user) {
+        const newUser = User({
+          _googleID: profile.id,
+          firstname: profile.name.givenName,
+          lastname: "GoogleUser",
+          //email: profile.emails[0].value,
+          username: profile.name.givenName,
+          cover: 'cinema',
+          avatar: profile.photos[0].value
+        });
+
+        newUser.save((err) => {
+          if (err) {
+            console.log(err)
+            return done(null, false, { error: err });
+          } else {
+            return done(null, newUser);
+          }
+        });
+      } else {
+        return done(null, user);
+      }
+    });
+  }
+));
 
 passport.use(new FourtyTwoStrategy({
     clientID: process.env.FOURTYTWO_CLIENT_ID,
@@ -163,6 +199,22 @@ app.get('/oauth/42',
   passport.authenticate('42'));
 app.get('/oauth/42/redirect', 
   passport.authenticate('42', { failureRedirect: `http://${config.client.host}:${config.client.port}/login` }),
+  (req, res) => {
+    req.login(req.user, (err) => {
+      if (err) {
+        res.redirect(`http://${config.client.host}:${config.client.port}/login`);
+      } else if (user) {
+        res.redirect(`http://${config.client.host}:${config.client.port}/`);
+      } else {
+        res.redirect(`http://${config.client.host}:${config.client.port}/login`);
+      }
+    })
+});
+
+app.get('/oauth/google',
+  passport.authenticate('google', { scope: ['profile'] }));
+app.get('/oauth/google/redirect', 
+passport.authenticate('google', { failureRedirect: `http://${config.client.host}:${config.client.port}/login` }),
   (req, res) => {
     req.login(req.user, (err) => {
       if (err) {
