@@ -14,12 +14,48 @@ global.__basedir = __dirname;
 // Passport
 const passport = require('passport')
   , LocalStrategy = require('passport-local').Strategy
-  , TwitterStrategy = require('passport-twitter').Strategy;
+  , TwitterStrategy = require('passport-twitter').Strategy
+  , FourtyTwoStrategy = require('passport-42').Strategy;
+
+passport.use(new FourtyTwoStrategy({
+    clientID: process.env.FOURTYTWO_CLIENT_ID,
+    clientSecret: process.env.FOURTYTWO_CLIENT_SECRET,
+    callbackURL: "http://localhost:4001/oauth/42/redirect"
+  },
+  function(req, token, tokenSecret, profile, done) {
+    User.findOne({ _fourtytwoID: profile.id }, function(err, user) {
+      if (err) {
+        return done(err);
+      } else if (!user) {
+        const newUser = User({
+          _fourtytwoID: profile.id,
+          firstname: profile.name.givenName,
+          lastname: profile.name.familyName,
+          email: profile.emails[0].value,
+          username: profile.username,
+          cover: 'cinema',
+          avatar: profile.photos[0].value
+        });
+
+        newUser.save((err) => {
+          if (err) {
+            console.log(err)
+            return done(null, false, { error: err });
+          } else {
+            return done(null, newUser);
+          }
+        });
+      } else {
+        return done(null, user);
+      }
+    });
+  }
+));
 
 passport.use(new TwitterStrategy({
     consumerKey: process.env.TWITTER_CONSUMER_KEY,
     consumerSecret: process.env.TWITTER_CONSUMER_SECRET,
-    callbackURL: `http://${config.server.host}:${config.server.port}/oauth/twitter/callback`,
+    callbackURL: `http://${config.server.host}:${config.server.port}/oauth/twitter/redirect`,
     passReqToCallback: true
   },
   function(req, token, tokenSecret, profile, done) {
@@ -30,7 +66,7 @@ passport.use(new TwitterStrategy({
         const newUser = User({
           _twitterID: profile.id,
           firstname: profile.displayName,
-          lastname: "",
+          lastname: "TwitterUser",
           username: profile.username,
           cover: 'cinema',
           avatar: profile.photos[0].value.replace("_normal", "")
@@ -109,7 +145,7 @@ db.once('open', () => {
 
 app.get('/oauth/twitter',
   passport.authenticate('twitter'));
-app.get('/oauth/twitter/callback', 
+app.get('/oauth/twitter/redirect', 
   passport.authenticate('twitter', { failureRedirect: `http://${config.client.host}:${config.client.port}/login` }),
   (req, res) => {
     req.login(req.user, (err) => {
@@ -123,9 +159,21 @@ app.get('/oauth/twitter/callback',
     })
 });
 
-// app.get('/oauth/42/redirect', (req, res) => {
-//   res.json({ apiCode42: req.query.code });
-// })
+app.get('/oauth/42',
+  passport.authenticate('42'));
+app.get('/oauth/42/redirect', 
+  passport.authenticate('42', { failureRedirect: `http://${config.client.host}:${config.client.port}/login` }),
+  (req, res) => {
+    req.login(req.user, (err) => {
+      if (err) {
+        res.redirect(`http://${config.client.host}:${config.client.port}/login`);
+      } else if (user) {
+        res.redirect(`http://${config.client.host}:${config.client.port}/`);
+      } else {
+        res.redirect(`http://${config.client.host}:${config.client.port}/login`);
+      }
+    })
+});
 
 app.use('/auth', require('./router/auth'));
 app.use('/users', require('./router/users'));

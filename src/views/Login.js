@@ -50,6 +50,8 @@ class Login extends React.Component {
   authenticate = (strategy) => {
     if (strategy === 'twitter') {
       window.location.href = `http://${config.hostname}:${config.port}/oauth/twitter/`;
+    } else if (strategy === '42') {
+      window.location.href = `http://${config.hostname}:${config.port}/oauth/42/`;
     } else {
       const body = {
         username: this.usernameInput.current.value,
@@ -59,7 +61,7 @@ class Login extends React.Component {
         .then((res) => {
           //alert(res.data.status);
           if (res.data.success) {
-            window.location.href = `http://${config.hostname}:${config.port}/`;
+            window.location.href = `http://localhost:3000/`;
             // this.props.history.push('/');
           } else {
             this.setState({ error: res.data.status });
@@ -115,7 +117,7 @@ class Login extends React.Component {
               </div>
               <div id="login-form">
                 <div className="row" style={{ justifyContent: 'space-between', marginBottom: 20 }}>
-                  <button className="oauth-btn oauth-btn-42" style={{width: '31%'}}><FourtyTwoIcon fill="#fff" width="25" height="25" /></button>
+                  <button onClick={() => this.authenticate('42')} className="oauth-btn oauth-btn-42" style={{width: '31%'}}><FourtyTwoIcon fill="#fff" width="25" height="25" /></button>
                   <button onClick={() => this.authenticate('twitter')} className="oauth-btn oauth-btn-twitter" style={{width: '31%'}}><TwitterIcon fill="#fff" width="25" height="25" /></button>
                   <button className="oauth-btn oauth-btn-facebook" style={{width: '31%'}}><FacebookIcon fill="#fff" width="25" height="25" /></button>
                 </div>
