@@ -23,7 +23,7 @@ router.route('/')
       res.json({ success: true, users: users });
   });
 })
-.post(async (req, res) => {
+.post((req, res) => {
   let avatarFile = 'default_avatar.png'
   if (req.body.avatar)
     avatarFile = req.body.avatar;
@@ -31,12 +31,12 @@ router.route('/')
   const confirmKey = uuidv4();
   const confirmationLink = `${req.body.origin}/confirm/${confirmKey}`;
 
-  const hash = await bcrypt.hash(req.body.password, 10);
+  // const hash = await bcrypt.hash(req.body.password, 10);
 	const newUser = User({
     firstname: req.body.firstname,
     lastname: req.body.lastname,
     username: req.body.username,
-    password: hash,
+    password: req.body.password,
     avatar: `http://${config.server.host}:${config.server.port}/public/avatars/` + avatarFile,
     cover: 'cinema',
     birthdate: req.body.birthdate,

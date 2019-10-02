@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect, useRef } from 'react';
 import axios from 'axios'
 import config from 'config'
 import translations from 'translations'
@@ -29,6 +29,7 @@ const Register = () => {
   const [toggleSuccess, updateToggleSuccess] = useState(false)
   const [warnMatch, updateWarnMatch] = useState(false)
   const [warnLength, updateWarnLength] = useState(false)
+  const uploadAvatar = useRef(null)
   const context = useContext(UserConsumer)
   const { language } = context
 
@@ -62,8 +63,25 @@ const Register = () => {
     updatenewUser({ ...newUser, [option]: event.target.value })
   }
 
+  const onChangeAvatar = (event) => {
+    if (event.target.files[0]) {
+      event.preventDefault();
+      const data = new FormData();
+      data.append('file', event.target.files[0]);
+      data.append('filename', event.target.files[0].name);
+      alert('OK');
+      // Treat image upload and show it on form, save it temp, and move it in the user folder only if register success
+    }
+  }
+
   return (
     <div className="dark-card center text-center">
+      <div className="profile-avatar center">
+        <a className="profile-avatar-overlay" onClick={() => uploadAvatar.current.click()}>Upload avatar</a> {/* To translate */}
+        <input type="file" id="file" ref={ uploadAvatar } onChange={(e) => onChangeAvatar(e)} style={{display: "none"}}/>
+        <img src={`http://${config.hostname}:${config.port}/public/avatars/default_avatar.png`} alt={`Upload avatar`} />
+      </div>
+
       <h2>{translations[language].register.title}</h2>
       {
         (toggleSuccess) ? (
