@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react'
 import { ReactComponent as TerminalIcon } from '../svg/terminal.svg'
-import { ReactComponent as Close } from '../svg/close.svg'
+import { ReactComponent as Close } from '../../svg/close.svg'
 
 const Terminal = () => {
 
