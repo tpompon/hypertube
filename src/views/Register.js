@@ -1,10 +1,10 @@
 import React, { useState, useContext, useEffect } from 'react';
 import axios from 'axios'
-import config from '../config'
-import translations from '../translations'
-import Button from '../components/Button'
+import config from 'config'
+import translations from 'translations'
+import Button from 'components/Button'
 import { Link } from "react-router-dom";
-import { UserConsumer } from '../store';
+import { UserConsumer } from 'store';
 
 const Register = () => {
 

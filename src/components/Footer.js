@@ -1,5 +1,5 @@
 import React from 'react';
-import translations from '../translations'
+import translations from 'translations'
 import { Link } from "react-router-dom";
 
 const Footer = ({ language }) => (

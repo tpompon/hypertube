@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios'
-import config from '../config'
-import Button from '../components/Button'
-import Poster from '../components/Poster'
-import Loading from '../components/Loading'
-import { UserConsumer } from '../store';
+import config from 'config'
+import Button from 'components/Button'
+import Poster from 'components/Poster'
+import Loading from 'components/Loading'
+import { UserConsumer } from 'store';
 import { Link } from "react-router-dom";
 
 function compare(a, b) {

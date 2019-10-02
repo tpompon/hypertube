@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
-import config from '../config'
-import translations from '../translations'
-import MoviesSlider from '../components/MoviesSlider'
-import Loading from '../components/Loading'
-import { ReactComponent as VerifiedIcon } from '../svg/verified.svg'
+import config from 'config'
+import translations from 'translations'
+import MoviesSlider from 'components/MoviesSlider'
+import Loading from 'components/Loading'
+import { ReactComponent as VerifiedIcon } from 'svg/verified.svg'
 
 const heartbeat = [
   { id: 1, name_fr: "L'Arnacoeur", name_en: "L'Arnacoeur", poster: "/posters/arnacoeur.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.8 },

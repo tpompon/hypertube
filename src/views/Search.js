@@ -1,10 +1,10 @@
 import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios'
-import config from '../config'
-import Poster from '../components/Poster2'
-import Loading from '../components/Loading'
+import config from 'config'
+import Poster from 'components/Poster2'
+import Loading from 'components/Loading'
 import { Link } from "react-router-dom";
-import { UserConsumer } from '../store';
+import { UserConsumer } from 'store';
 
 const Search = (props) => {
 

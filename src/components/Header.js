@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
-import config from '../config'
-import translations from '../translations'
-import { ReactComponent as SearchIcon } from '../svg/search.svg'
+import config from 'config'
+import translations from 'translations'
+import { ReactComponent as SearchIcon } from 'svg/search.svg'
 import { Link } from "react-router-dom";
-import { UserConsumer } from "../store"
+import { UserConsumer } from "store"
 
 axios.defaults.withCredentials = true;
 
@@ -17,6 +17,7 @@ const Header = (props) => {
   const context = useContext(UserConsumer)
 
   useEffect(() => {
+    //fetchData()
     axios.get(`http://${config.hostname}:${config.port}/auth`)
     .then(res => {
       if (res.data.auth) {
@@ -66,6 +67,57 @@ const Header = (props) => {
       }
     });
   }, [])
+
+  /*
+  const fetchData = async() => {
+    const responseAuth = await axios.get(`http://${config.hostname}:${config.port}/auth`)
+    if (responseAuth.data.auth) {
+      updateIsAuth(true)
+      axios.get(`http://${config.hostname}:${config.port}/user/${res.data.user._id}`)
+      .then(res => {
+        if (res.data.success) {
+          updateUser(res.data.user[0])
+          axios.get(`http://${config.hostname}:${config.port}/movies`)
+            .then(res => {
+              if (res.data.success) {
+                updateMovies(res.data.movies)
+                const showSearchBar = document.getElementsByClassName('show-search-bar')[0];
+                const searchBarCollapse = document.getElementsByClassName('search-bar-collapse')[0];
+                const avatar = document.getElementsByClassName('avatar')[0];
+                const avatarDropdown = document.getElementsByClassName('avatar-dropdown')[0];
+            
+                document.onclick = (e) => {
+                  if (e.target.classList[0] !== 'avatar-dropdown' && e.target.classList[0] !== 'avatar-dropdown-item') {
+                    if (e.target.classList[0] !== 'avatar') {
+                      closeMenus();
+                    }
+                  } else if (e.target.classList[0] !== 'input-search-bar') {
+                    closeMenus();
+                  }
+                };
+            
+                showSearchBar.addEventListener("click", () => {
+                  if (searchBarCollapse.style.display === "block") {
+                    searchBarCollapse.style.display = "none";
+                  } else {
+                    searchBarCollapse.style.display = "block";
+                  }
+                }, false);
+            
+                avatar.addEventListener("click", () => {
+                  if (avatarDropdown.style.display === "block") {
+                    avatarDropdown.style.display = "none";
+                  } else {
+                    avatarDropdown.style.display = "block";
+                  }
+                }, false);
+              }
+            });
+        }
+      });
+    }
+  }
+  */
 
   const resetSearchBar = () => {
     const searchBarExtended = document.getElementsByClassName('search-bar-extended')[0];

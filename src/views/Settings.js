@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios'
-import config from '../config'
-import translations from '../translations'
-import Button from '../components/Button'
-import Loading from '../components/Loading'
+import config from 'config'
+import translations from 'translations'
+import Button from 'components/Button'
+import Loading from 'components/Loading'
 
 const Settings = (props) => {
 

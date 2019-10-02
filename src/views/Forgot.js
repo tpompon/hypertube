@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
-import config from '../config'
-import translations from '../translations'
-import Loading from '../components/Loading'
-import { ReactComponent as CheckMark } from '../svg/checkmark.svg'
-import Button from '../components/Button'
+import config from 'config'
+import translations from 'translations'
+import Loading from 'components/Loading'
+import { ReactComponent as CheckMark } from 'svg/checkmark.svg'
+import Button from 'components/Button'
 
 const Forgot = (props) => {
 

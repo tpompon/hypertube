@@ -1,16 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import config from '../config'
-import MoviesSlider from '../components/MoviesSlider'
-import MoviesSlider2 from '../components/MoviesSlider2'
-import translations from '../translations'
-import Loading from '../components/Loading'
-import { ReactComponent as VerifiedIcon } from '../svg/verified.svg'
-import { ReactComponent as PencilIcon } from '../svg/pencil.svg'
-import { ReactComponent as CinemaIcon } from '../svg/cinema-icon.svg'
-import { ReactComponent as JapanIcon } from '../svg/japan-icon.svg'
-import { ReactComponent as AnimalsIcon } from '../svg/animals-icon.svg'
-import { ReactComponent as FruitsIcon } from '../svg/fruits-icon.svg'
+import config from 'config'
+import MoviesSlider from 'components/MoviesSlider'
+import MoviesSlider2 from 'components/MoviesSlider2'
+import translations from 'translations'
+import Loading from 'components/Loading'
+import { ReactComponent as VerifiedIcon } from 'svg/verified.svg'
+import { ReactComponent as PencilIcon } from 'svg/pencil.svg'
+import { ReactComponent as CinemaIcon } from 'svg/cinema-icon.svg'
+import { ReactComponent as JapanIcon } from 'svg/japan-icon.svg'
+import { ReactComponent as AnimalsIcon } from 'svg/animals-icon.svg'
+import { ReactComponent as FruitsIcon } from 'svg/fruits-icon.svg'
 
 const heartbeat = [
   { id: 1, name_fr: "L'Arnacoeur", name_en: "L'Arnacoeur", poster: "/posters/arnacoeur.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.8 },

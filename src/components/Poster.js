@@ -1,10 +1,10 @@
 import React from 'react';
 import axios from 'axios';
-import config from '../config';
-import translations from '../translations';
+import config from 'config';
+import translations from 'translations';
 import Rating from 'react-rating'
-import { ReactComponent as StarFull } from '../svg/star-full.svg'
-import { ReactComponent as StarEmpty } from '../svg/star-empty.svg'
+import { ReactComponent as StarFull } from 'svg/star-full.svg'
+import { ReactComponent as StarEmpty } from 'svg/star-empty.svg'
 
 class Poster extends React.Component {
 

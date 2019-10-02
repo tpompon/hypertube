@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import axios from 'axios'
-import config from '../config'
-import translations from '../translations'
+import config from 'config'
+import translations from 'translations'
 import { Link } from "react-router-dom";
-import Button from '../components/Button'
-import { ReactComponent as TwitterIcon } from '../svg/twitter.svg'
-import { ReactComponent as FourtyTwoIcon } from '../svg/42.svg'
-import { ReactComponent as GoogleIcon } from '../svg/google.svg'
+import Button from 'components/Button'
+import { ReactComponent as TwitterIcon } from 'svg/twitter.svg'
+import { ReactComponent as FourtyTwoIcon } from 'svg/42.svg'
+import { ReactComponent as GoogleIcon } from 'svg/google.svg'
 
 axios.defaults.withCredentials = true;
 
