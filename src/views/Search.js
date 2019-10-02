@@ -16,72 +16,54 @@ const Search = (props) => {
   const context = useContext(UserConsumer)
 
   useEffect(() => {
+    fetchMovies()
+  }, [])
+
+  const fetchMovies = async() => {
     const search = context.search;
     if (search.trim() !== '') {
-      axios.get(`http://${config.hostname}:${config.port}/torrents/yts/search/${search}`)
-        .then((res) => {
-          if (res.data.count !== 0) {
-            updateMovies(res.data.results.data.movies)
-          }
-          updateStatus("no results")
-        })
+      const response = await axios.get(`http://${config.hostname}:${config.port}/torrents/yts/search/${search}`)
+      if (response.data.count !== 0) {
+        updateMovies(response.data.results.data.movies)
+      }
+      updateStatus("no results")
     } else {
       updateStatus("empty")
       //alert('empty search');
     }
     updateIsLoaded(true)
-  }, [])
-
-  // Voir si on garde ou pas
-  const fetchMovies = () => {
-    if (search.trim() !== '') {
-      axios.get(`http://${config.hostname}:${config.port}/torrents/yts/search/${search}`)
-        .then((res) => {
-          if (res.data.count !== 0) {
-            updateMovies(res.data.results.data.movies)
-          } else {
-            alert('No result');
-          }
-        })
-    } else {
-      alert('empty search');
-    }
   }
 
-  const checkDatabase = (ytsID) => {
-    axios.get(`http://${config.hostname}:${config.port}/movies/yts/${ytsID}`)
-      .then((res) => {
-        if (!res.data.success) {
-          axios.get(`http://${config.hostname}:${config.port}/torrents/yts/${ytsID}`)
-          .then((res) => {
-            const movie = res.data.result.data.movie;
-
-            movie.torrents.forEach((torrent) => {
-              torrent.magnet = `magnet:?xt=urn:btih:${movie.torrents[0].hash}&dn=${encodeURI(movie.title)}&tr=http://track.one:1234/announce&tr=udp://track.two:80`;
-              torrent.magnet2 = `magnet:?xt=urn:btih:${movie.torrents[0].hash}&dn=${encodeURI(movie.title)}&tr=http://track.one:1234/announce&tr=udp://tracker.openbittorrent.com:80`;
-            })
-
-            const newMovie = {
-              ytsId: movie.id,
-              name: movie.title,
-              poster: movie.large_cover_image,
-              ytsData: movie,
-              description: movie.description_full,
-              author: 'Someone',
-              rating: movie.rating / 2
-            }
-            axios.post(`${config.serverURL}/movies`, newMovie)
-              .then((res) => {
-                if (res.data.success)
-                  props.history.push(`/watch/${res.data.movie._id}`);
-                else
-                  alert('Could not create entry in Database for this movie');
-              })
-          });
-        } else {
-          props.history.push(`/watch/${res.data.movie._id}`);
+  const checkDatabase = async(ytsID) => {
+    const responseMovies = await axios.get(`http://${config.hostname}:${config.port}/movies/yts/${ytsID}`)
+    if (!responseMovies.data.success) {
+      const responseYts = await axios.get(`http://${config.hostname}:${config.port}/torrents/yts/${ytsID}`)
+      if (responseYts) {
+        const movie = responseYts.data.result.data.movie;
+        movie.torrents.forEach((torrent) => {
+          torrent.magnet = `magnet:?xt=urn:btih:${movie.torrents[0].hash}&dn=${encodeURI(movie.title)}&tr=http://track.one:1234/announce&tr=udp://track.two:80`;
+          torrent.magnet2 = `magnet:?xt=urn:btih:${movie.torrents[0].hash}&dn=${encodeURI(movie.title)}&tr=http://track.one:1234/announce&tr=udp://tracker.openbittorrent.com:80`;
+        })
+        const newMovie = {
+          ytsId: movie.id,
+          name: movie.title,
+          poster: movie.large_cover_image,
+          ytsData: movie,
+          description: movie.description_full,
+          author: 'Someone',
+          rating: movie.rating / 2
         }
-      })
+        const responseNewMovie = await axios.post(`${config.serverURL}/movies`, newMovie)
+        if (responseNewMovie.data.success) {
+          props.history.push(`/watch/${responseNewMovie.data.movie._id}`);
+        }
+        else {
+          alert('Could not create entry in Database for this movie');
+        }
+      }
+    } else {
+      props.history.push(`/watch/${responseMovies.data.movie._id}`);
+    }
   }
 
   return (
@@ -90,7 +72,7 @@ const Search = (props) => {
         _isLoaded ? (
           <div className="posters-list row wrap">
           {
-            movies.map((movie) => {
+            movies.map((movie, index) => {
                 if (!movie.large_cover_image)
                   movie.large_cover_image = 'http://story-one.com/wp-content/uploads/2016/02/Poster_Not_Available2.jpg';
                 return (
@@ -98,7 +80,7 @@ const Search = (props) => {
                   // <Link to={`/watchyts/${movie.id}`} key={`movie-${movie.slug}`}>
                   //   <Poster movie={movie} language={language} />
                   // </Link>
-                  <div onClick={() => checkDatabase(movie.id)}><Poster movie={movie} language={language} /></div>
+                  <div key={ `movie-${index}` } onClick={() => checkDatabase(movie.id)}><Poster movie={movie} language={language} /></div>
                 )
             })
           }

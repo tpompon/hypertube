@@ -90,7 +90,7 @@ const MoviesList = (props) => {
             <select onChange={(event) => updateFilter({ ...filter, ["genre"]: event.target.value })} className="dark-input">
               {
                 dropDownOptions.map((option) => (
-                  <option value={ option.value }>{ option.genre }</option>
+                  <option key={ `option-${option.value}` } value={ option.value }>{ option.genre }</option>
                 ))
               }
             </select>
