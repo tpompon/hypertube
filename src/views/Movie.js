@@ -150,12 +150,12 @@ const Movie = (props) => {
   }
 
   const toggleHeartbeat = async() => {
-    updateHeartbeat(!heartbeat)
-    if (heartbeat) {
+    if (!heartbeat) {
       axios.post(`http://${config.hostname}:${config.port}/movie/${id}/heartbeat`, { uid: user._id }); // ipare ID (replace with logged user id)
     } else {
       axios.delete(`http://${config.hostname}:${config.port}/movie/${id}/heartbeat`, { data: { uid: user._id } }); // ipare ID (replace with logged user id)
     }
+    updateHeartbeat(!heartbeat)
   }
 
   const reportComment = async(id) => {

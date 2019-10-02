@@ -143,10 +143,10 @@ const Header = (props) => {
                         <div className="search-bar-extended">
                         {
                           movies.map((movie) => {
-                            if (movie.name_fr.toLowerCase().trim().startsWith(searchMovie.toLowerCase().trim()) || movie.name_en.toLowerCase().trim().startsWith(searchMovie.toLowerCase().trim())) {
+                            if (movie.name.toLowerCase().trim().startsWith(searchMovie.toLowerCase().trim()) || movie.name.toLowerCase().trim().startsWith(searchMovie.toLowerCase().trim())) {
                               return (
                                 <Link to={`/watch/${movie._id}`} key={`movie-${movie._id}`} onClick={() => resetSearchBar()}>
-                                  <div className="search-bar-extended-result"><img src={movie.poster} width="20" height="20" alt={`movie-${movie._id}`} style={{marginRight: 10}} />{(language === 'fr') ? movie.name_fr : movie.name_en}</div>
+                                  <div className="search-bar-extended-result"><img src={movie.poster} width="20" height="20" alt={`movie-${movie._id}`} style={{marginRight: 10}} />{movie.name}</div>
                                 </Link>
                               )
                             }
@@ -197,10 +197,10 @@ const Header = (props) => {
                     <div className="search-bar-extended">
                     {
                       movies.map((movie) => {
-                        if (movie.name_fr.toLowerCase().trim().startsWith(searchMovie.toLowerCase().trim()) || movie.name_en.toLowerCase().trim().startsWith(searchMovie.toLowerCase().trim())) {
+                        if (movie.name.toLowerCase().trim().startsWith(searchMovie.toLowerCase().trim()) || movie.name.toLowerCase().trim().startsWith(searchMovie.toLowerCase().trim())) {
                           return (
                             <Link to={`/watch/${movie._id}`} key={`movie-${movie._id}`} onClick={() => resetSearchBar()}>
-                              <div className="search-bar-extended-result"><img src={movie.poster} width="20" height="20" alt={`movie-${movie._id}`} style={{marginRight: 10}} />{(language === 'fr') ? movie.name_fr : movie.name_en}</div>
+                              <div className="search-bar-extended-result"><img src={movie.poster} width="20" height="20" alt={`movie-${movie._id}`} style={{marginRight: 10}} />{movie.name}</div>
                             </Link>
                           )
                         } else {

@@ -7,22 +7,9 @@ import Loading from '../components/Loading'
 import { UserConsumer } from '../store';
 import { Link } from "react-router-dom";
 
-function compare_fr(a, b) {
-  const nameA = a.name_fr.toUpperCase();
-  const nameB = b.name_fr.toUpperCase();
-  
-  let comparison = 0;
-  if (nameA > nameB) {
-    comparison = 1;
-  } else if (nameA < nameB) {
-    comparison = -1;
-  }
-  return comparison;
-}
-
-function compare_en(a, b) {
-  const nameA = a.name_en.toUpperCase();
-  const nameB = b.name_en.toUpperCase();
+function compare(a, b) {
+  const nameA = a.name.toUpperCase();
+  const nameB = b.name.toUpperCase();
   
   let comparison = 0;
   if (nameA > nameB) {
@@ -58,13 +45,8 @@ class MoviesList extends React.Component {
     .then(res => {
       if (res.data.success) {
         this.setState({movies: res.data.movies}, () => {
-          if (this.props.language === 'FR') {
-            this.state.movies.sort(compare_fr);
-            this.setState({_isLoaded: true});
-          } else {
-            this.state.movies.sort(compare_en);
-            this.setState({_isLoaded: true});
-          }
+          this.state.movies.sort(compare);
+          this.setState({_isLoaded: true});
         });
       }
     });
@@ -94,13 +76,8 @@ class MoviesList extends React.Component {
     .then(res => {
       if (res.data.success) {
         this.setState({movies: res.data.movies}, () => {
-          if (this.props.language === 'FR') {
-            this.state.movies.sort(compare_fr);
-            this.setState({_isLoaded: true});
-          } else {
-            this.state.movies.sort(compare_en);
-            this.setState({_isLoaded: true});
-          }
+          this.state.movies.sort(compare);
+          this.setState({_isLoaded: true});
         });
       }
     });
@@ -144,7 +121,7 @@ class MoviesList extends React.Component {
             <div className="posters-list row wrap">
             {
               movies.map((movie) => {
-                if (movie.name_fr.toLowerCase().trim().includes(search.toLowerCase().trim())) {
+                if (movie.name.toLowerCase().trim().includes(search.toLowerCase().trim())) {
                   return (
                     <Link to={`/watch/${movie._id}`} key={`movie-${movie._id}`}>
                       <Poster movie={movie} language={language} />
