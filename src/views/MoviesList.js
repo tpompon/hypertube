@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios'
 import config from '../config'
 import Button from '../components/Button'
@@ -20,124 +20,103 @@ function compare(a, b) {
   return comparison;
 }
 
-class MoviesList extends React.Component {
+const dropDownOptions = [
+  { value: "",  genre: "Genre:" },
+  { value: "0",  genre: "Comedy" },
+  { value: "1",  genre: "Sci-Fi" },
+  { value: "2",  genre: "Horror" },
+  { value: "3",  genre: "Romance" },
+  { value: "4",  genre: "Action" },
+  { value: "5",  genre: "Thriller" },
+  { value: "6",  genre: "Drama" },
+  { value: "7",  genre: "Mystery" },
+  { value: "8",  genre: "Crime" },
+  { value: "9",  genre: "Animation" },
+  { value: "10",  genre: "Adventure" },
+  { value: "11",  genre: "Fantasy" },
+  { value: "12",  genre: "Superhero" },
+  { value: "13",  genre: "Documentary" },
+  { value: "14",  genre: "Music" },
+  { value: "15",  genre: "Family" },
+]
+const MoviesList = (props) => {
+  
+  const { language } = props
+  const context = useContext(UserConsumer)
+  const [movies, updateMovies] = useState([])
+  const [filter, updateFilter] = useState({
+    genre: "",
+    minYear: "",
+    maxYear: "",
+    minRating: "",
+    maxRating: ""
+  })
+  const [_isLoaded, updateIsLoaded] = useState(false)
+  const { search } = context
 
-  static contextType = UserConsumer
+  useEffect(() => {
+    fetchMovies()
+  }, [])
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      movies: [],
-      filter: {
-        genre: "",
-        minYear: "",
-        maxYear: "",
-        minRating: "",
-        maxRating: ""
-      },
-      _isLoaded: false
+  useEffect(() => {
+    movies.sort(compare)
+    updateIsLoaded(true)
+  })
+
+  const fetchMovies = async() => {
+    const response = await axios.get(`http://${config.hostname}:${config.port}/movies`)
+    if (response.data.success) {
+      updateMovies(response.data.movies)
     }
   }
 
-  componentDidMount() {
-    console.log("test")
-    axios.get(`http://${config.hostname}:${config.port}/movies`)
-    .then(res => {
-      if (res.data.success) {
-        this.setState({movies: res.data.movies}, () => {
-          this.state.movies.sort(compare);
-          this.setState({_isLoaded: true});
-        });
+  const searchRequest = async() => {
+    const response = await axios.get(`http://${config.hostname}:${config.port}/movies?genre=${filter.genre}&minyear=${filter.minYear}&maxyear=${filter.maxYear}&minrating=${filter.minRating}&maxRating=${filter.maxRating}`)
+    if (response.data.success) {
+      if (response.data.success) {
+        updateMovies(response.data.movies)
       }
-    });
+    }
   }
   
-  updateFilter = () => {
-    const fGenre = document.getElementById("filter_genre");
-    const fMinYear = document.getElementById("filter_minyear");
-    const fMaxYear = document.getElementById("filter_maxyear");
-    const fMinRating = document.getElementById("filter_minrating");
-    const fMaxRating = document.getElementById("filter_maxrating");
-
-    this.setState({
-      filter: {
-        genre: fGenre.value,
-        minYear: fMinYear.value,
-        maxYear: fMaxYear.value,
-        minRating: fMinRating.value,
-        maxRating: fMaxRating.value
-      }
-    })
-  }
-
-  searchRequest = () => {
-    const { filter } = this.state;
-    axios.get(`http://${config.hostname}:${config.port}/movies?genre=${filter.genre}&minyear=${filter.minYear}&maxyear=${filter.maxYear}&minrating=${filter.minRating}&maxRating=${filter.maxRating}`)
-    .then(res => {
-      if (res.data.success) {
-        this.setState({movies: res.data.movies}, () => {
-          this.state.movies.sort(compare);
-          this.setState({_isLoaded: true});
-        });
-      }
-    });
-  }
-
-  render() {
-    const { movies, _isLoaded } = this.state;
-    const { language } = this.props;
-    const { search } = this.context
-    return (
-      <div>
-      {
-        _isLoaded ? (
-          <div className="col">
-            <div className="row wrap" style={{ justifyContent: 'center', marginBottom: 20 }}>
-              <input id="filter_minyear" onChange={() => this.updateFilter()} className="dark-input" type="number" placeholder="Min. Year" />
-              <input id="filter_maxyear" onChange={() => this.updateFilter()} className="dark-input" type="number" placeholder="Max. Year" style={{marginLeft: 10, marginRight: 30}} />
-              <select id="filter_genre" onChange={() => this.updateFilter()} className="dark-input">
-                <option value="">Genre:</option>
-                <option value="0">Comedy</option>
-                <option value="1">Sci-Fi</option>
-                <option value="2">Horror</option>
-                <option value="3">Romance</option>
-                <option value="4">Action</option>
-                <option value="5">Thriller</option>
-                <option value="6">Drama</option>
-                <option value="7">Mystery</option>
-                <option value="8">Crime</option>
-                <option value="9">Animation</option>
-                <option value="10">Adventure</option>
-                <option value="11">Fantasy</option>
-                <option value="12">Superhero</option>
-                <option value="13">Documentary</option>
-                <option value="14">Music</option>
-                <option value="15">Family</option>
-              </select>
-              <input id="filter_minrating" onChange={() => this.updateFilter()} className="dark-input" type="number" placeholder="Min. Rating" style={{marginLeft: 30}} />
-              <input id="filter_maxrating" onChange={() => this.updateFilter()} className="dark-input" type="number" placeholder="Max. Rating" style={{marginLeft: 10}} />
-              <Button style={{marginLeft: 20}} action={() => this.searchRequest()} content="Search" />
-            </div>
-            <div className="posters-list row wrap">
-            {
-              movies.map((movie) => {
-                if (movie.name.toLowerCase().trim().includes(search.toLowerCase().trim())) {
-                  return (
-                    <Link to={`/watch/${movie._id}`} key={`movie-${movie._id}`}>
-                      <Poster movie={movie} language={language} />
-                    </Link>
-                  )
-                }
-                return null;
-              })
-            }
-            </div>
+  return (
+    <div>
+    {
+      _isLoaded ? (
+        <div className="col">
+          <div className="row wrap" style={{ justifyContent: 'center', marginBottom: 20 }}>
+            <input onChange={(event) => updateFilter({ ...filter, ["minYear"]: event.target.value })} className="dark-input" type="number" placeholder="Min. Year" />
+            <input onChange={(event) => updateFilter({ ...filter, ["maxYear"]: event.target.value })} className="dark-input" type="number" placeholder="Max. Year" style={{marginLeft: 10, marginRight: 30}} />
+            <select onChange={(event) => updateFilter({ ...filter, ["genre"]: event.target.value })} className="dark-input">
+              {
+                dropDownOptions.map((option) => (
+                  <option value={ option.value }>{ option.genre }</option>
+                ))
+              }
+            </select>
+            <input onChange={(event) => updateFilter({ ...filter, ["minRating"]: event.target.value })} className="dark-input" type="number" placeholder="Min. Rating" style={{marginLeft: 30}} />
+            <input onChange={(event) => updateFilter({ ...filter, ["maxRating"]: event.target.value })} className="dark-input" type="number" placeholder="Max. Rating" style={{marginLeft: 10}} />
+            <Button style={{marginLeft: 20}} action={() => searchRequest()} content="Search" />
           </div>
-        ) : <Loading />
-      }
-      </div>
-    );
-  }
+          <div className="posters-list row wrap">
+          {
+            movies.map((movie, index) => {
+              if (movie.name.toLowerCase().trim().includes(search.toLowerCase().trim())) {
+                return (
+                  <Link to={`/watch/${movie._id}`} key={`movie-${index}`}>
+                    <Poster movie={movie} language={language} />
+                  </Link>
+                )
+              }
+              return null;
+            })
+          }
+          </div>
+        </div>
+      ) : <Loading />
+    }
+    </div>
+  )
 }
 
 export default MoviesList
