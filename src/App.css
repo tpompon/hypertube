@@ -268,8 +268,10 @@ App
   opacity: 1;
 }
 .poster-content {
+  width: 80%;
   height: 90%;
-  overflow-y: scroll;
+  padding: 20px;
+  overflow-y: auto;
   color: white;
   font-size: 14px;
   position: absolute;

@@ -39,6 +39,7 @@ const dropDownOptions = [
   { value: "14",  genre: "Music" },
   { value: "15",  genre: "Family" },
 ]
+
 const MoviesList = (props) => {
   
   const { language } = props
@@ -52,14 +53,12 @@ const MoviesList = (props) => {
     maxRating: ""
   })
   const [_isLoaded, updateIsLoaded] = useState(false)
-  const { search } = context
 
+  const { search } = context
   useEffect(() => {
     fetchMovies()
   }, [])
-
   useEffect(() => {
-    movies.sort(compare)
     updateIsLoaded(true)
   })
 
@@ -90,7 +89,7 @@ const MoviesList = (props) => {
             <select onChange={(event) => updateFilter({ ...filter, ["genre"]: event.target.value })} className="dark-input">
               {
                 dropDownOptions.map((option) => (
-                  <option value={ option.value }>{ option.genre }</option>
+                  <option key={ `option-${option.value}` } value={ option.value }>{ option.genre }</option>
                 ))
               }
             </select>
@@ -100,7 +99,7 @@ const MoviesList = (props) => {
           </div>
           <div className="posters-list row wrap">
           {
-            movies.map((movie, index) => {
+            movies.sort(compare).map((movie, index) => {
               if (movie.name.toLowerCase().trim().includes(search.toLowerCase().trim())) {
                 return (
                   <Link to={`/watch/${movie._id}`} key={`movie-${index}`}>

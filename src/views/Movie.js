@@ -205,7 +205,7 @@ const Movie = (props) => {
                           <div className="cast row" style={{marginBottom: 20}}>
                           {
                             movie.ytsData.cast.map((person, index) => (
-                                <a className="pointer" href={`https://www.imdb.com/name/nm${person.imdb_code}`} target="_blank" key={index}>
+                                <a className="pointer" href={`https://www.imdb.com/name/nm${person.imdb_code}`} target="_blank" key={`${person.name}-${index}`}>
                                   <img style={{ width: 75, height: 75, objectFit: 'cover', borderRadius: '50%', marginRight: -20 }} src={person.url_small_image ? person.url_small_image : `http://${config.hostname}:${config.port}/public/avatars/default_avatar.png`} alt={person.name} />
                                 </a>
                               ))
@@ -284,7 +284,7 @@ const Movie = (props) => {
                       <div className="cast row" style={{marginBottom: 20}}>
                       {
                         movie.ytsData.cast.map((person, index) => (
-                            <a className="pointer" href={`https://www.imdb.com/name/nm${person.imdb_code}`} target="_blank" key={index}>
+                            <a className="pointer" href={`https://www.imdb.com/name/nm${person.imdb_code}`} target="_blank" key={`${person.name}-${index}`}>
                               <img style={{ width: 75, height: 75, objectFit: 'cover', borderRadius: '50%', marginRight: -20 }} src={person.url_small_image ? person.url_small_image : `http://${config.hostname}:${config.port}/public/avatars/default_avatar.png`} alt={person.name} />
                             </a>
                           ))
@@ -294,7 +294,7 @@ const Movie = (props) => {
                   }
                   <div>
                     <Rating
-                      onChange={(value) => updateRating(value)}
+                      onChange={(value) => updatingRating(value)}
                       initialRating={rating}
                       emptySymbol={<StarEmpty width="30" height="30" fill="#FFD700" />}
                       fullSymbol={<StarFull width="30" height="30" fill="#FFD700" />}

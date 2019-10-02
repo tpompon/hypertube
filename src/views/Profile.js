@@ -12,34 +12,36 @@ import { ReactComponent as JapanIcon } from 'svg/japan-icon.svg'
 import { ReactComponent as AnimalsIcon } from 'svg/animals-icon.svg'
 import { ReactComponent as FruitsIcon } from 'svg/fruits-icon.svg'
 
-const heartbeat = [
-  { id: 1, name_fr: "L'Arnacoeur", name_en: "L'Arnacoeur", poster: "/posters/arnacoeur.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.8 },
-  { id: 2, name_fr: "Hunger Games", name_en: "Hunger Games", poster: "/posters/hunger_games.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.8 },
-  { id: 3, name_fr: "Le Monde de Narnia", name_en: "Narnia's World", poster: "/posters/narnia.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.8 },
-  { id: 4, name_fr: "Pirates des Caraïbes", name_en: "Pirates of Caraïbes", poster: "/posters/pirates_des_caraibes.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.8 },
-  { id: 7, name_fr: "Star Wars: Les Derniers Jedi", name_en: "Star Wars: The Last Jedi", poster: "/posters/star_wars2.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.2 },
-  { id: 8, name_fr: "Titanic", name_en: "Titanic", poster: "/posters/titanic.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.8 },
-  { id: 9, name_fr: "Spiderman: Homecoming", name_en: "Spiderman: Homecoming", poster: "/posters/spiderman.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.8 },
-  { id: 10, name_fr: "Dunkerque", name_en: "Dunkerque", poster: "/posters/dunkerque.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.8 }
-]
+const covers = ['cinema', 'japan', 'animals', 'fruits'];
 
-const recents = [
-  { id: 1, name_fr: "L'Arnacoeur", name_en: "L'Arnacoeur", poster: "/posters/arnacoeur.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.8 },
-  { id: 2, name_fr: "Hunger Games", name_en: "Hunger Games", poster: "/posters/hunger_games.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.8 },
-  { id: 3, name_fr: "Le Monde de Narnia", name_en: "Narnia's World", poster: "/posters/narnia.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.8 },
-  { id: 4, name_fr: "Pirates des Caraïbes", name_en: "Pirates of Caraïbes", poster: "/posters/pirates_des_caraibes.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.8 },
-]
+// const heartbeat = [
+//   { id: 1, name_fr: "L'Arnacoeur", name_en: "L'Arnacoeur", poster: "/posters/arnacoeur.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.8 },
+//   { id: 2, name_fr: "Hunger Games", name_en: "Hunger Games", poster: "/posters/hunger_games.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.8 },
+//   { id: 3, name_fr: "Le Monde de Narnia", name_en: "Narnia's World", poster: "/posters/narnia.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.8 },
+//   { id: 4, name_fr: "Pirates des Caraïbes", name_en: "Pirates of Caraïbes", poster: "/posters/pirates_des_caraibes.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.8 },
+//   { id: 7, name_fr: "Star Wars: Les Derniers Jedi", name_en: "Star Wars: The Last Jedi", poster: "/posters/star_wars2.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.2 },
+//   { id: 8, name_fr: "Titanic", name_en: "Titanic", poster: "/posters/titanic.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.8 },
+//   { id: 9, name_fr: "Spiderman: Homecoming", name_en: "Spiderman: Homecoming", poster: "/posters/spiderman.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.8 },
+//   { id: 10, name_fr: "Dunkerque", name_en: "Dunkerque", poster: "/posters/dunkerque.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.8 }
+// ]
 
-const inProgress = [
-  { id: 1, name_fr: "L'Arnacoeur", name_en: "L'Arnacoeur", poster: "/posters/arnacoeur.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.8 },
-  { id: 2, name_fr: "Hunger Games", name_en: "Hunger Games", poster: "/posters/hunger_games.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.8 },
-  { id: 3, name_fr: "Le Monde de Narnia", name_en: "Narnia's World", poster: "/posters/narnia.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.8 },
-  { id: 4, name_fr: "Pirates des Caraïbes", name_en: "Pirates of Caraïbes", poster: "/posters/pirates_des_caraibes.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.8 },
-]
+// const recents = [
+//   { id: 1, name_fr: "L'Arnacoeur", name_en: "L'Arnacoeur", poster: "/posters/arnacoeur.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.8 },
+//   { id: 2, name_fr: "Hunger Games", name_en: "Hunger Games", poster: "/posters/hunger_games.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.8 },
+//   { id: 3, name_fr: "Le Monde de Narnia", name_en: "Narnia's World", poster: "/posters/narnia.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.8 },
+//   { id: 4, name_fr: "Pirates des Caraïbes", name_en: "Pirates of Caraïbes", poster: "/posters/pirates_des_caraibes.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.8 },
+// ]
+
+// const inProgress = [
+//   { id: 1, name_fr: "L'Arnacoeur", name_en: "L'Arnacoeur", poster: "/posters/arnacoeur.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.8 },
+//   { id: 2, name_fr: "Hunger Games", name_en: "Hunger Games", poster: "/posters/hunger_games.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.8 },
+//   { id: 3, name_fr: "Le Monde de Narnia", name_en: "Narnia's World", poster: "/posters/narnia.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.8 },
+//   { id: 4, name_fr: "Pirates des Caraïbes", name_en: "Pirates of Caraïbes", poster: "/posters/pirates_des_caraibes.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.8 },
+// ]
 
 const Profile = (props) => {
 
-  const [cover, updateCover] = useState("url('/covers/cinema.svg')")
+  const [cover, updateCover] = useState('cinema')
   const [user, updateUser] = useState({})
   const [heartbeat, updateHeartbeat] = useState([])
   const [recents, updateRecents] = useState([])
@@ -57,9 +59,8 @@ const Profile = (props) => {
             if (res.data.success) {
               updateUser(res.data.user[0])
               updateHeartbeat(getMoviesList(res.data.user[0].heartbeat))
-              updateCover(res.data.user[0].cover)
               updateIsLoaded(true)
-              updateCoverBackground(cover)
+              updateCoverBackground(res.data.user[0].cover)
             }
           });
         // const coversMenu = document.getElementsByClassName('covers-menu')[0];
@@ -105,29 +106,11 @@ const Profile = (props) => {
   }
 
   const updateCoverBackground = (cover) => {
-    const coversMenu = document.getElementsByClassName('covers-menu-child');
-    const coverSelected = document.getElementsByClassName('cover-selected')[0];
-    coverSelected.classList.remove('cover-selected');
-
     let body = {};
-    if (cover === 'cinema' || cover === "url('/covers/cinema.svg')") {
-      updateCover("url('/covers/cinema.svg')")
-      coversMenu[0].classList.add('cover-selected');
-      body.cover = "url('/covers/cinema.svg')";
-    } else if (cover === 'japan' || cover === "url('/covers/japan.svg')") {
-      updateCover("url('/covers/japan.svg')")
-      coversMenu[1].classList.add('cover-selected');
-      body.cover = "url('/covers/japan.svg')";
-    } else if (cover === 'animals' || cover === "url('/covers/animals.svg')") {
-      updateCover("url('/covers/animals.svg')")
-      coversMenu[2].classList.add('cover-selected');
-      body.cover = "url('/covers/animals.svg')";
-    } else if (cover === 'fruits' || cover === "url('/covers/fruits.svg')") {
-      updateCover("url('/covers/fruits.svg')")
-      coversMenu[3].classList.add('cover-selected');
-      body.cover = "url('/covers/fruits.svg')";
+    if (covers.includes(cover)) {
+      updateCover(cover);
+      body.cover = cover;
     }
-
     axios.put(`http://${config.hostname}:${config.port}/user/${user._id}`, body);
   }
 
@@ -151,7 +134,7 @@ const Profile = (props) => {
       {
         _isLoaded ? (
           <div className="text-center">
-            <div className="cover" style={{backgroundImage: `${cover}`, paddingTop: 40, paddingBottom: 50, marginTop: -20}}>
+            <div className="cover" style={{backgroundImage: `url('/covers/${cover}.svg')`, paddingTop: 40, paddingBottom: 50, marginTop: -20}}>
               <div className="profile-avatar center">
                 <a className="profile-avatar-overlay" onClick={() => uploadAvatar.current.click()}>{translations[language].profile.updateAvatar}</a>
                 <input type="file" id="file" ref={ uploadAvatar } onChange={ (event) => onChangeAvatar(event) } style={{display: "none"}}/>
@@ -168,10 +151,10 @@ const Profile = (props) => {
                 <PencilIcon className="pencil-icon" fill="#fff" width="15" height="15" style={{marginTop: 10 }} />
                 <span className="tooltip-text-left">{translations[language].profile.editCover}</span>
                 <div className="covers-menu" style={{ position: 'absolute', display: (toggleCoverMenu) ? "block" : 'none', backgroundColor: '#04050C', borderRadius: 10, width: 100, marginBottom: 10, bottom: 50, right: 0, zIndex: 9 }}>
-                  <div className="covers-menu-child cover-selected" onClick={() => updateCoverBackground('cinema')}><CinemaIcon width="25" height="25" /></div>
-                  <div className="covers-menu-child" onClick={() => updateCoverBackground('japan')}><JapanIcon width="25" height="25" /></div>
-                  <div className="covers-menu-child" onClick={() => updateCoverBackground('animals')}><AnimalsIcon width="25" height="25" /></div>
-                  <div className="covers-menu-child" onClick={() => updateCoverBackground('fruits')}><FruitsIcon width="25" height="25" /></div>
+                  <div className={`covers-menu-child ${cover === 'cinema' ? 'cover-selected' : null}`} onClick={() => updateCoverBackground('cinema')}><CinemaIcon width="25" height="25" /></div>
+                  <div className={`covers-menu-child ${cover === 'japan' ? 'cover-selected' : null}`} onClick={() => updateCoverBackground('japan')}><JapanIcon width="25" height="25" /></div>
+                  <div className={`covers-menu-child ${cover === 'animals' ? 'cover-selected' : null}`} onClick={() => updateCoverBackground('animals')}><AnimalsIcon width="25" height="25" /></div>
+                  <div className={`covers-menu-child ${cover === 'fruits' ? 'cover-selected' : null}`} onClick={() => updateCoverBackground('fruits')}><FruitsIcon width="25" height="25" /></div>
                 </div>
               </div>
             </div>
