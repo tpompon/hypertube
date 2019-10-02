@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import axios from 'axios'
 import config from '../config'
 import translations from '../translations'
@@ -13,30 +13,34 @@ import { ReactComponent as Close } from '../svg/close.svg'
 import { ReactComponent as AddFav } from '../svg/add_heart.svg'
 import { ReactComponent as RemoveFav } from '../svg/remove_heart.svg'
 
-class Movie extends React.Component {
+const Movie = (props) => {
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      id: parseInt(this.props.match.params.id),
-      movie: {},
-      user: {},
-      comment: "",
-      heartbeat: false,
-      rating: 0,
-      ratingAverage: 0,
-      ratingCount: 0,
-      moviePath: 'https://file-examples.com/wp-content/uploads/2017/04/file_example_MP4_1280_10MG.mp4'
-    }
-  }
+  const { language, match } = props
+  const { id } = match.params
+  //const [id, updateId] = useState(parseInt(id))
+  const [movie, updateMovie] = useState({})
+  const [user, updateUser] = useState({})
+  const [comment, updateComment] = useState("")
+  const [heartbeat, updateHeartbeat] = useState(false)
+  const [rating, updateRating] = useState(0)
+  const [ratingAverage, updateRatingAverage] = useState(0)
+  const [ratingCount, updateRatingCount] = useState(0)
+  const [loaded, updateLoaded] = useState(false)
+  const [togglePlayer, updateTogglePlayer] = useState(false)
+  const [moviePath, updateMoviePath] = useState("https://file-examples.com/wp-content/uploads/2017/04/file_example_MP4_1280_10MG.mp4")
+  const player = useRef(null)
 
-  componentDidMount() {
-    window.scrollTo(0, 0);
-    axios.get(`http://${config.hostname}:${config.port}/movies/${this.props.match.params.id}`)
-    .then(res => this.setState({movie: res.data.movie[0], loaded: true}))
-    .then(() => {
-      if (this.state.movie) {
+  useEffect(() => {
+    window.scrollTo(0, 0)
+    fetchMovie()
+  }, [])
 
+  const fetchMovie = async() => {
+    const reponseMovie = await axios.get(`http://${config.hostname}:${config.port}/movies/${id}`)
+    if (reponseMovie) {
+      updateMovie(reponseMovie.data.movie[0])
+      updateLoaded(true)
+      if (reponseMovie.data.movie[0]) {
         // Download torrent
         // const { movie } = this.state;
         // const body = {
@@ -56,9 +60,9 @@ class Movie extends React.Component {
         //   })
         // })
 
-        document.addEventListener('scroll', this.handleScroll, false);
-        document.querySelector('.comment-input').addEventListener('keydown', this.onEnter, false);
-        document.addEventListener('keydown', this.onEscape, false);
+        //document.addEventListener('scroll', this.handleScroll, false);
+        //document.querySelector('.comment-input').addEventListener('keydown', this.onEnter, false);
+        //document.addEventListener('keydown', this.onEscape, false);
 
         // Remove les Events Listener dans le WillUnmount - sinon Memory Leaks -
 
@@ -74,340 +78,284 @@ class Movie extends React.Component {
         //   }, 1000);
         // })
       }
-    })
-    axios.get(`http://${config.hostname}:${config.port}/auth`)
-    .then(res => {
-      this.setState({ user: res.data.user });
-      axios.get(`http://${config.hostname}:${config.port}/movie/${this.props.match.params.id}/heartbeat`, { params: { uid: res.data.user._id } })
-      .then((res) => {
-        if (res.data.success && res.data.found > 0) {
-          this.setState({ heartbeat: true });
-        }
-      });
-      axios.get(`http://${config.hostname}:${config.port}/movie/${this.props.match.params.id}/ratings/${res.data.user._id}`)
-      .then(res => {
-        if (res.data.rating) {
-          this.setState({ rating: res.data.rating });
-        }
-      })
-      axios.get(`http://${config.hostname}:${config.port}/movie/${this.props.match.params.id}/ratings`)
-      .then(res => {
-        if (res.data.success) {
-          this.setState({ ratingAverage: res.data.ratingAverage, ratingCount: res.data.ratingCount });
-        }
-      })
-    })
-  }
-
-  componentWillUnmount() {
-    document.removeEventListener('keydown', this.onEnter, false);
-    document.removeEventListener('keydown', this.onEscape, false);
-    document.removeEventListener('scroll', this.handleScroll, false);
-  }
-
-  onEnter = (e) => {
-    if (e.keyCode === 13)
-      this.addComment();
-  }
-  onEscape = (e) => {
-    if (e.keyCode === 27) {
-      this.hidePlayer();
+    }
+    const responseUser = await axios.get(`http://${config.hostname}:${config.port}/auth`)
+    if (responseUser) {
+      updateUser(responseUser.data.user)
+      const responseHeartbeat = await axios.get(`http://${config.hostname}:${config.port}/movie/${id}/heartbeat`, { params: { uid: responseUser.data.user._id } })
+      if (responseHeartbeat.data.success && responseHeartbeat.data.found > 0) {
+        updateHeartbeat(true)
+      }
+      const responseRating = await axios.get(`http://${config.hostname}:${config.port}/movie/${id}/ratings/${responseUser.data.user._id}`)
+      if (responseRating.data.rating) {
+        updateRating(responseRating.data.rating)
+      }
+      const responseRatingCount = await axios.get(`http://${config.hostname}:${config.port}/movie/${id}/ratings`)
+      if (responseRatingCount.data.success) {
+        updateRatingAverage(responseRatingCount.data.ratingAverage)
+        updateRatingCount(responseRatingCount.data.ratingCount)
+      }
     }
   }
 
-  // handleScroll = (e) => {
-  //   const moviePoster = document.getElementById('movie-page-poster-fullsize');
-  //   const movieInfos = document.getElementById('movie-infos-fullsize');
-  //   const top = window.pageYOffset || document.documentElement.scrollTop;
-
-  //   if (top < movieInfos.offsetHeight)
-  //     moviePoster.style.marginTop = `${top}px`;
-  // }
-
-  addComment = () => {
-    const { user } = this.state;
+  const addComment = async() => {
     const newComment = {
       author: user.username,
-      content: this.state.comment
+      content: comment,
     }
 
     if (newComment.content.trim() !== '') {
-      axios.post(`http://${config.hostname}:${config.port}/movie/${this.props.match.params.id}/comments`, newComment)
-      .then(res => console.log(res.data));
-  
-      this.state.movie.comments.push(newComment);
+      const response = await axios.post(`http://${config.hostname}:${config.port}/movie/${id}/comments`, newComment)
+      if (response) {
+        console.log(response.data)
+      }
+      updateMovie({ ...movie, comments: [...movie.comments, newComment] })
     }
-    this.setState({comment: ""});
+    updateComment("")
   }
 
-  updateRating = (value) => {
-    const { user } = this.state;
+  const updatingRating = async(value) => {
     const newRating = {
       uid: user._id,
-      rating: value
+      rating: value,
     }
-    axios.post(`http://${config.hostname}:${config.port}/movie/${this.props.match.params.id}/ratings`, newRating)
-    .then(() => {
-      this.setState({ rating: value });
-      axios.get(`http://${config.hostname}:${config.port}/movie/${this.props.match.params.id}/ratings`)
-      .then(res => {
-        if (res.data.success) {
-          this.setState({ ratingAverage: res.data.ratingAverage, ratingCount: res.data.ratingCount });
-        }
-      })
-    })
-  }
-
-  showPlayer = () => {
-    const playerContainer = document.getElementsByClassName('player-container')[0];
-    const videoPlayer = document.getElementsByClassName('video-player')[0];
-    playerContainer.style.display = 'block';
-    videoPlayer.play();
-  }
-  hidePlayer = () => {
-    const playerContainer = document.getElementsByClassName('player-container')[0];
-    const videoPlayer = document.getElementsByClassName('video-player')[0];
-    playerContainer.style.display = 'none';
-    videoPlayer.pause();
-  }
-
-  toggleHeartbeat = () => {
-    const { user } = this.state;
-    this.setState({ heartbeat: !this.state.heartbeat }, () => {
-      if (this.state.heartbeat) {
-        axios.post(`http://${config.hostname}:${config.port}/movie/${this.props.match.params.id}/heartbeat`, { uid: user._id }); // ipare ID (replace with logged user id)
-      } else {
-        // Need data object for DELETE REQUEST cf. https://github.com/axios/axios/issues/736 (not working without)
-        axios.delete(`http://${config.hostname}:${config.port}/movie/${this.props.match.params.id}/heartbeat`, { data: { uid: user._id } }); // ipare ID (replace with logged user id)
+    const response = await axios.post(`http://${config.hostname}:${config.port}/movie/${id}/ratings`, newRating)
+    if (response) {
+      updateRating(value)
+      const responseRating = await axios.get(`http://${config.hostname}:${config.port}/movie/${id}/ratings`)
+      if (responseRating.data.success) {
+        updateRatingAverage(responseRating.data.ratingAverage)
+        updateRatingCount(responseRating.data.ratingCount)
       }
-    });
+    }
   }
 
-  reportComment = (id) => {
-    axios.post(`${config.serverURL}/movie/${this.state.movie._id}/comments/report`, { commId: id })
-    .then((res) => {
-      console.log(res.data);
-    })
+  // Make a state
+  const showPlayer = () => {
+    updateTogglePlayer(true)
+    player.current.play();
   }
 
-  render() {
-    const { movie, loaded, heartbeat } = this.state;
-    const { language } = this.props;
+  const hidePlayer = () => {
+    updateTogglePlayer(false)
+    player.current.pause();
+  }
 
-    return (
-      <div>
-        {
-          (movie && loaded)
-          ? (
-            <div>
-              <div className="movie-page">
-                <div className="row wrap">
-                  <img id="movie-page-poster-fullsize" className="movie-page-poster center" src={movie.poster} alt="Movie poster" />
-                  <div className="col center" style={{ width: '45%', padding: 50, backgroundColor: '#16162e', wordBreak: 'break-word', borderRadius: 20 }}>
-                    <div id="movie-infos-fullsize" className="movie-infos" style={{marginBottom: 20}}>
-                      <div className="row" style={{ alignItems: 'center', flexWrap: 'wrap' }}>
-                        <h1>{(language === 'fr') ? movie.name_fr : movie.name_en}</h1>
-                        <span style={{marginTop: 10, marginLeft: 10}}>({movie.ytsData.year})</span>
-                        <div className="tooltip toggle-heartbeat" onClick={() => this.toggleHeartbeat()}>
-                          {(heartbeat) ? <RemoveFav width="25" height="25" fill="crimson" /> : <AddFav width="25" height="25" fill="crimson" />}
-                          <span className="tooltip-text">{(heartbeat) ? translations[language].movie.tooltip.heartbeatRemove : translations[language].movie.tooltip.heartbeatAdd}</span>
-                        </div>
-                      </div>
-                      <div className="hr"></div>
-                      <div className="container-ytb" style={{marginBottom: 20}}>
-                        <iframe src={`//www.youtube.com/embed/${movie.ytsData.yt_trailer_code}?autoplay=1`}
-                        allow="autoplay" frameBorder="0" allowFullScreen className="video-ytb"></iframe>
-                      </div>
-                      {
-                        movie.ytsData.genres ? (
-                          <div className="genres row wrap" style={{marginBottom: 20}}>
-                          {
-                            movie.ytsData.genres.map((genre, index) => {
-                              return (
-                                <div key={index} className="genre">{genre}</div>
-                              )
-                            })
-                          }
-                          </div>
-                        ) : null
-                      }
-                      <p>{(language === 'fr') ? movie.description_fr : movie.description_en}</p>
-                      <div className="wrap" style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        {
-                          movie.ytsData.cast ? (
-                            <div className="cast row" style={{marginBottom: 20}}>
-                            {
-                              movie.ytsData.cast.map((person) => {
-                                return (
-                                  <a className="pointer" href={`https://www.imdb.com/name/nm${person.imdb_code}`} target="_blank" key={person.name}>
-                                    <img style={{ width: 75, height: 75, objectFit: 'cover', borderRadius: '50%', marginRight: -20 }} src={person.url_small_image ? person.url_small_image : `http://${config.hostname}:${config.port}/public/avatars/default_avatar.png`} alt={person.name} />
-                                  </a>
-                                )
-                              })
-                            }
-                            </div>
-                          ) : null
-                        }
-                        <div>
-                          <Rating
-                            onChange={(value) => this.updateRating(value)}
-                            initialRating={this.state.rating}
-                            emptySymbol={<StarEmpty width="30" height="30" fill="#FFD700" />}
-                            fullSymbol={<StarFull width="30" height="30" fill="#FFD700" />}
-                            fractions={2}
-                          />
-                          <br />
-                          <span>{translations[language].movie.rating} - {this.state.ratingAverage} ({this.state.ratingCount})</span>
-                        </div>
+  const toggleHeartbeat = async() => {
+    updateHeartbeat(!heartbeat)
+    if (heartbeat) {
+      axios.post(`http://${config.hostname}:${config.port}/movie/${id}/heartbeat`, { uid: user._id }); // ipare ID (replace with logged user id)
+    } else {
+      axios.delete(`http://${config.hostname}:${config.port}/movie/${id}/heartbeat`, { data: { uid: user._id } }); // ipare ID (replace with logged user id)
+    }
+  }
+
+  const reportComment = async(id) => {
+    const response = await axios.post(`${config.serverURL}/movie/${movie._id}/comments/report`, { commId: id })
+    console.log(response)
+  }
+
+  return (
+    <div>
+      {
+        (movie && loaded)
+        ? (
+          <div>
+            <div className="movie-page">
+              <div className="row wrap">
+                <img id="movie-page-poster-fullsize" className="movie-page-poster center" src={movie.poster} alt="Movie poster" />
+                <div className="col center" style={{ width: '45%', padding: 50, backgroundColor: '#16162e', wordBreak: 'break-word', borderRadius: 20 }}>
+                  <div id="movie-infos-fullsize" className="movie-infos" style={{marginBottom: 20}}>
+                    <div className="row" style={{ alignItems: 'center', flexWrap: 'wrap' }}>
+                      <h1>{(language === 'fr') ? movie.name_fr : movie.name_en}</h1>
+                      <span style={{marginTop: 10, marginLeft: 10}}>({movie.ytsData.year})</span>
+                      <div className="tooltip toggle-heartbeat" onClick={() => toggleHeartbeat()}>
+                        {(heartbeat) ? <RemoveFav width="25" height="25" fill="crimson" /> : <AddFav width="25" height="25" fill="crimson" />}
+                        <span className="tooltip-text">{(heartbeat) ? translations[language].movie.tooltip.heartbeatRemove : translations[language].movie.tooltip.heartbeatAdd}</span>
                       </div>
                     </div>
-                    <span onClick={() => this.showPlayer()}><Button content={translations[language].movie.watch} /></span>
-                    <div>
-                      <h2>{translations[language].movie.comments}</h2>
-                      <div className="hr"></div>
-                      <div className="comments col">
-                      {
-                        movie.comments.length > 0 ? (
-                          movie.comments.map((comment) => {
-                            return (
-                              <div className="comment" key={`comment-${comment._id}`}>
-                                <div onClick={() => this.reportComment(`${comment._id}`)} className="report-flag"><ReportFlag width="20" height="20" /></div>
-                                <div className="comment-name">{comment.author}<span style={{marginLeft: 10}}><VerifiedIcon width="15" height="15" /></span></div>
-                                {comment.content}
-                              </div>
-                            )
-                          })
-                        ) : (
-                          <div className="no-comments center" style={{marginTop: 50, marginBottom: 50}}>{translations[language].movie.noComments}</div>
-                        )
-                      }
-                      </div>
-                      <input className="dark-input comment-input" placeholder={translations[language].movie.reviewPlaceholder} style={{width: '100%', marginBottom: 20}} value={this.state.comment} onChange={e => this.setState({ comment: e.target.value })} />
-                      <div style={{float: 'right'}} ref="reviewSubmit" onClick={() => this.addComment()}><Button content={translations[language].movie.reviewSubmit} /></div>
+                    <div className="hr"></div>
+                    <div className="container-ytb" style={{marginBottom: 20}}>
+                      <iframe src={`//www.youtube.com/embed/${movie.ytsData.yt_trailer_code}?autoplay=1`}
+                      allow="autoplay" frameBorder="0" allowFullScreen className="video-ytb"></iframe>
                     </div>
-                  </div>
-                </div>
-              </div>
-              <div className="movie-page-lowres">
-                <div className="movie-infos" style={{marginBottom: 20}}>
-                  <img className="movie-page-poster-lowres" src={movie.poster} style={{ width: '100%' }} alt="poster" />
-                  <div className="row" style={{ alignItems: 'center' }}>
-                    <h1>{(language === 'fr') ? movie.name_fr : movie.name_en}</h1>
-                    <span style={{marginTop: 10, marginLeft: 10}}>({movie.ytsData.year})</span>
-                    <div className="toggle-heartbeat" onClick={() => this.toggleHeartbeat()}>
-                      {(heartbeat) ? <RemoveFav width="25" height="25" fill="crimson" /> : <AddFav width="25" height="25" fill="crimson" />}
-                    </div>
-                  </div>
-                  <div className="hr"></div>
-                  <div className="container-ytb" style={{marginBottom: 20}}>
-                    <iframe src={`//www.youtube.com/embed/${movie.ytsData.yt_trailer_code}?autoplay=1`}
-                    allow="autoplay" frameBorder="0" allowFullScreen className="video-ytb"></iframe>
-                  </div>
-                  {
-                    movie.ytsData.genres ? (
-                      <div className="genres row wrap" style={{marginBottom: 20}}>
-                      {
-                        movie.ytsData.genres.map((genre, index) => {
-                          return (
-                            <div key={ index } className="genre">{genre}</div>
-                          )
-                        })
-                      }
-                      </div>
-                    ) : null
-                  }
-                  <p>{(language === 'fr') ? movie.description_fr : movie.description_en}</p>
-                  <div className="wrap" style={{ display: 'flex', justifyContent: 'space-between' }}>
                     {
-                      movie.ytsData.cast ? (
-                        <div className="cast row" style={{marginBottom: 20}}>
+                      movie.ytsData.genres ? (
+                        <div className="genres row wrap" style={{marginBottom: 20}}>
                         {
-                          movie.ytsData.cast.map((person) => {
-                            return (
-                              <a className="pointer" href={`https://www.imdb.com/name/nm${person.imdb_code}`} target="_blank" key={person.name}>
-                                <img style={{ width: 75, height: 75, objectFit: 'cover', borderRadius: '50%', marginRight: -20 }} src={person.url_small_image ? person.url_small_image : `http://${config.hostname}:${config.port}/public/avatars/default_avatar.png`} alt={person.name} />
-                              </a>
-                            )
-                          })
+                          movie.ytsData.genres.map((genre, index) => (
+                              <div key={index} className="genre">{genre}</div>
+                            ))
                         }
                         </div>
                       ) : null
                     }
-                    <div>
-                      <Rating
-                        onChange={(value) => this.updateRating(value)}
-                        initialRating={this.state.rating}
-                        emptySymbol={<StarEmpty width="30" height="30" fill="#FFD700" />}
-                        fullSymbol={<StarFull width="30" height="30" fill="#FFD700" />}
-                        fractions={2}
-                      />
-                      <br />
-                      <span>{translations[language].movie.rating} - {this.state.ratingAverage} ({this.state.ratingCount})</span>
+                    <p>{(language === 'fr') ? movie.description_fr : movie.description_en}</p>
+                    <div className="wrap" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      {
+                        movie.ytsData.cast ? (
+                          <div className="cast row" style={{marginBottom: 20}}>
+                          {
+                            movie.ytsData.cast.map((person, index) => (
+                                <a className="pointer" href={`https://www.imdb.com/name/nm${person.imdb_code}`} target="_blank" key={index}>
+                                  <img style={{ width: 75, height: 75, objectFit: 'cover', borderRadius: '50%', marginRight: -20 }} src={person.url_small_image ? person.url_small_image : `http://${config.hostname}:${config.port}/public/avatars/default_avatar.png`} alt={person.name} />
+                                </a>
+                              ))
+                          }
+                          </div>
+                        ) : null
+                      }
+                      <div>
+                        <Rating
+                          onChange={(value) => updatingRating(value)}
+                          initialRating={rating}
+                          emptySymbol={<StarEmpty width="30" height="30" fill="#FFD700" />}
+                          fullSymbol={<StarFull width="30" height="30" fill="#FFD700" />}
+                          fractions={2}
+                        />
+                        <br />
+                        <span>{translations[language].movie.rating} - {ratingAverage} ({ratingCount})</span>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <Button content={translations[language].movie.watch} />
-                <div>
-                  <h2>{translations[language].movie.comments}</h2>
-                  <div className="hr"></div>
-                  <div className="comments col">
-                  {
-                    movie.comments.length > 0 ? (
-                      movie.comments.map((comment) => {
-                        return (
-                          <div className="comment" key={`comment-${comment._id}`}>
-                            <div onClick={() => this.reportComment(comment._id)} className="report-flag"><ReportFlag width="20" height="20" /></div>
-                            <div className="comment-name">{comment.author}<span style={{marginLeft: 10}}><VerifiedIcon width="15" height="15" /></span></div>
-                            {comment.content}
-                          </div>
-                        )
-                      })
-                    ) : (
-                      <div className="no-comments center" style={{marginTop: 50, marginBottom: 50}}>{translations[language].movie.noComments}</div>
-                    )
-                  }
+                  <span onClick={() => showPlayer()}><Button content={translations[language].movie.watch} /></span>
+                  <div>
+                    <h2>{translations[language].movie.comments}</h2>
+                    <div className="hr"></div>
+                    <div className="comments col">
+                    {
+                      movie.comments.length > 0 ? (
+                        movie.comments.map((comment, index) => (
+                            <div className="comment" key={`comment-${index}`}>
+                              <div onClick={() => reportComment(`${comment._id}`)} className="report-flag"><ReportFlag width="20" height="20" /></div>
+                              <div className="comment-name">{comment.author}<span style={{marginLeft: 10}}><VerifiedIcon width="15" height="15" /></span></div>
+                              {comment.content}
+                            </div>
+                          ))
+                      ) : (
+                        <div className="no-comments center" style={{marginTop: 50, marginBottom: 50}}>{translations[language].movie.noComments}</div>
+                      )
+                    }
+                    </div>
+                    <input className="dark-input comment-input" placeholder={translations[language].movie.reviewPlaceholder} style={{width: '100%', marginBottom: 20}} value={comment} onChange={e => updateComment(e.target.value)} />
+                    <div style={{float: 'right'}} onClick={() => addComment()}><Button content={translations[language].movie.reviewSubmit} /></div>
                   </div>
-                  <input className="dark-input comment-input" placeholder={translations[language].movie.reviewPlaceholder} style={{width: '100%', marginBottom: 20}} onChange={e => this.setState({ comment: e.target.value })} />
-                  <div style={{float: 'right'}} onClick={() => this.addComment()}><Button content={translations[language].movie.reviewSubmit} /></div>
                 </div>
               </div>
-
-              {/* Player */}
-              <div className="player-container" style={{display: 'none', position: 'absolute', top: 100, width: '100%', backgroundColor: "black", height: '93vh'}}>
-                <div style={{position: 'relative', width: '100%', height: '100%'}}>
-                  <span className="close-icon" onClick={() => this.hidePlayer()} style={{position: 'absolute', top: 25, right: 25}}><Close width="15" height="15" fill="#fff" /></span>
-                  <video className="video-player" width='100%' controls controlsList="nodownload">
+            </div>
+            <div className="movie-page-lowres">
+              <div className="movie-infos" style={{marginBottom: 20}}>
+                <img className="movie-page-poster-lowres" src={movie.poster} style={{ width: '100%' }} alt="poster" />
+                <div className="row" style={{ alignItems: 'center' }}>
+                  <h1>{(language === 'fr') ? movie.name_fr : movie.name_en}</h1>
+                  <span style={{marginTop: 10, marginLeft: 10}}>({movie.ytsData.year})</span>
+                  <div className="toggle-heartbeat" onClick={() => toggleHeartbeat()}>
+                    {(heartbeat) ? <RemoveFav width="25" height="25" fill="crimson" /> : <AddFav width="25" height="25" fill="crimson" />}
+                  </div>
+                </div>
+                <div className="hr"></div>
+                <div className="container-ytb" style={{marginBottom: 20}}>
+                  <iframe src={`//www.youtube.com/embed/${movie.ytsData.yt_trailer_code}?autoplay=1`}
+                  allow="autoplay" frameBorder="0" allowFullScreen className="video-ytb"></iframe>
+                </div>
+                {
+                  movie.ytsData.genres ? (
+                    <div className="genres row wrap" style={{marginBottom: 20}}>
+                    {
+                      movie.ytsData.genres.map((genre, index) => (
+                          <div key={ index } className="genre">{genre}</div>
+                        ))
+                    }
+                    </div>
+                  ) : null
+                }
+                <p>{(language === 'fr') ? movie.description_fr : movie.description_en}</p>
+                <div className="wrap" style={{ display: 'flex', justifyContent: 'space-between' }}>
                   {
-                    this.state.moviePath ? (
-                        <source
-                          src={this.state.moviePath}
-                          type="video/mp4"
-                        />
+                    movie.ytsData.cast ? (
+                      <div className="cast row" style={{marginBottom: 20}}>
+                      {
+                        movie.ytsData.cast.map((person, index) => (
+                            <a className="pointer" href={`https://www.imdb.com/name/nm${person.imdb_code}`} target="_blank" key={index}>
+                              <img style={{ width: 75, height: 75, objectFit: 'cover', borderRadius: '50%', marginRight: -20 }} src={person.url_small_image ? person.url_small_image : `http://${config.hostname}:${config.port}/public/avatars/default_avatar.png`} alt={person.name} />
+                            </a>
+                          ))
+                      }
+                      </div>
                     ) : null
                   }
-                  </video>
+                  <div>
+                    <Rating
+                      onChange={(value) => updateRating(value)}
+                      initialRating={rating}
+                      emptySymbol={<StarEmpty width="30" height="30" fill="#FFD700" />}
+                      fullSymbol={<StarFull width="30" height="30" fill="#FFD700" />}
+                      fractions={2}
+                    />
+                    <br />
+                    <span>{translations[language].movie.rating} - {ratingAverage} ({ratingCount})</span>
+                  </div>
                 </div>
               </div>
-
-            </div>
-          )
-          : (
-            <div>
-            {
-              (!movie) ? (
-                <div style={{ color: 'white', textAlign: 'center' }}>
-                  {translations[language].movie.noResults}
+              <Button content={translations[language].movie.watch} />
+              <div>
+                <h2>{translations[language].movie.comments}</h2>
+                <div className="hr"></div>
+                <div className="comments col">
+                {
+                  movie.comments.length > 0 ? (
+                    movie.comments.map((comment, index) => (
+                        <div className="comment" key={`comment-${index}`}>
+                          <div onClick={() => reportComment(comment._id)} className="report-flag"><ReportFlag width="20" height="20" /></div>
+                          <div className="comment-name">{comment.author}<span style={{marginLeft: 10}}><VerifiedIcon width="15" height="15" /></span></div>
+                          {comment.content}
+                        </div>
+                      ))
+                  ) : (
+                    <div className="no-comments center" style={{marginTop: 50, marginBottom: 50}}>{translations[language].movie.noComments}</div>
+                  )
+                }
                 </div>
-              ) : (
-                <Loading />
-              )
-            }
+                <input className="dark-input comment-input" placeholder={translations[language].movie.reviewPlaceholder} style={{width: '100%', marginBottom: 20}} onChange={e => updateComment(e.target.value)} />
+                <div style={{float: 'right'}} onClick={() => addComment()}><Button content={translations[language].movie.reviewSubmit} /></div>
+              </div>
             </div>
-          )
-        }
-      </div>
-    )
-  }
+
+            {/* Player */}
+            <div className="player-container" style={{display: (togglePlayer) ? "block" : 'none', position: 'absolute', top: 100, width: '100%', backgroundColor: "black", height: '93vh'}}>
+              <div style={{position: 'relative', width: '100%', height: '100%'}}>
+                <span className="close-icon" onClick={() => hidePlayer()} style={{position: 'absolute', top: 25, right: 25}}><Close width="15" height="15" fill="#fff" /></span>
+                <video ref={ player } className="video-player" width='100%' controls controlsList="nodownload">
+                  {
+                    moviePath ? (
+                      <source
+                        src={moviePath}
+                        type="video/mp4"
+                      />
+                    ) : null
+                  }
+                </video>
+              </div>
+            </div>
+          </div>
+        )
+        : (
+          <div>
+          {
+            (!movie) ? (
+              <div style={{ color: 'white', textAlign: 'center' }}>
+                {translations[language].movie.noResults}
+              </div>
+            ) : (
+              <Loading />
+            )
+          }
+          </div>
+        )
+      }
+    </div>
+  )
+
 }
 
 export default Movie

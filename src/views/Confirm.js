@@ -7,7 +7,7 @@ import { ReactComponent as CheckMark } from '../svg/checkmark.svg'
 
 const Confirm = (props) => {
   
-  const [key, updateKey] = useState(props.match.params.key)
+  const { key } = props.match.params
   const [status, updateStatus] = useState("")
   const [_isLoaded, updateIsLoaded] = useState(false)
 
