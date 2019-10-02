@@ -843,7 +843,7 @@ Terminal
 }
 .terminal-output:hover {
   cursor: pointer;
-  background-color: rgba(7, 3, 17, 1);
+  background-color: rgb(21, 10, 49);
 }
 
 .terminal-history {

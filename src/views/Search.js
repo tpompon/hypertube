@@ -63,12 +63,10 @@ const Search = (props) => {
 
             const newMovie = {
               ytsId: movie.id,
-              name_fr: movie.title,
-              name_en: movie.title,
+              name: movie.title,
               poster: movie.large_cover_image,
               ytsData: movie,
-              description_fr: movie.description_full,
-              description_en: movie.description_full,
+              description: movie.description_full,
               author: 'Someone',
               rating: movie.rating / 2
             }

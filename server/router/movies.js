@@ -20,12 +20,10 @@ router.route('/')
 
 	const newMovie = Movie({
     _ytsId: req.body.ytsId,
-		name_fr: req.body.name_fr, 
-		name_en: req.body.name_en, 
+		name: req.body.name, 
     poster: req.body.poster,
     ytsData: req.body.ytsData,
-		description_fr: req.body.description_fr,
-		description_en: req.body.description_en,
+		description: req.body.description,
 		author: req.body.author,
 		rating: req.body.rating
 	});
@@ -52,14 +50,10 @@ router.route('/:id')
 .put((req, res) => {
   const updateQuery = {};
 
-  if (req.body.name_fr)
-    updateQuery.name_fr = req.body.name_fr;
-  if (req.body.name_en)
-    updateQuery.name_en = req.body.name_en;
-  if (req.body.description_fr)
-    updateQuery.description_fr = req.body.description_fr;
-  if (req.body.description_en)
-    updateQuery.description_en = req.body.description_en;
+  if (req.body.name)
+    updateQuery.name = req.body.name;
+  if (req.body.description)
+    updateQuery.description = req.body.description;
   if (req.body.poster)
     updateQuery.poster = req.body.poster;
   if (req.body.author)

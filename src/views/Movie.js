@@ -60,14 +60,14 @@ const Movie = (props) => {
         //   })
         // })
 
-        //document.addEventListener('scroll', this.handleScroll, false);
+        // document.addEventListener('scroll', handleScroll, false);
         //document.querySelector('.comment-input').addEventListener('keydown', this.onEnter, false);
         //document.addEventListener('keydown', this.onEscape, false);
 
         // Remove les Events Listener dans le WillUnmount - sinon Memory Leaks -
 
         // Download torrent and display
-        // axios.get(`http://${config.hostname}:${config.port}/torrents/download/${this.state.movie.name_fr}`)
+        // axios.get(`http://${config.hostname}:${config.port}/torrents/download/${this.state.movie.name}`)
         // .then(res => {
         //   this.setState({ moviePath: res.data.moviePath });
         //   console.log(this.state.moviePath)
@@ -97,6 +97,14 @@ const Movie = (props) => {
       }
     }
   }
+
+  // const handleScroll = (e) => {
+  //   const moviePoster = document.getElementById('movie-page-poster-fullsize');
+  //   const movieInfos = document.getElementById('movie-infos-fullsize');
+  //   const top = window.pageYOffset || document.documentElement.scrollTop;
+
+  //   moviePoster.style.marginTop = `${top}px`;
+  // }
 
   const addComment = async() => {
     const newComment = {
@@ -167,7 +175,7 @@ const Movie = (props) => {
                 <div className="col center" style={{ width: '45%', padding: 50, backgroundColor: '#16162e', wordBreak: 'break-word', borderRadius: 20 }}>
                   <div id="movie-infos-fullsize" className="movie-infos" style={{marginBottom: 20}}>
                     <div className="row" style={{ alignItems: 'center', flexWrap: 'wrap' }}>
-                      <h1>{(language === 'fr') ? movie.name_fr : movie.name_en}</h1>
+                      <h1>{movie.name}</h1>
                       <span style={{marginTop: 10, marginLeft: 10}}>({movie.ytsData.year})</span>
                       <div className="tooltip toggle-heartbeat" onClick={() => toggleHeartbeat()}>
                         {(heartbeat) ? <RemoveFav width="25" height="25" fill="crimson" /> : <AddFav width="25" height="25" fill="crimson" />}
@@ -190,7 +198,7 @@ const Movie = (props) => {
                         </div>
                       ) : null
                     }
-                    <p>{(language === 'fr') ? movie.description_fr : movie.description_en}</p>
+                    <p>{movie.description}</p>
                     <div className="wrap" style={{ display: 'flex', justifyContent: 'space-between' }}>
                       {
                         movie.ytsData.cast ? (
@@ -247,7 +255,7 @@ const Movie = (props) => {
               <div className="movie-infos" style={{marginBottom: 20}}>
                 <img className="movie-page-poster-lowres" src={movie.poster} style={{ width: '100%' }} alt="poster" />
                 <div className="row" style={{ alignItems: 'center' }}>
-                  <h1>{(language === 'fr') ? movie.name_fr : movie.name_en}</h1>
+                  <h1>{movie.name}</h1>
                   <span style={{marginTop: 10, marginLeft: 10}}>({movie.ytsData.year})</span>
                   <div className="toggle-heartbeat" onClick={() => toggleHeartbeat()}>
                     {(heartbeat) ? <RemoveFav width="25" height="25" fill="crimson" /> : <AddFav width="25" height="25" fill="crimson" />}
@@ -269,7 +277,7 @@ const Movie = (props) => {
                     </div>
                   ) : null
                 }
-                <p>{(language === 'fr') ? movie.description_fr : movie.description_en}</p>
+                <p>{movie.description}</p>
                 <div className="wrap" style={{ display: 'flex', justifyContent: 'space-between' }}>
                   {
                     movie.ytsData.cast ? (

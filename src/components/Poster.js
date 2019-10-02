@@ -31,11 +31,11 @@ class Poster extends React.Component {
 
     return (
       <div className="poster-container">
-        <img className="movie-poster" src={movie.poster} alt={(language === 'FR') ? movie.name_fr : movie.name_en} />
+        <img className="movie-poster" src={movie.poster} alt={movie.name} />
         <div className="poster-overlay">
           <div className="poster-content">
-            <h3>{(language === 'FR') ? movie.name_fr : movie.name_en}</h3>
-            <p>{(language === 'FR') ? movie.description_fr : movie.description_en}</p>
+            <h3>{movie.name}</h3>
+            <p>{movie.description}</p>
             <span>{translations[language].poster.rating} - <Rating readonly={true} initialRating={ratingAverage} emptySymbol={<StarEmpty width="15" height="15" fill="#FFD700" />} fullSymbol={<StarFull width="15" height="15" fill="#FFD700" />} fractions={2} /> ({ratingCount})</span>
           </div>
         </div>

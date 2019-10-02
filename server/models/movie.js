@@ -3,10 +3,8 @@ const Schema = mongoose.Schema;
 
 const MovieSchema = new Schema({
 	_ytsId: { type: String, required: true},
-	name_fr: { type: String, required: true },
-	name_en: { type: String, required: true },
-	description_fr: { type: String, required: true },
-	description_en: { type: String, required: true },
+	name: { type: String, required: true },
+	description: { type: String, required: true },
 	ytsData: {},
 	torrentPath: String,
 	poster: String,
