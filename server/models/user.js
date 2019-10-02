@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const bcrypt = require("bcrypt");
 const Schema = mongoose.Schema;
 
 const UserSchema = new Schema({
@@ -38,7 +39,7 @@ UserSchema.pre('save', (next) => {
 });
 
 UserSchema.methods.validPassword = function(password) {
-  return (this.password === password);
+  return (bcrypt.compare(password, UserSchema.password));
 };
 
 UserSchema.methods.isMailConfirmed = function() {

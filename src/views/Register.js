@@ -72,18 +72,19 @@ const Register = () => {
           </div>
         ) : null
       }
-      <input className="dark-input" type="text" value={newUser.firstname} onChange={ (event) => onChange(event, "firstname")} placeholder={translations[language].register.firstname} style={{marginRight: 10, marginTop: 5, marginBottom: 5}} />
-      <input className="dark-input" type="text" value={newUser.lastname} onChange={ (event) => onChange(event, "lastname")} placeholder={translations[language].register.lastname} style={{marginLeft: 10, marginTop: 5, marginBottom: 5}} />
+      
+      <input className="dark-input" type="text" value={newUser.firstname} onChange={ (event) => onChange(event, "firstname")} placeholder={translations[language].register.firstname} style={{marginRight: 10, marginTop: 5, marginBottom: 5}} required />
+      <input className="dark-input" type="text" value={newUser.lastname} onChange={ (event) => onChange(event, "lastname")} placeholder={translations[language].register.lastname} style={{marginLeft: 10, marginTop: 5, marginBottom: 5}} required />
       <br />
-      <input className="dark-input" type="text" value={newUser.username} onChange={ (event) => onChange(event, "username")} placeholder={translations[language].register.username} style={{marginRight: 10, marginTop: 5, marginBottom: 5}} />
-      <input className="dark-input" type="password" value={newUser.password} onChange={ (event) => onChange(event, "password")} placeholder={translations[language].register.password} style={{marginLeft: 10, marginTop: 5, marginBottom: 5}} />
+      <input className="dark-input" type="text" value={newUser.username} onChange={ (event) => onChange(event, "username")} placeholder={translations[language].register.username} style={{marginRight: 10, marginTop: 5, marginBottom: 5}} required />
+      <input className="dark-input" type="password" value={newUser.password} onChange={ (event) => onChange(event, "password")} placeholder={translations[language].register.password} style={{marginLeft: 10, marginTop: 5, marginBottom: 5}} required />
       <br />
-      <input className="dark-input" type="email" value={newUser.email} onChange={ (event) => onChange(event, "email")} placeholder={translations[language].register.email} style={{width: '100%', marginTop: 5, marginBottom: 5}} />
+      <input className="dark-input" type="email" value={newUser.email} onChange={ (event) => onChange(event, "email")} placeholder={translations[language].register.email} style={{width: '100%', marginTop: 5, marginBottom: 5}} required />
       <br />
       <input className="dark-input" type="text" value={newUser.city} onChange={ (event) => onChange(event, "city")} placeholder={translations[language].register.city} style={{marginRight: 10, marginTop: 5, marginBottom: 5}} />
       <input className="dark-input" type="number" value={newUser.phone} onChange={ (event) => onChange(event, "phone")} placeholder={translations[language].register.phone} style={{marginLeft: 10, marginTop: 5, marginBottom: 5}} />
       <br />
-      <input className="dark-input" type="password" value={newUser.confirmPassword} onChange={ (event) => onChange(event, "confirmPassword")} placeholder={translations[language].register.confirmPassword} style={{width: '100%', marginTop: 5, marginBottom: 10}} />
+      <input className="dark-input" type="password" value={newUser.confirmPassword} onChange={ (event) => onChange(event, "confirmPassword")} placeholder={translations[language].register.confirmPassword} style={{width: '100%', marginTop: 5, marginBottom: 10}} required />
       <div className="warnings">
         { warnMatch ? <p style={{ display: "block" }} className="warn">{translations[language].register.warns.match}</p> : null }
         { warnLength ? <p style={{ display: "block" }} className="warn">{translations[language].register.warns.length}</p> : null }

@@ -136,7 +136,7 @@ const Profile = (props) => {
           <div className="text-center">
             <div className="cover" style={{backgroundImage: `url('/covers/${cover}.svg')`, paddingTop: 40, paddingBottom: 50, marginTop: -20}}>
               <div className="profile-avatar center">
-                <a className="profile-avatar-overlay" onClick={() => uploadAvatar.current.click()}>{translations[language].profile.updateAvatar}</a>
+                <a href="#" className="profile-avatar-overlay" onClick={() => uploadAvatar.current.click()}>{translations[language].profile.updateAvatar}</a>
                 <input type="file" id="file" ref={ uploadAvatar } onChange={ (event) => onChangeAvatar(event) } style={{display: "none"}}/>
                 <img src={user.avatar} alt={`Avatar ${user.username}`} />
               </div>
