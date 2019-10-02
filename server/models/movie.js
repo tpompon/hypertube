@@ -25,7 +25,7 @@ const MovieSchema = new Schema({
 	updated_at: Date
 });
 
-MovieSchema.pre('save', (next) => {
+MovieSchema.pre('save', function(next) {
 	const currentDate = new Date();
 	this.updated_at = currentDate;
 	if (!this.created_at)

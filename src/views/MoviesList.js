@@ -84,8 +84,8 @@ const MoviesList = (props) => {
       _isLoaded ? (
         <div className="col">
           <div className="row wrap" style={{ justifyContent: 'center', marginBottom: 20 }}>
-            <input onChange={(event) => updateFilter({ ...filter, ["minYear"]: event.target.value })} className="dark-input" type="number" placeholder="Min. Year" />
-            <input onChange={(event) => updateFilter({ ...filter, ["maxYear"]: event.target.value })} className="dark-input" type="number" placeholder="Max. Year" style={{marginLeft: 10, marginRight: 30}} />
+            <input min={1900} max={2019} onChange={(event) => updateFilter({ ...filter, ["minYear"]: event.target.value })} className="dark-input" type="number" placeholder="Min. Year" />
+            <input min={1900} max={(new Date).getFullYear()} onChange={(event) => updateFilter({ ...filter, ["maxYear"]: event.target.value })} className="dark-input" type="number" placeholder="Max. Year" style={{marginLeft: 10, marginRight: 30}} />
             <select onChange={(event) => updateFilter({ ...filter, ["genre"]: event.target.value })} className="dark-input">
               {
                 dropDownOptions.map((option) => (

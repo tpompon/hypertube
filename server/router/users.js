@@ -24,10 +24,6 @@ router.route('/')
   });
 })
 .post((req, res) => {
-  let avatarFile = 'default_avatar.png'
-  if (req.body.avatar)
-    avatarFile = req.body.avatar;
-
   const confirmKey = uuidv4();
   const confirmationLink = `${req.body.origin}/confirm/${confirmKey}`;
 
@@ -37,7 +33,7 @@ router.route('/')
     lastname: req.body.lastname,
     username: req.body.username,
     password: req.body.password,
-    avatar: `http://${config.server.host}:${config.server.port}/public/avatars/` + avatarFile,
+    avatar: req.body.avatar,
     cover: 'cinema',
     birthdate: req.body.birthdate,
     age: req.body.age,

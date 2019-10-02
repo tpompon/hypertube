@@ -15,7 +15,7 @@ const Register = () => {
     username: "",
     password: "",
     confirmPassword: "",
-    // avatar: `http://${hostname}:${port}/public/avatars/${req.body.avatar}`,
+    avatar: `http://${config.hostname}:${config.port}/public/avatars/default_avatar.png`,
     // cover: req.body.cover,
     // birthdate: req.body.birthdate,
     // age: req.body.age,
@@ -63,13 +63,16 @@ const Register = () => {
     updatenewUser({ ...newUser, [option]: event.target.value })
   }
 
-  const onChangeAvatar = (event) => {
+  const onChangeAvatar = async (event) => {
     if (event.target.files[0]) {
       event.preventDefault();
       const data = new FormData();
       data.append('file', event.target.files[0]);
       data.append('filename', event.target.files[0].name);
-      alert('OK');
+      const res = await axios.post(`${config.serverURL}/register/avatar`, data);
+      if (res.data.success) {
+        updatenewUser({ ...newUser, avatar: `http://${config.hostname}:${config.port}/public/avatars/tmp/${res.data.file}` });
+      }
       // Treat image upload and show it on form, save it temp, and move it in the user folder only if register success
     }
   }
@@ -79,7 +82,7 @@ const Register = () => {
       <div className="profile-avatar center">
         <a className="profile-avatar-overlay" onClick={() => uploadAvatar.current.click()}>Upload avatar</a> {/* To translate */}
         <input type="file" id="file" ref={ uploadAvatar } onChange={(e) => onChangeAvatar(e)} style={{display: "none"}}/>
-        <img src={`http://${config.hostname}:${config.port}/public/avatars/default_avatar.png`} alt={`Upload avatar`} />
+        <img src={newUser.avatar} alt={`Upload avatar`} />
       </div>
 
       <h2>{translations[language].register.title}</h2>

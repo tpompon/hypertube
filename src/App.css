@@ -265,6 +265,7 @@ App
   border-radius: 10px;
 }
 .poster-container:hover .poster-overlay {
+  cursor: pointer;
   opacity: 1;
 }
 .poster-content {

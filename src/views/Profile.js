@@ -52,38 +52,30 @@ const Profile = (props) => {
   const { language } = props;
 
   useEffect(() => {
-    axios.get(`${config.serverURL}/auth`)
-      .then(res => {
-        axios.get(`${config.serverURL}/user/${res.data.user._id}`)
-          .then(res => {
-            if (res.data.success) {
-              updateUser(res.data.user[0])
-              updateHeartbeat(getMoviesList(res.data.user[0].heartbeat))
-              updateIsLoaded(true)
-              updateCoverBackground(res.data.user[0].cover)
-            }
-          });
-        // const coversMenu = document.getElementsByClassName('covers-menu')[0];
-        // document.onclick = (e) => {
-        //   if (e.target.classList[0] !== 'covers-menu' && e.target.classList[0] !== 'covers-menu-child' && e.target.classList[0] !== 'cover-icon') {
-        //     if (e.target.classList[0] !== 'edit-cover-box' && e.target.classList[0] !== 'pencil-icon') {
-        //       coversMenu.style.display = 'none';
-        //     }
-        //   }
-        // }
-      })
+    const fetchData = async () => {
+      const check = await axios.get(`${config.serverURL}/auth`);
+      if (check.data.auth) {
+        const res = await axios.get(`${config.serverURL}/user/${check.data.user._id}`);
+        if (res.data.success) {
+          updateUser(res.data.user[0])
+          updateHeartbeat(getMoviesList(res.data.user[0].heartbeat))
+          updateIsLoaded(true)
+          // console.log('ready')
+          updateCoverBackground(res.data.user[0].cover)
+        }
+      }
+    }
+    fetchData();
   }, [])
   
   const getMoviesList = (moviesListIds) => {
     let array = [];
-    moviesListIds.map((movie) => {
-      axios.get(`${config.serverURL}/movies/${movie.id}`)
-        .then(res => {
-          if (res.data.success && res.data.movie) {
-            array.push(res.data.movie[0]);
-          }
-        })
+    moviesListIds.forEach(async (movie, index) => {
+      const res = await axios.get(`${config.serverURL}/movies/${movie.id}`);
+      if (res.data.success && res.data.movie)
+        array.push(res.data.movie[0]);
     });
+    // console.log(array.slice());
     return array;
   }
 

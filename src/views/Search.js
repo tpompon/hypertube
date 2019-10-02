@@ -50,8 +50,7 @@ const Search = (props) => {
           poster: movie.large_cover_image,
           ytsData: movie,
           description: movie.description_full,
-          author: 'Someone',
-          rating: movie.rating / 2
+          author: 'Someone'
         }
         const responseNewMovie = await axios.post(`${config.serverURL}/movies`, newMovie)
         if (responseNewMovie.data.success) {
