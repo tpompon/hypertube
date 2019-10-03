@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const bcrypt = require("bcrypt");
 const Schema = mongoose.Schema;
 
 const UserSchema = new Schema({
@@ -29,7 +30,7 @@ const UserSchema = new Schema({
   updated_at: Date
 });
 
-UserSchema.pre('save', (next) => {
+UserSchema.pre('save', function(next) {
 	const currentDate = new Date();
 	this.updated_at = currentDate;
 	if (!this.created_at)
@@ -38,7 +39,8 @@ UserSchema.pre('save', (next) => {
 });
 
 UserSchema.methods.validPassword = function(password) {
-  return (this.password === password);
+  return (password === this.password);
+  // return (bcrypt.compare(password, UserSchema.password));
 };
 
 UserSchema.methods.isMailConfirmed = function() {

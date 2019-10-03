@@ -22,69 +22,65 @@ import NotFound from './views/NotFound'
 import Loading from './components/Loading'
 
 import { BrowserRouter as Router, Route, Switch, Redirect } from "react-router-dom";
-import { UserConsumer } from './store';
 
 const App = () => {
   
   const [_isAuth, updateIsAuth] = useState(false)
   const [_isLoaded, updateIsLoaded] = useState(false)
-  const context = useContext(UserConsumer)
 
   useEffect(() => {
     axios.get(`http://${config.hostname}:${config.port}/auth`)
       .then((res) => {
         if (res.data.auth) {
           updateIsAuth(true)
-          updateIsLoaded(true)
+          //updateIsLoaded(true)
         }
-        else {
-          updateIsLoaded(true)
-        }
+        updateIsLoaded(true)
+        //else {
+        //  updateIsLoaded(true)
+        //}
       })
   }, [])
 
-  const { language } = context
   return (
     <Router>
       <div className="App">
         <div className="App-wrapper">
-          <Header language={language} extended={true} />
+          <Header extended={true} />
           {
             _isLoaded ? (
               <Switch>
-                <Route exact path='/' component={(props) => (
-                  _isAuth ? <MoviesList {...props} language={language} /> : <Redirect to="/login" />
+                <Route exact path='/' component={() => (
+                  _isAuth ? <MoviesList /> : <Redirect to="/login" />
                 )}/>
-                <Route exact path='/watch/:id' component={(match) => (
-                  _isAuth ? <Movie {...match} language={language} /> : <Redirect to="/login" />
+                <Route exact path='/watch/:id' component={() => (
+                  _isAuth ? <Movie /> : <Redirect to="/login" />
                 )}/>
-                <Route exact path='/user/:username' component={(match) => (
-                  _isAuth ? <User {...match} language={language} /> : <Redirect to="/login" />
+                <Route exact path='/user/:username' component={() => (
+                  _isAuth ? <User /> : <Redirect to="/login" />
                 )}/>
-                <Route exact path='/profile' component={(props) => (
-                  _isAuth ? <Profile {...props} language={language} /> : <Redirect to="/login" />
+                <Route exact path='/profile' component={() => (
+                  _isAuth ? <Profile /> : <Redirect to="/login" />
                 )}/>
-                <Route exact path='/settings' component={(props) => (
-                  _isAuth ? <Settings {...props} language={language} /> : <Redirect to="/login" />
+                <Route exact path='/settings' component={() => (
+                  _isAuth ? <Settings /> : <Redirect to="/login" />
                 )}/>
-                <Route exact path='/logout' component={(props) => (
-                  _isAuth ? <Logout {...props} language={language} /> : <Redirect to="/login" />
+                <Route exact path='/logout' component={() => (
+                  _isAuth ? <Logout /> : <Redirect to="/login" />
                 )}/>
-                <Route exact path='/register' component={(props) => (
-                  _isAuth ? <Redirect to ="/" /> : <Register {...props} language={language} />
+                <Route exact path='/register' component={() => (
+                  _isAuth ? <Redirect to ="/" /> : <Register />
                 )}/>
-                <Route exact path='/login' component={(props) => (
-                  _isAuth ? <Redirect to ="/" /> : <Login {...props} language={language} />
-                )}/>
-
-                <Route exact path='/search' component={(props) => (
-                  _isAuth ? <Search {...props} language={language} /> : <Redirect to="/login" />
+                <Route exact path='/login' component={() => (
+                  _isAuth ? <Redirect to ="/" /> : <Login />
                 )}/>
 
-                <Route exact path='/confirm/:key' component={(match) => <Confirm {...match} language={language} />} />
-                <Route exact path='/forgot/:key' component={(match) => <Forgot {...match} language={language} />} />
-
-                <Route component={() => <NotFound language={language} />} />
+                <Route exact path='/search' component={() => (
+                  _isAuth ? <Search /> : <Redirect to="/login" />
+                )}/>
+                <Route exact path='/confirm/:key' component={() => <Confirm />} />
+                <Route exact path='/forgot/:key' component={() => <Forgot />} />
+                <Route component={() => <NotFound />} />
               </Switch>
             ) : (
               <Loading />
@@ -94,10 +90,10 @@ const App = () => {
 
         <Terminal />
 
-        <Footer language={language} />
+        <Footer />
       </div>
     </Router>
   );
 }
 
-export default App;
+export default App

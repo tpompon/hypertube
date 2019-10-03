@@ -1,15 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios'
 import config from 'config'
 import translations from 'translations'
 import Button from 'components/Button'
 import Loading from 'components/Loading'
+import { UserConsumer } from 'store';
 
-const Settings = (props) => {
+const Settings = () => {
 
+  const context = useContext(UserConsumer)
   const [user, updateUser] = useState({})
   const [_isLoaded, updateIsLoaded] = useState(false)
-  const [language, updateLanguage] = useState(props.language)
+  const [language, updateLanguage] = useState(context.language)
 
   useEffect(() => {
     axios.get(`http://${config.hostname}:${config.port}/auth`)

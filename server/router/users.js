@@ -1,4 +1,5 @@
 const express = require("express");
+const bcrypt = require("bcrypt");
 const router = express.Router();
 
 const config = require('../config');
@@ -23,19 +24,16 @@ router.route('/')
   });
 })
 .post((req, res) => {
-  let avatarFile = 'default_avatar.png'
-  if (req.body.avatar)
-    avatarFile = req.body.avatar;
-
   const confirmKey = uuidv4();
   const confirmationLink = `${req.body.origin}/confirm/${confirmKey}`;
 
+  // const hash = await bcrypt.hash(req.body.password, 10);
 	const newUser = User({
     firstname: req.body.firstname,
     lastname: req.body.lastname,
     username: req.body.username,
     password: req.body.password,
-    avatar: `http://${config.server.host}:${config.server.port}/public/avatars/` + avatarFile,
+    avatar: req.body.avatar,
     cover: 'cinema',
     birthdate: req.body.birthdate,
     age: req.body.age,
@@ -80,6 +78,7 @@ router.route('/')
 
   newUser.save((err) => {
     if (err) {
+      console.log(err);
       res.json({ success: false });
     } else {
       res.json({ success: true, user: newUser });

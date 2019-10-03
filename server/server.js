@@ -227,6 +227,18 @@ passport.authenticate('google', { failureRedirect: `http://${config.client.host}
     })
 });
 
+app.post('/register/avatar', (req, res) => {
+  const imageFile = req.files.file;
+  const timestamp = Date.now();
+  const uniqueId = uuid();
+  imageFile.mv(`${__basedir}/public/avatars/tmp/${uniqueId}_${timestamp}.jpg`, (err) => {
+    if (err)
+      res.json({ success: false })
+    else
+		  res.json({ success: true, file: `${uniqueId}_${timestamp}.jpg`});
+  });
+});
+
 app.use('/auth', require('./router/auth'));
 app.use('/users', require('./router/users'));
 app.use('/user', require('./router/user'));

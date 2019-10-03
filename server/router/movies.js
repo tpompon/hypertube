@@ -29,11 +29,12 @@ router.route('/')
 	});
 
 	newMovie.save((err) => {
-		if (err)
+    if (err) {
 			res.json({ success: false, error: err });
-		else
+    } else {
 			res.json({ success: true, movie: newMovie });
-	});
+    }
+  });
 })
 
 router.route('/:id')

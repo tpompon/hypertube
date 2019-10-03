@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { withRouter } from "react-router-dom"
 import axios from 'axios'
 import config from 'config'
 import translations from '../translations'
@@ -50,4 +51,4 @@ const Confirm = (props) => {
 
 }
 
-export default Confirm
+export default withRouter(Confirm)

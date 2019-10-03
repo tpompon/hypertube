@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect, useRef } from 'react';
 import axios from 'axios'
 import config from 'config'
 import translations from 'translations'
@@ -15,7 +15,7 @@ const Register = () => {
     username: "",
     password: "",
     confirmPassword: "",
-    // avatar: `http://${hostname}:${port}/public/avatars/${req.body.avatar}`,
+    avatar: `http://${config.hostname}:${config.port}/public/avatars/default_avatar.png`,
     // cover: req.body.cover,
     // birthdate: req.body.birthdate,
     // age: req.body.age,
@@ -29,6 +29,7 @@ const Register = () => {
   const [toggleSuccess, updateToggleSuccess] = useState(false)
   const [warnMatch, updateWarnMatch] = useState(false)
   const [warnLength, updateWarnLength] = useState(false)
+  const uploadAvatar = useRef(null)
   const context = useContext(UserConsumer)
   const { language } = context
 
@@ -62,8 +63,28 @@ const Register = () => {
     updatenewUser({ ...newUser, [option]: event.target.value })
   }
 
+  const onChangeAvatar = async (event) => {
+    if (event.target.files[0]) {
+      event.preventDefault();
+      const data = new FormData();
+      data.append('file', event.target.files[0]);
+      data.append('filename', event.target.files[0].name);
+      const res = await axios.post(`${config.serverURL}/register/avatar`, data);
+      if (res.data.success) {
+        updatenewUser({ ...newUser, avatar: `http://${config.hostname}:${config.port}/public/avatars/tmp/${res.data.file}` });
+      }
+      // Treat image upload and show it on form, save it temp, and move it in the user folder only if register success
+    }
+  }
+
   return (
     <div className="dark-card center text-center">
+      <div className="profile-avatar center">
+        <a className="profile-avatar-overlay" onClick={() => uploadAvatar.current.click()}>Upload avatar</a> {/* To translate */}
+        <input type="file" id="file" ref={ uploadAvatar } onChange={(e) => onChangeAvatar(e)} style={{display: "none"}}/>
+        <img src={newUser.avatar} alt={`Upload avatar`} />
+      </div>
+
       <h2>{translations[language].register.title}</h2>
       {
         (toggleSuccess) ? (
@@ -72,18 +93,19 @@ const Register = () => {
           </div>
         ) : null
       }
-      <input className="dark-input" type="text" value={newUser.firstname} onChange={ (event) => onChange(event, "firstname")} placeholder={translations[language].register.firstname} style={{marginRight: 10, marginTop: 5, marginBottom: 5}} />
-      <input className="dark-input" type="text" value={newUser.lastname} onChange={ (event) => onChange(event, "lastname")} placeholder={translations[language].register.lastname} style={{marginLeft: 10, marginTop: 5, marginBottom: 5}} />
+      
+      <input className="dark-input" type="text" value={newUser.firstname} onChange={ (event) => onChange(event, "firstname")} placeholder={translations[language].register.firstname} style={{marginRight: 10, marginTop: 5, marginBottom: 5}} required />
+      <input className="dark-input" type="text" value={newUser.lastname} onChange={ (event) => onChange(event, "lastname")} placeholder={translations[language].register.lastname} style={{marginLeft: 10, marginTop: 5, marginBottom: 5}} required />
       <br />
-      <input className="dark-input" type="text" value={newUser.username} onChange={ (event) => onChange(event, "username")} placeholder={translations[language].register.username} style={{marginRight: 10, marginTop: 5, marginBottom: 5}} />
-      <input className="dark-input" type="password" value={newUser.password} onChange={ (event) => onChange(event, "password")} placeholder={translations[language].register.password} style={{marginLeft: 10, marginTop: 5, marginBottom: 5}} />
+      <input className="dark-input" type="text" value={newUser.username} onChange={ (event) => onChange(event, "username")} placeholder={translations[language].register.username} style={{marginRight: 10, marginTop: 5, marginBottom: 5}} required />
+      <input className="dark-input" type="password" value={newUser.password} onChange={ (event) => onChange(event, "password")} placeholder={translations[language].register.password} style={{marginLeft: 10, marginTop: 5, marginBottom: 5}} required />
       <br />
-      <input className="dark-input" type="email" value={newUser.email} onChange={ (event) => onChange(event, "email")} placeholder={translations[language].register.email} style={{width: '100%', marginTop: 5, marginBottom: 5}} />
+      <input className="dark-input" type="email" value={newUser.email} onChange={ (event) => onChange(event, "email")} placeholder={translations[language].register.email} style={{width: '100%', marginTop: 5, marginBottom: 5}} required />
       <br />
       <input className="dark-input" type="text" value={newUser.city} onChange={ (event) => onChange(event, "city")} placeholder={translations[language].register.city} style={{marginRight: 10, marginTop: 5, marginBottom: 5}} />
       <input className="dark-input" type="number" value={newUser.phone} onChange={ (event) => onChange(event, "phone")} placeholder={translations[language].register.phone} style={{marginLeft: 10, marginTop: 5, marginBottom: 5}} />
       <br />
-      <input className="dark-input" type="password" value={newUser.confirmPassword} onChange={ (event) => onChange(event, "confirmPassword")} placeholder={translations[language].register.confirmPassword} style={{width: '100%', marginTop: 5, marginBottom: 10}} />
+      <input className="dark-input" type="password" value={newUser.confirmPassword} onChange={ (event) => onChange(event, "confirmPassword")} placeholder={translations[language].register.confirmPassword} style={{width: '100%', marginTop: 5, marginBottom: 10}} required />
       <div className="warnings">
         { warnMatch ? <p style={{ display: "block" }} className="warn">{translations[language].register.warns.match}</p> : null }
         { warnLength ? <p style={{ display: "block" }} className="warn">{translations[language].register.warns.length}</p> : null }

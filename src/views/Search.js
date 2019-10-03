@@ -3,7 +3,7 @@ import axios from 'axios'
 import config from 'config'
 import Poster from 'components/Poster2'
 import Loading from 'components/Loading'
-import { Link } from "react-router-dom";
+import { Link, withRouter } from "react-router-dom";
 import { UserConsumer } from 'store';
 
 const Search = (props) => {
@@ -12,7 +12,7 @@ const Search = (props) => {
   const [movies, updateMovies] = useState([])
   const [_isLoaded, updateIsLoaded] = useState(false)
   const [_status, updateStatus] = useState(undefined)
-  const { language } = props
+  const { language } = context
   const context = useContext(UserConsumer)
 
   useEffect(() => {
@@ -50,8 +50,7 @@ const Search = (props) => {
           poster: movie.large_cover_image,
           ytsData: movie,
           description: movie.description_full,
-          author: 'Someone',
-          rating: movie.rating / 2
+          author: 'Someone'
         }
         const responseNewMovie = await axios.post(`${config.serverURL}/movies`, newMovie)
         if (responseNewMovie.data.success) {
@@ -123,7 +122,6 @@ const Search = (props) => {
       //   }
       // </div>
     )
-
 }
 
-export default Search;
+export default withRouter(Search);

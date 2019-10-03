@@ -10,7 +10,7 @@ axios.defaults.withCredentials = true;
 
 const Header = (props) => {
 
-  const { language, extended } = props
+  const { extended } = props
   const [searchMovie, updateSearchMovie] = useState("")
   const [movies, updateMovies] = useState([])
   const [user, updateUser] = useState({})
@@ -19,6 +19,7 @@ const Header = (props) => {
   const [toggleSearchBarCollapse, updateToggleSearchBarCollapse] = useState(false)
   const [toggleAvatarDropdown, updateToggleAvatarDropdown] = useState(false)
   const context = useContext(UserConsumer)
+  const { language, updateSearch } = context
 
   useEffect(() => {
     fetchData()
@@ -51,7 +52,7 @@ const Header = (props) => {
   const resetSearchBar = () => {
     updateSearchMovie("");
     updateSearchInProgress(false)
-    context.updateSearch("");
+    updateSearch("");
   }
 
   const closeMenus = () => {
@@ -177,7 +178,6 @@ const Header = (props) => {
         }
       </header>
   );
-
 }
 
 export default Header;

@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useContext } from 'react'
+import { withRouter } from "react-router-dom"
 import axios from 'axios'
 import config from 'config'
 import translations from 'translations'
@@ -12,10 +13,13 @@ import { ReactComponent as ReportFlag } from 'svg/report-flag.svg'
 import { ReactComponent as Close } from 'svg/close.svg'
 import { ReactComponent as AddFav } from 'svg/add_heart.svg'
 import { ReactComponent as RemoveFav } from 'svg/remove_heart.svg'
+import { UserConsumer } from 'store'
 
 const Movie = (props) => {
 
-  const { language, match } = props
+  const { match } = props
+  const context = useContext(UserConsumer)
+  const { language } = context
   const { id } = match.params
   //const [id, updateId] = useState(parseInt(id))
   const [movie, updateMovie] = useState({})
@@ -33,6 +37,13 @@ const Movie = (props) => {
   useEffect(() => {
     window.scrollTo(0, 0)
     fetchMovie()
+
+    return () => {
+      document.removeEventListener('scroll', handleScroll, false);
+      // document.removeEventListener('scroll', onEnter, false);
+      document.removeEventListener('scroll', onEscape, false);
+    }
+
   }, [])
 
   const fetchMovie = async() => {
@@ -60,9 +71,9 @@ const Movie = (props) => {
         //   })
         // })
 
-        // document.addEventListener('scroll', handleScroll, false);
-        //document.querySelector('.comment-input').addEventListener('keydown', this.onEnter, false);
-        //document.addEventListener('keydown', this.onEscape, false);
+        document.addEventListener('scroll', handleScroll, false);
+        // document.querySelector('.comment-input').addEventListener('keydown', onEnter, false);
+        document.addEventListener('keydown', onEscape, false);
 
         // Remove les Events Listener dans le WillUnmount - sinon Memory Leaks -
 
@@ -98,13 +109,20 @@ const Movie = (props) => {
     }
   }
 
-  // const handleScroll = (e) => {
-  //   const moviePoster = document.getElementById('movie-page-poster-fullsize');
-  //   const movieInfos = document.getElementById('movie-infos-fullsize');
-  //   const top = window.pageYOffset || document.documentElement.scrollTop;
+  const handleScroll = (e) => {
+    const moviePoster = document.getElementById('movie-page-poster-fullsize');
+    const movieInfos = document.getElementById('movie-infos-fullsize');
+    const top = window.pageYOffset;
 
-  //   moviePoster.style.marginTop = `${top}px`;
-  // }
+    const maxBottom = movieInfos.offsetHeight + movieInfos.offsetTop
+    const posterHeight = moviePoster.offsetHeight + movieInfos.offsetTop;
+
+    if (top + posterHeight <= maxBottom)
+      moviePoster.style.marginTop = `${top}px`;
+  }
+  // const onEnter = (e) => { if (e.keyCode === 13) addComment(); }
+  const onEscape = (e) => { if (e.keyCode === 27) hidePlayer(); }
+
 
   const addComment = async() => {
     const newComment = {
@@ -172,8 +190,8 @@ const Movie = (props) => {
             <div className="movie-page">
               <div className="row wrap">
                 <img id="movie-page-poster-fullsize" className="movie-page-poster center" src={movie.poster} alt="Movie poster" />
-                <div className="col center" style={{ width: '45%', padding: 50, backgroundColor: '#16162e', wordBreak: 'break-word', borderRadius: 20 }}>
-                  <div id="movie-infos-fullsize" className="movie-infos" style={{marginBottom: 20}}>
+                <div id="movie-infos-fullsize" className="col center" style={{ width: '45%', padding: 50, backgroundColor: '#16162e', wordBreak: 'break-word', borderRadius: 20 }}>
+                  <div className="movie-infos" style={{marginBottom: 20}}>
                     <div className="row" style={{ alignItems: 'center', flexWrap: 'wrap' }}>
                       <h1>{movie.name}</h1>
                       <span style={{marginTop: 10, marginLeft: 10}}>({movie.ytsData.year})</span>
@@ -205,7 +223,7 @@ const Movie = (props) => {
                           <div className="cast row" style={{marginBottom: 20}}>
                           {
                             movie.ytsData.cast.map((person, index) => (
-                                <a className="pointer" href={`https://www.imdb.com/name/nm${person.imdb_code}`} target="_blank" key={index}>
+                                <a className="pointer" href={`https://www.imdb.com/name/nm${person.imdb_code}`} target="_blank" key={`${person.name}-${index}`}>
                                   <img style={{ width: 75, height: 75, objectFit: 'cover', borderRadius: '50%', marginRight: -20 }} src={person.url_small_image ? person.url_small_image : `http://${config.hostname}:${config.port}/public/avatars/default_avatar.png`} alt={person.name} />
                                 </a>
                               ))
@@ -284,7 +302,7 @@ const Movie = (props) => {
                       <div className="cast row" style={{marginBottom: 20}}>
                       {
                         movie.ytsData.cast.map((person, index) => (
-                            <a className="pointer" href={`https://www.imdb.com/name/nm${person.imdb_code}`} target="_blank" key={index}>
+                            <a className="pointer" href={`https://www.imdb.com/name/nm${person.imdb_code}`} target="_blank" key={`${person.name}-${index}`}>
                               <img style={{ width: 75, height: 75, objectFit: 'cover', borderRadius: '50%', marginRight: -20 }} src={person.url_small_image ? person.url_small_image : `http://${config.hostname}:${config.port}/public/avatars/default_avatar.png`} alt={person.name} />
                             </a>
                           ))
@@ -294,7 +312,7 @@ const Movie = (props) => {
                   }
                   <div>
                     <Rating
-                      onChange={(value) => updateRating(value)}
+                      onChange={(value) => updatingRating(value)}
                       initialRating={rating}
                       emptySymbol={<StarEmpty width="30" height="30" fill="#FFD700" />}
                       fullSymbol={<StarFull width="30" height="30" fill="#FFD700" />}
@@ -366,4 +384,4 @@ const Movie = (props) => {
 
 }
 
-export default Movie
+export default withRouter(Movie)

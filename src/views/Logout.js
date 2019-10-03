@@ -1,13 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios'
 import config from 'config'
 import translations from 'translations'
 import Loading from 'components/Loading'
 import { ReactComponent as CheckMark } from 'svg/checkmark.svg'
+import { UserConsumer } from 'store';
 
-const Logout = (props) => {
+const Logout = () => {
 
   const [disconnected, updateDisconnected] = useState(false)
+  const context = useContext(UserConsumer)
 
   useEffect(() => {
     axios.get(`http://${config.hostname}:${config.port}/auth/logout`)
@@ -23,7 +25,7 @@ const Logout = (props) => {
         (disconnected) ? (
           <div>
             <CheckMark width="50" height="50" fill="#5CB85C" />
-            <p>{translations[props.language].logout.title}</p>
+            <p>{translations[context.language].logout.title}</p>
           </div>
         ) : <Loading />
       }

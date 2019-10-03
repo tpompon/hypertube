@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import axios from 'axios'
 import config from 'config'
 import translations from 'translations'
@@ -7,12 +7,14 @@ import Button from 'components/Button'
 import { ReactComponent as TwitterIcon } from 'svg/twitter.svg'
 import { ReactComponent as FourtyTwoIcon } from 'svg/42.svg'
 import { ReactComponent as GoogleIcon } from 'svg/google.svg'
+import { UserConsumer } from 'store';
 
 axios.defaults.withCredentials = true;
 
-const Login = (props) => {
+const Login = () => {
 
-  const { language } = props
+  const context = useContext(UserConsumer)
+  const { language } = context
   const [username, updateUsername] = useState("")
   const [password, updatePassword] = useState("")
   const [email, updateEmail] = useState("")

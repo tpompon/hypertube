@@ -39,9 +39,9 @@ const dropDownOptions = [
   { value: "14",  genre: "Music" },
   { value: "15",  genre: "Family" },
 ]
-const MoviesList = (props) => {
+
+const MoviesList = () => {
   
-  const { language } = props
   const context = useContext(UserConsumer)
   const [movies, updateMovies] = useState([])
   const [filter, updateFilter] = useState({
@@ -52,14 +52,12 @@ const MoviesList = (props) => {
     maxRating: ""
   })
   const [_isLoaded, updateIsLoaded] = useState(false)
-  const { search } = context
+  const { search, language } = context
 
   useEffect(() => {
     fetchMovies()
   }, [])
-
   useEffect(() => {
-    movies.sort(compare)
     updateIsLoaded(true)
   })
 
@@ -85,8 +83,8 @@ const MoviesList = (props) => {
       _isLoaded ? (
         <div className="col">
           <div className="row wrap" style={{ justifyContent: 'center', marginBottom: 20 }}>
-            <input onChange={(event) => updateFilter({ ...filter, ["minYear"]: event.target.value })} className="dark-input" type="number" placeholder="Min. Year" />
-            <input onChange={(event) => updateFilter({ ...filter, ["maxYear"]: event.target.value })} className="dark-input" type="number" placeholder="Max. Year" style={{marginLeft: 10, marginRight: 30}} />
+            <input min={1900} max={2019} onChange={(event) => updateFilter({ ...filter, ["minYear"]: event.target.value })} className="dark-input" type="number" placeholder="Min. Year" />
+            <input min={1900} max={(new Date).getFullYear()} onChange={(event) => updateFilter({ ...filter, ["maxYear"]: event.target.value })} className="dark-input" type="number" placeholder="Max. Year" style={{marginLeft: 10, marginRight: 30}} />
             <select onChange={(event) => updateFilter({ ...filter, ["genre"]: event.target.value })} className="dark-input">
               {
                 dropDownOptions.map((option) => (
@@ -100,7 +98,7 @@ const MoviesList = (props) => {
           </div>
           <div className="posters-list row wrap">
           {
-            movies.map((movie, index) => {
+            movies.sort(compare).map((movie, index) => {
               if (movie.name.toLowerCase().trim().includes(search.toLowerCase().trim())) {
                 return (
                   <Link to={`/watch/${movie._id}`} key={`movie-${index}`}>

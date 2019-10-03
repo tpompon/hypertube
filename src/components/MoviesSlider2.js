@@ -1,13 +1,55 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import config from "config"
 import Poster from './Poster'
 import { Link } from "react-router-dom";
+import axios from 'axios';
 import { ReactComponent as ArrowLeft } from 'svg/arrow-point-to-left.svg'
 import { ReactComponent as ArrowRight } from 'svg/arrow-point-to-right.svg'
 
 const PostersSlider = (props) => {
 
-  const [currentPos, updateCurrentPos] = useState(0)
   const { movies, language } = props
+  const [test, updateTest] = useState([])
+  const [currentPos, updateCurrentPos] = useState(0)
+
+  /*
+  const getMovie = async(movie) => {
+    const res = await axios.get(`${config.serverURL}/movies/${movie.id}`);
+    if (res.data.success && res.data.movie) {
+      return (
+        <Link to={`/watch/${res.data._id}`} key={`movie-${res.data._id}`}>
+          <Poster movie={res.data.movie} language={language} />
+        </Link>
+      )
+    }
+    return null
+  }
+  */
+
+  // useEffect(() => {
+  //   getMovie()
+  // }, [])
+
+  // const getMovie = () => {
+  //   movies.forEach(async(movie)=> {
+  //     const res = await axios.get(`${config.serverURL}/movies/${movie.id}`);
+  //     //console.log(res)
+  //     if (res.data.success && res.data.movie) {
+  //       //console.log(res.data.movie)
+  //       console.log(test)
+  //       updateTest(
+  //         //...test,
+  //         res.data.movie.map((mov) => {
+  //           //console.log(mov)
+  //           return mov
+  //         })
+  //       )
+  //       return null
+  //     }
+  //   })
+  // }
+
+  // console.log(test)
 
   return (
     <div className="posters-slider-container row">
@@ -25,13 +67,11 @@ const PostersSlider = (props) => {
               }
             >
             {
-              movies.map((movie) => {
-                return (
-                  <Link to={`/watch/${movie._id}`} key={`movie-${movie._id}`}>
-                    <Poster movie={movie} language={language} />
-                  </Link>
-                )
-              })
+              movies.map((movie) => (
+                <Link to={`/watch/${movie._id}`} key={`movie-${movie._id}`}>
+                  <Poster movie={movie} language={language} />
+                </Link>
+              ))
             }
             </div>
           ) : (

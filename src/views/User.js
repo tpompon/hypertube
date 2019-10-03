@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
+import { withRouter } from "react-router-dom"
 import axios from 'axios'
 import config from 'config'
 import translations from 'translations'
 import MoviesSlider from 'components/MoviesSlider'
 import Loading from 'components/Loading'
 import { ReactComponent as VerifiedIcon } from 'svg/verified.svg'
+import { UserConsumer } from 'store'
 
 const heartbeat = [
   { id: 1, name_fr: "L'Arnacoeur", name_en: "L'Arnacoeur", poster: "/posters/arnacoeur.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.8 },
@@ -27,7 +29,9 @@ const recents = [
 const User = (props) => {
   const [user, updateUser] = useState(null)
   const [_isLoaded, updateIsLoaded] = useState(false)
-  const { language, match } = props
+  const context = useContext(UserConsumer)
+  const { language } = context
+  const { match } = props
 
   useEffect(() => {
     axios.get(`http://${config.hostname}:${config.port}/user/username/${match.params.username}`)
@@ -40,7 +44,6 @@ const User = (props) => {
   }, [])
 
   const copyProfileURL = () => {
-    const { language } = props;
     const profileURL = document.createElement('textarea');
     const tooltipText = document.getElementsByClassName("tooltip-text")[0];
     tooltipText.innerHTML = translations[language].user.tooltip.copied;
@@ -54,7 +57,6 @@ const User = (props) => {
   }
 
   const resetTooltip = () => {
-    const { language } = props;
     const tooltipText = document.getElementsByClassName("tooltip-text")[0];
     tooltipText.innerHTML = translations[language].user.tooltip.copy;
   }
@@ -98,4 +100,4 @@ const User = (props) => {
 
 }
 
-export default User;
+export default withRouter(User);
