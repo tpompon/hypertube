@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios'
 import config from 'config'
-import Poster from 'components/Poster2'
+import PosterYTS from 'components/PosterYTS'
 import Loading from 'components/Loading'
 import { Link, withRouter } from "react-router-dom";
 import { UserConsumer } from 'store';
@@ -79,7 +79,7 @@ const Search = (props) => {
                   // <Link to={`/watchyts/${movie.id}`} key={`movie-${movie.slug}`}>
                   //   <Poster movie={movie} language={language} />
                   // </Link>
-                  <div key={ `movie-${index}` } onClick={() => checkDatabase(movie.id)}><Poster from="yts" movie={movie} language={language} /></div>
+                  <div key={ `movie-${index}` } onClick={() => checkDatabase(movie.id)}><PosterYTS from="yts" movie={movie} language={language} /></div>
                 )
             })
           }

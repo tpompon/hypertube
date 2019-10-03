@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useContext } from 'react';
 import axios from 'axios';
 import config from 'config'
 import MoviesSlider from 'components/MoviesSlider'
-import MoviesSlider2 from 'components/MoviesSlider2'
+import PostersSlider from 'components/PostersSlider'
 import translations from 'translations'
 import Loading from 'components/Loading'
 import { ReactComponent as VerifiedIcon } from 'svg/verified.svg'
@@ -140,7 +140,7 @@ const Profile = () => {
               </div>
             </div>
             <h2>{translations[language].profile.list.heartbeat}</h2>
-            <MoviesSlider2 number={1} movies={heartbeat} language={language} />
+            <PostersSlider number={1} movies={heartbeat} language={language} />
             <h2>{translations[language].profile.list.recents}</h2>
             <MoviesSlider number={2} movies={recents} language={language} />
             <h2>{translations[language].profile.list.continue}</h2>

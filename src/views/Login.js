@@ -29,6 +29,7 @@ const Login = () => {
   };
 
   const authenticate = async(strategy) => {
+    document.getElementById('error').style.display = 'none';
     if (strategy === 'twitter') {
       window.location.href = `http://${config.hostname}:${config.port}/oauth/twitter/`;
     } else if (strategy === '42') {
@@ -48,6 +49,7 @@ const Login = () => {
   }
 
   const sendResetLink = async() => {
+    document.getElementById('error2').style.display = 'none';
     const body = { email, origin: window.location.origin }
     const response = await axios.post(`${config.serverURL}/auth/forgot`, body)
     if (!response.data.success) {
