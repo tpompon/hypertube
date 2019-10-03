@@ -17,7 +17,7 @@ const Search = (props) => {
 
   useEffect(() => {
     fetchMovies()
-  })
+  }, [search])
 
   const fetchMovies = async() => {
     if (search.trim() !== '') {

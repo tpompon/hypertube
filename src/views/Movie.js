@@ -35,16 +35,19 @@ const Movie = (props) => {
   const player = useRef(null)
 
   useEffect(() => {
-    window.scrollTo(0, 0)
     fetchMovie()
 
     return () => {
       document.removeEventListener('scroll', handleScroll, false);
-      // document.removeEventListener('scroll', onEnter, false);
+      document.removeEventListener('scroll', onEnter, false);
       document.removeEventListener('scroll', onEscape, false);
     }
+  }, []);
 
-  }, [])
+  useEffect(() => {
+    window.scrollTo(0, 0)
+    fetchMovie();
+  }, [id]);
 
   const fetchMovie = async() => {
     const reponseMovie = await axios.get(`http://${config.hostname}:${config.port}/movies/${id}`)
@@ -72,7 +75,7 @@ const Movie = (props) => {
         // })
 
         document.addEventListener('scroll', handleScroll, false);
-        // document.querySelector('.comment-input').addEventListener('keydown', onEnter, false);
+        document.querySelector('.comment-input').addEventListener('keydown', onEnter, false);
         document.addEventListener('keydown', onEscape, false);
 
         // Remove les Events Listener dans le WillUnmount - sinon Memory Leaks -
@@ -109,7 +112,7 @@ const Movie = (props) => {
     }
   }
 
-  const handleScroll = (e) => {
+  const handleScroll = () => {
     const moviePoster = document.getElementById('movie-page-poster-fullsize');
     const movieInfos = document.getElementById('movie-infos-fullsize');
     const top = window.pageYOffset;
@@ -120,15 +123,18 @@ const Movie = (props) => {
     if (top + posterHeight <= maxBottom)
       moviePoster.style.marginTop = `${top}px`;
   }
-  // const onEnter = (e) => { if (e.keyCode === 13) addComment(); }
+  const onEnter = (e) => { if (e.keyCode === 13) addComment(); }
   const onEscape = (e) => { if (e.keyCode === 27) hidePlayer(); }
 
 
   const addComment = async() => {
     const newComment = {
       author: user.username,
-      content: comment,
+      content: comment
     }
+
+    // To fix
+    // user.username et comment vides lorsque que l'on envoie avec la touche ENTER
 
     if (newComment.content.trim() !== '') {
       const response = await axios.post(`http://${config.hostname}:${config.port}/movie/${id}/comments`, newComment)
@@ -264,7 +270,7 @@ const Movie = (props) => {
                     }
                     </div>
                     <input className="dark-input comment-input" placeholder={translations[language].movie.reviewPlaceholder} style={{width: '100%', marginBottom: 20}} value={comment} onChange={e => updateComment(e.target.value)} />
-                    <div style={{float: 'right'}} onClick={() => addComment()}><Button content={translations[language].movie.reviewSubmit} /></div>
+                    <Button content={translations[language].movie.reviewSubmit} style={{float: 'right'}} action={() => addComment()} />
                   </div>
                 </div>
               </div>
@@ -343,7 +349,7 @@ const Movie = (props) => {
                 }
                 </div>
                 <input className="dark-input comment-input" placeholder={translations[language].movie.reviewPlaceholder} style={{width: '100%', marginBottom: 20}} onChange={e => updateComment(e.target.value)} />
-                <div style={{float: 'right'}} onClick={() => addComment()}><Button content={translations[language].movie.reviewSubmit} /></div>
+                <Button content={translations[language].movie.reviewSubmit} style={{float: 'right'}} action={() => addComment()} />
               </div>
             </div>
 

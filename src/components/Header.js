@@ -24,16 +24,17 @@ const Header = (props) => {
 
   useEffect(() => {
     fetchData()
-    window.addEventListener("mousedown", closeMenu)
     return () => {
       window.removeEventListener("mousedown", closeMenu)
     }
   }, [])
 
   useEffect(() => {
-    window.addEventListener("mousedown", closeSearchBar)
-    return () => {
-      window.removeEventListener("mousedown", closeSearchBar)
+    if (_isAuth) {
+      window.addEventListener("mousedown", closeSearchBar)
+      return () => {
+        window.removeEventListener("mousedown", closeSearchBar)
+      }
     }
   }, [searchInProgress])
 
@@ -41,6 +42,7 @@ const Header = (props) => {
     const responseAuth = await axios.get(`http://${config.hostname}:${config.port}/auth`)
     if (responseAuth.data.auth) {
       updateIsAuth(true)
+      window.addEventListener("mousedown", closeMenu)
       const responseUser = await axios.get(`http://${config.hostname}:${config.port}/user/${responseAuth.data.user._id}`)
       if (responseUser.data.success) {
         updateUser(responseUser.data.user[0])

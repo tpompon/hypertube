@@ -30,18 +30,11 @@ const Profile = () => {
 
   useEffect(() => {
     fetchData();
-    window.addEventListener("mousedown", closeMenu)
+    window.addEventListener("mousedown", closeCoverMenu)
     return () => {
-      window.removeEventListener("mousedown", closeMenu)
+      window.removeEventListener("mousedown", closeCoverMenu)
     }
   }, [])
-
-  const closeMenu = (event) => {
-    if (refMenu.current.contains(event.target)) {
-      return
-    }
-    updateToggleCoverMenu(false)
-  }
 
   const fetchData = async () => {
     const check = await axios.get(`${config.serverURL}/auth`);
@@ -57,6 +50,12 @@ const Profile = () => {
     }
   }
   
+  const closeCoverMenu = (event) => {
+    if (refMenu.current.contains(event.target))
+      return;
+    updateToggleCoverMenu(false);
+  }
+
   const getMoviesList = (moviesListIds) => {
     return Promise.all(
       moviesListIds.map(async(movie) => {
