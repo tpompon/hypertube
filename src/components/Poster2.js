@@ -1,9 +1,9 @@
 import React from 'react';
 import translations from '../translations'
 
-const Poster = ({ movie, language }) => (
+const Poster = ({ movie, language, from }) => (
   <div className="poster-container">
-    <img className="movie-poster" src={movie.large_cover_image} alt={movie.title} />
+    <img className="movie-poster" src={(from) === 'yst' ? `https://yst.am${movie.large_cover_image}` : movie.large_cover_image} alt={movie.title} />
     <div className="poster-overlay">
       <div className="poster-content">
         <h3>{movie.title}</h3>

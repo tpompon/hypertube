@@ -16,7 +16,6 @@ import { UserConsumer } from 'store';
 const covers = ['cinema', 'japan', 'animals', 'fruits'];
 
 const Profile = () => {
-
   const [cover, updateCover] = useState('cinema')
   const [user, updateUser] = useState({})
   const [heartbeat, updateHeartbeat] = useState([])
@@ -24,13 +23,25 @@ const Profile = () => {
   const [inProgress, updateInProgress] = useState([])
   const [_isLoaded, updateIsLoaded] = useState(false)
   const [toggleCoverMenu, updateToggleCoverMenu] = useState(false)
+  const refMenu = useRef(null)
   const uploadAvatar = useRef(null)
   const context = useContext(UserConsumer)
   const { language, avatar, updateAvatar } = context
 
   useEffect(() => {
     fetchData();
+    window.addEventListener("mousedown", closeMenu)
+    return () => {
+      window.removeEventListener("mousedown", closeMenu)
+    }
   }, [])
+
+  const closeMenu = (event) => {
+    if (refMenu.current.contains(event.target)) {
+      return
+    }
+    updateToggleCoverMenu(false)
+  }
 
   const fetchData = async () => {
     const check = await axios.get(`${config.serverURL}/auth`);
@@ -118,7 +129,7 @@ const Profile = () => {
                   <span className="tooltip-text">{translations[language].profile.tooltip.copy}</span>
                 </div>
               </div>
-              <div className="edit-cover-box tooltip-left" onClick={() => updateToggleCoverMenu(!toggleCoverMenu)}>
+              <div ref={ refMenu } className="edit-cover-box tooltip-left" onClick={() => updateToggleCoverMenu(!toggleCoverMenu)}>
                 <PencilIcon className="pencil-icon" fill="#fff" width="15" height="15" style={{marginTop: 10 }} />
                 <span className="tooltip-text-left">{translations[language].profile.editCover}</span>
                 <div className="covers-menu" style={{ position: 'absolute', display: (toggleCoverMenu) ? "block" : 'none', backgroundColor: '#04050C', borderRadius: 10, width: 100, marginBottom: 10, bottom: 50, right: 0, zIndex: 9 }}>
@@ -140,7 +151,6 @@ const Profile = () => {
       }
     </div>
   );
-
 }
 
 export default Profile;

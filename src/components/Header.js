@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useRef } from 'react';
 import axios from 'axios';
 import config from 'config'
 import translations from 'translations'
@@ -9,7 +9,6 @@ import { UserConsumer } from "store"
 axios.defaults.withCredentials = true;
 
 const Header = (props) => {
-
   const { extended } = props
   const [searchMovie, updateSearchMovie] = useState("")
   const [movies, updateMovies] = useState([])
@@ -20,10 +19,23 @@ const Header = (props) => {
   const [toggleAvatarDropdown, updateToggleAvatarDropdown] = useState(false)
   const context = useContext(UserConsumer)
   const { language, updateSearch, avatar, updateAvatar } = context
+  const refSearchBar = useRef(null)
+  const refAvatar = useRef(null)
 
   useEffect(() => {
     fetchData()
+    window.addEventListener("mousedown", closeMenu)
+    return () => {
+      window.removeEventListener("mousedown", closeMenu)
+    }
   }, [])
+
+  useEffect(() => {
+    window.addEventListener("mousedown", closeSearchBar)
+    return () => {
+      window.removeEventListener("mousedown", closeSearchBar)
+    }
+  }, [searchInProgress])
 
   const fetchData = async() => {
     const responseAuth = await axios.get(`http://${config.hostname}:${config.port}/auth`)
@@ -36,41 +48,33 @@ const Header = (props) => {
         const responseMovies = await axios.get(`http://${config.hostname}:${config.port}/movies`)
         if (responseMovies.data.success) {
           updateMovies(responseMovies.data.movies)
-          document.onclick = (e) => {
-            if (e.target.classList[0] !== 'avatar-dropdown' && e.target.classList[0] !== 'avatar-dropdown-item') {
-              if (e.target.classList[0] !== 'avatar') {
-                closeMenus();
-              }
-            } else if (e.target.classList[0] !== 'input-search-bar') {
-              closeMenus();
-            }
-          }
         }
       }
     }
+  }
+
+  const closeSearchBar = (event) => {
+    if (refSearchBar.current.contains(event.target)) {
+      if (searchMovie.trim() !== "") {
+        updateSearchInProgress(true)
+      }
+      return
+    }
+    updateSearchInProgress(false)
+    updateToggleSearchBarCollapse(false)
+  }
+
+  const closeMenu = (event) => {
+    if (refAvatar.current.contains(event.target)) {
+      return
+    }
+    updateToggleAvatarDropdown(false)
   }
 
   const resetSearchBar = () => {
     updateSearchMovie("");
     updateSearchInProgress(false)
     updateSearch("");
-  }
-
-  const closeMenus = () => {
-    // if (this.state._isAuth) {
-    //   const avatarDropdown = document.getElementsByClassName('avatar-dropdown')[0];
-    //   avatarDropdown.style.display = "none";
-  
-    //   const searchBarExtended = document.getElementsByClassName('search-bar-extended')[0];
-    //   const searchBarExtendedLowRes = document.getElementsByClassName('search-bar-extended')[1];
-    //   const searchBar = document.getElementsByClassName('search-bar')[0];
-    //   const searchBarCollapse = document.getElementsByClassName('search-bar-collapse')[0];
-  
-    //   searchBar.style.borderRadius = '20px 20px 20px 20px'
-    //   searchBarCollapse.style.borderRadius = '0px 0px 0px 0px'
-    //   searchBarExtended.style.display = 'none';
-    //   searchBarExtendedLowRes.style.display = 'none';
-    // }
   }
 
   const handleSearch = (event) => {
@@ -91,10 +95,10 @@ const Header = (props) => {
           _isAuth ? (
             <div>
               <div className="App-header align-center">
-                <Link to="/" onClick={() => closeMenus()}>
+                <Link to="/">
                   <img className="logo" src={process.env.PUBLIC_URL + '/logo.png'} alt="Logo" />
                 </Link>
-                <div style={{ borderRadius: (searchInProgress) ? '20px 20px 0px 0px' : '20px 20px 20px 20px' }} className="search-bar">
+                <div ref={ refSearchBar } style={{ borderRadius: (searchInProgress) ? '20px 20px 0px 0px' : '20px 20px 20px 20px' }} className="search-bar">
                   <div className="row align-center">
                     <input className="input-search-bar" type="text" placeholder={translations[language].header.searchPlaceholder} spellCheck="false" value={searchMovie} onChange={handleSearch} />
                     <SearchIcon className="submit-search-bar" style={{ fill: "#fff", width: 20, height: 20 }} />
@@ -119,25 +123,25 @@ const Header = (props) => {
                   }
                 </div>
                 <SearchIcon onClick={ () => updateToggleSearchBarCollapse(!toggleSearchBarCollapse) } className="show-search-bar" style={{ fill: "#fff", width: 20, height: 20 }} />
-                <div style={{position: 'relative'}}>
+                <div ref={ refAvatar } style={{position: 'relative'}}>
                   <img onClick={ () => updateToggleAvatarDropdown(!toggleAvatarDropdown) } className="avatar" src={avatar} alt="Avatar" width="50" height="50" />
                   <div className="avatar-dropdown" style={{ display: (toggleAvatarDropdown) ? "block" : "none" }}>
-                    <Link to="/search" onClick={() => closeMenus()}>
+                    <Link to="/search" onClick={() => updateToggleAvatarDropdown(!toggleAvatarDropdown)}>
                       <div className="avatar-dropdown-item">
                         Search
                       </div>
                     </Link>
-                    <Link to="/profile" onClick={() => closeMenus()}>
+                    <Link to="/profile" onClick={() => updateToggleAvatarDropdown(!toggleAvatarDropdown)}>
                       <div className="avatar-dropdown-item">
                         {translations[language].header.avatarMenu.profile}
                       </div>
                     </Link>
-                    <Link to="/settings" onClick={() => closeMenus()}>
+                    <Link to="/settings" onClick={() => updateToggleAvatarDropdown(!toggleAvatarDropdown)}>
                       <div className="avatar-dropdown-item">
                         {translations[language].header.avatarMenu.settings}
                       </div>
                     </Link>
-                    <Link to="/logout" onClick={() => closeMenus()}>
+                    <Link to="/logout" onClick={() => updateToggleAvatarDropdown(!toggleAvatarDropdown)}>
                       <div className="avatar-dropdown-item">
                         {translations[language].header.avatarMenu.logout}
                       </div>

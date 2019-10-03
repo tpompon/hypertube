@@ -8,40 +8,41 @@ import Loading from 'components/Loading'
 import { ReactComponent as VerifiedIcon } from 'svg/verified.svg'
 import { UserConsumer } from 'store'
 
-const heartbeat = [
-  { id: 1, name_fr: "L'Arnacoeur", name_en: "L'Arnacoeur", poster: "/posters/arnacoeur.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.8 },
-  { id: 2, name_fr: "Hunger Games", name_en: "Hunger Games", poster: "/posters/hunger_games.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.8 },
-  { id: 3, name_fr: "Le Monde de Narnia", name_en: "Narnia's World", poster: "/posters/narnia.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.8 },
-  { id: 4, name_fr: "Pirates des Caraïbes", name_en: "Pirates of Caraïbes", poster: "/posters/pirates_des_caraibes.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.8 },
-  { id: 7, name_fr: "Star Wars: Les Derniers Jedi", name_en: "Star Wars: The Last Jedi", poster: "/posters/star_wars2.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.2 },
-  { id: 8, name_fr: "Titanic", name_en: "Titanic", poster: "/posters/titanic.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.8 },
-  { id: 9, name_fr: "Spiderman: Homecoming", name_en: "Spiderman: Homecoming", poster: "/posters/spiderman.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.8 },
-  { id: 10, name_fr: "Dunkerque", name_en: "Dunkerque", poster: "/posters/dunkerque.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.8 }
-]
-
-const recents = [
-  { id: 1, name_fr: "L'Arnacoeur", name_en: "L'Arnacoeur", poster: "/posters/arnacoeur.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.8 },
-  { id: 2, name_fr: "Hunger Games", name_en: "Hunger Games", poster: "/posters/hunger_games.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.8 },
-  { id: 3, name_fr: "Le Monde de Narnia", name_en: "Narnia's World", poster: "/posters/narnia.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.8 },
-  { id: 4, name_fr: "Pirates des Caraïbes", name_en: "Pirates of Caraïbes", poster: "/posters/pirates_des_caraibes.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.8 },
-]
+const covers = ['cinema', 'japan', 'animals', 'fruits'];
 
 const User = (props) => {
   const [user, updateUser] = useState(null)
   const [_isLoaded, updateIsLoaded] = useState(false)
+  const [heartbeat, updateHeartbeat] = useState([])
+  const [recents, updateRecents] = useState([])
   const context = useContext(UserConsumer)
   const { language } = context
   const { match } = props
 
   useEffect(() => {
-    axios.get(`http://${config.hostname}:${config.port}/user/username/${match.params.username}`)
-      .then(res => {
-        if (res.data.success) {
-          updateUser(res.data.user[0])
-          updateIsLoaded(true)
-        }
-      });
+    fetchData();
   }, [])
+
+  const fetchData = async () => {
+    const res = await axios.get(`http://${config.hostname}:${config.port}/user/username/${match.params.username}`)
+    if (res.data.success) {
+      updateUser(res.data.user[0])
+      const getMovies = await getMoviesList(res.data.user[0].heartbeat)
+      updateHeartbeat(getMovies)
+      updateIsLoaded(true)
+    }
+  }
+
+  const getMoviesList = (moviesListIds) => {
+    return Promise.all(
+      moviesListIds.map(async(movie) => {
+        const res = await axios.get(`${config.serverURL}/movies/${movie.id}`);
+        if (res.data.success && res.data.movie) {
+          return res.data.movie[0]
+        }
+      })
+    )
+  }
 
   const copyProfileURL = () => {
     const profileURL = document.createElement('textarea');
@@ -69,7 +70,7 @@ const User = (props) => {
             {
               user ? (
                 <div>
-                  <div style={{backgroundImage: user.cover, paddingTop: 40, paddingBottom: 50, marginTop: -20}}>
+                  <div style={{backgroundImage: `url('/covers/${user.cover}.svg')`, paddingTop: 40, paddingBottom: 50, marginTop: -20}}>
                     <div className="profile-avatar center">
                       <img src={user.avatar} alt={`Avatar ${user.username}`} />
                     </div>

@@ -11,10 +11,13 @@ const request = require('request');
 
 const config = require('../config');
 
+const sources = [ "https://yst.am/api/v2", "https://yts.lt/api/v2"]
+const selectedSource = sources[1];
+// Don't forget to update source in Search for Poster
+
 router.route('/yts/search/:search')
 .get(async (req, res) => {
-	// 2nd source https://yst.am/api/v2/list_movies.json?query_term
-	request.get({url: `https://yts.lt/api/v2/list_movies.json?query_term=${req.params.search}`}, (err, results, body) => {
+	request.get({url: `${selectedSource}/list_movies.json?query_term=${req.params.search}`}, (err, results, body) => {
 		if (err) {
 			res.json({ success: false });
 		} else {
@@ -41,7 +44,7 @@ router.route('/yts/search/:search')
 
 router.route('/yts/:id')
 .get((req, res) => {
-	request.get({ url: `https://yts.lt/api/v2/movie_details.json?movie_id=${req.params.id}&with_images=true&with_cast=true`}, (err, results, body) => {
+	request.get({ url: `${selectedSource}/movie_details.json?movie_id=${req.params.id}&with_images=true&with_cast=true`}, (err, results, body) => {
 		if (err) {
 			res.json({ success: false });
 		} else {

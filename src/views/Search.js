@@ -17,7 +17,7 @@ const Search = (props) => {
 
   useEffect(() => {
     fetchMovies()
-  }, [])
+  })
 
   const fetchMovies = async() => {
     if (search.trim() !== '') {
@@ -71,6 +71,7 @@ const Search = (props) => {
           <div className="posters-list row wrap">
           {
             movies.map((movie, index) => {
+                console.log(movie)
                 if (!movie.large_cover_image)
                   movie.large_cover_image = 'http://story-one.com/wp-content/uploads/2016/02/Poster_Not_Available2.jpg';
                 return (
@@ -78,7 +79,7 @@ const Search = (props) => {
                   // <Link to={`/watchyts/${movie.id}`} key={`movie-${movie.slug}`}>
                   //   <Poster movie={movie} language={language} />
                   // </Link>
-                  <div key={ `movie-${index}` } onClick={() => checkDatabase(movie.id)}><Poster movie={movie} language={language} /></div>
+                  <div key={ `movie-${index}` } onClick={() => checkDatabase(movie.id)}><Poster from="yts" movie={movie} language={language} /></div>
                 )
             })
           }
@@ -86,40 +87,6 @@ const Search = (props) => {
         ) : <Loading />
       }
       </div>
-      // <div>
-      //   <h1>Test page</h1>
-      //   <input ref={this.search} type="text" placeholder="search" />
-      //   <button onClick={() => this.fetchMovies()}>Submit</button>
-      //   {
-      //     this.state.movies.map((movie) => {
-      //       return (
-      //         <div key={movie.slug}>
-      //           <h1>{movie.title}</h1>
-      //           <img src={movie.medium_cover_image} alt={movie.slug} />
-      //           <iframe width="500" height="500"
-      //             src={`https://www.youtube.com/embed/${movie.yt_trailer_code}`}>
-      //           </iframe>
-      //           <a style={{color: 'yellow'}} href={`https://www.imdb.com/title/${movie.imdb_code}`}>IMDb</a>
-      //           <h2>Torrents:</h2>
-      //           {
-      //             movie.torrents.map((torrent) => {
-      //               return (
-      //                 <div>
-      //                   <a style={{color: 'red'}} href={torrent.magnet}>Magnet</a> / <a style={{color: 'red'}} href={torrent.magnet2}>Magnet 2</a>
-      //                   <br />
-      //                   Quality: {torrent.quality}
-      //                   <br />
-      //                   Size: {torrent.size}
-      //                   <br /><br />
-      //                 </div>
-      //               )
-      //             })
-      //           }
-      //         </div>
-      //       )
-      //     })
-      //   }
-      // </div>
     )
 }
 
