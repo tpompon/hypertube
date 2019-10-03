@@ -284,6 +284,15 @@ App
   transform: translate(-50%, -50%);
   text-align: center;
 }
+.poster-content::-webkit-scrollbar {
+  background: transparent;
+  border-radius: 10px;
+  width: 5px;
+}
+.poster-content::-webkit-scrollbar-thumb {
+  background: rgba(211, 211, 211, 0.3);
+  border-radius: 10px;
+}
 
 .posters-list {
   justify-content: center;

@@ -92,7 +92,7 @@ const languages = {
 			confirmPassword: "Confirm password",
 			submit: "Save",
 			languages: {
-				english: "english",
+				english: "English",
 				french: "French"
 			}
 		},

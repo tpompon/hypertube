@@ -13,6 +13,7 @@ const config = require('../config');
 
 router.route('/yts/search/:search')
 .get(async (req, res) => {
+	// 2nd source https://yst.am/api/v2/list_movies.json?query_term
 	request.get({url: `https://yts.lt/api/v2/list_movies.json?query_term=${req.params.search}`}, (err, results, body) => {
 		if (err) {
 			res.json({ success: false });
