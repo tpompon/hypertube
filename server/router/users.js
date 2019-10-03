@@ -32,7 +32,7 @@ router.route('/')
     firstname: req.body.firstname,
     lastname: req.body.lastname,
     username: req.body.username,
-    password: req.body.password,
+    password: bcrypt.hashSync(req.body.password, 10),
     avatar: req.body.avatar,
     cover: 'cinema',
     birthdate: req.body.birthdate,
@@ -74,13 +74,14 @@ router.route('/')
     </html>
     `
   };
-  sgMail.send(msg);
+  
 
   newUser.save((err) => {
     if (err) {
       console.log(err);
       res.json({ success: false });
     } else {
+      sgMail.send(msg);
       res.json({ success: true, user: newUser });
     }
   });

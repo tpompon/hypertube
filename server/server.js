@@ -187,7 +187,7 @@ app.get('/oauth/twitter/redirect',
     req.login(req.user, (err) => {
       if (err) {
         res.redirect(`http://${config.client.host}:${config.client.port}/login`);
-      } else if (user) {
+      } else if (req.user) {
         res.redirect(`http://${config.client.host}:${config.client.port}/`);
       } else {
         res.redirect(`http://${config.client.host}:${config.client.port}/login`);
@@ -203,7 +203,7 @@ app.get('/oauth/42/redirect',
     req.login(req.user, (err) => {
       if (err) {
         res.redirect(`http://${config.client.host}:${config.client.port}/login`);
-      } else if (user) {
+      } else if (req.user) {
         res.redirect(`http://${config.client.host}:${config.client.port}/`);
       } else {
         res.redirect(`http://${config.client.host}:${config.client.port}/login`);
@@ -219,7 +219,7 @@ passport.authenticate('google', { failureRedirect: `http://${config.client.host}
     req.login(req.user, (err) => {
       if (err) {
         res.redirect(`http://${config.client.host}:${config.client.port}/login`);
-      } else if (user) {
+      } else if (req.user) {
         res.redirect(`http://${config.client.host}:${config.client.port}/`);
       } else {
         res.redirect(`http://${config.client.host}:${config.client.port}/login`);

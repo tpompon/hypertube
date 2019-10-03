@@ -39,8 +39,7 @@ UserSchema.pre('save', function(next) {
 });
 
 UserSchema.methods.validPassword = function(password) {
-  return (password === this.password);
-  // return (bcrypt.compare(password, UserSchema.password));
+   return (bcrypt.compareSync(password, this.password));
 };
 
 UserSchema.methods.isMailConfirmed = function() {
