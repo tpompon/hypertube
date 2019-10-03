@@ -2,9 +2,10 @@ import React from 'react';
 import axios from 'axios';
 import config from 'config';
 import translations from 'translations';
-import Rating from 'react-rating'
-import { ReactComponent as StarFull } from 'svg/star-full.svg'
-import { ReactComponent as StarEmpty } from 'svg/star-empty.svg'
+import Rating from 'react-rating';
+import ProgressBar from 'components/ProgressBar';
+import { ReactComponent as StarFull } from 'svg/star-full.svg';
+import { ReactComponent as StarEmpty } from 'svg/star-empty.svg';
 
 class Poster extends React.Component {
 
@@ -32,6 +33,7 @@ class Poster extends React.Component {
     return (
       <div className="poster-container">
         <img className="movie-poster" src={movie.poster} alt={movie.name} />
+        <ProgressBar progress={70} /> { /* To replace with the progression watch time of the user on the movie */ }
         <div className="poster-overlay">
           <div className="poster-content">
             <h3>{movie.name}</h3>
