@@ -19,7 +19,7 @@ const Header = (props) => {
   const [toggleSearchBarCollapse, updateToggleSearchBarCollapse] = useState(false)
   const [toggleAvatarDropdown, updateToggleAvatarDropdown] = useState(false)
   const context = useContext(UserConsumer)
-  const { language, updateSearch } = context
+  const { language, updateSearch, avatar, updateAvatar } = context
 
   useEffect(() => {
     fetchData()
@@ -32,6 +32,7 @@ const Header = (props) => {
       const responseUser = await axios.get(`http://${config.hostname}:${config.port}/user/${responseAuth.data.user._id}`)
       if (responseUser.data.success) {
         updateUser(responseUser.data.user[0])
+        updateAvatar(responseUser.data.user[0].avatar)
         const responseMovies = await axios.get(`http://${config.hostname}:${config.port}/movies`)
         if (responseMovies.data.success) {
           updateMovies(responseMovies.data.movies)
@@ -119,7 +120,7 @@ const Header = (props) => {
                 </div>
                 <SearchIcon onClick={ () => updateToggleSearchBarCollapse(!toggleSearchBarCollapse) } className="show-search-bar" style={{ fill: "#fff", width: 20, height: 20 }} />
                 <div style={{position: 'relative'}}>
-                  <img onClick={ () => updateToggleAvatarDropdown(!toggleAvatarDropdown) } className="avatar" src={user.avatar} alt="Avatar" width="50" height="50" />
+                  <img onClick={ () => updateToggleAvatarDropdown(!toggleAvatarDropdown) } className="avatar" src={avatar} alt="Avatar" width="50" height="50" />
                   <div className="avatar-dropdown" style={{ display: (toggleAvatarDropdown) ? "block" : "none" }}>
                     <Link to="/search" onClick={() => closeMenus()}>
                       <div className="avatar-dropdown-item">

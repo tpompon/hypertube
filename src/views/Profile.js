@@ -15,31 +15,6 @@ import { UserConsumer } from 'store';
 
 const covers = ['cinema', 'japan', 'animals', 'fruits'];
 
-// const heartbeat = [
-//   { id: 1, name_fr: "L'Arnacoeur", name_en: "L'Arnacoeur", poster: "/posters/arnacoeur.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.8 },
-//   { id: 2, name_fr: "Hunger Games", name_en: "Hunger Games", poster: "/posters/hunger_games.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.8 },
-//   { id: 3, name_fr: "Le Monde de Narnia", name_en: "Narnia's World", poster: "/posters/narnia.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.8 },
-//   { id: 4, name_fr: "Pirates des Caraïbes", name_en: "Pirates of Caraïbes", poster: "/posters/pirates_des_caraibes.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.8 },
-//   { id: 7, name_fr: "Star Wars: Les Derniers Jedi", name_en: "Star Wars: The Last Jedi", poster: "/posters/star_wars2.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.2 },
-//   { id: 8, name_fr: "Titanic", name_en: "Titanic", poster: "/posters/titanic.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.8 },
-//   { id: 9, name_fr: "Spiderman: Homecoming", name_en: "Spiderman: Homecoming", poster: "/posters/spiderman.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.8 },
-//   { id: 10, name_fr: "Dunkerque", name_en: "Dunkerque", poster: "/posters/dunkerque.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.8 }
-// ]
-
-// const recents = [
-//   { id: 1, name_fr: "L'Arnacoeur", name_en: "L'Arnacoeur", poster: "/posters/arnacoeur.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.8 },
-//   { id: 2, name_fr: "Hunger Games", name_en: "Hunger Games", poster: "/posters/hunger_games.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.8 },
-//   { id: 3, name_fr: "Le Monde de Narnia", name_en: "Narnia's World", poster: "/posters/narnia.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.8 },
-//   { id: 4, name_fr: "Pirates des Caraïbes", name_en: "Pirates of Caraïbes", poster: "/posters/pirates_des_caraibes.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.8 },
-// ]
-
-// const inProgress = [
-//   { id: 1, name_fr: "L'Arnacoeur", name_en: "L'Arnacoeur", poster: "/posters/arnacoeur.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.8 },
-//   { id: 2, name_fr: "Hunger Games", name_en: "Hunger Games", poster: "/posters/hunger_games.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.8 },
-//   { id: 3, name_fr: "Le Monde de Narnia", name_en: "Narnia's World", poster: "/posters/narnia.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.8 },
-//   { id: 4, name_fr: "Pirates des Caraïbes", name_en: "Pirates of Caraïbes", poster: "/posters/pirates_des_caraibes.jpg", description_fr: "Un film sympa et cool", description_en: "A really nice movie, yeah", author: "tpompon", rating: 4.8 },
-// ]
-
 const Profile = () => {
 
   const [cover, updateCover] = useState('cinema')
@@ -51,7 +26,7 @@ const Profile = () => {
   const [toggleCoverMenu, updateToggleCoverMenu] = useState(false)
   const uploadAvatar = useRef(null)
   const context = useContext(UserConsumer)
-  const { language } = context
+  const { language, avatar, updateAvatar } = context
 
   useEffect(() => {
     fetchData();
@@ -118,6 +93,7 @@ const Profile = () => {
       axios.post(`${config.serverURL}/user/${user._id}/avatar`, data)
         .then((res) => {
           if (res.data.success) {
+            updateAvatar(`http://${config.hostname}:${config.port}/${res.data.file}`)
             updateUser({ ...user, avatar: `http://${config.hostname}:${config.port}/${res.data.file}` })
           }
         });
@@ -133,7 +109,7 @@ const Profile = () => {
               <div className="profile-avatar center">
                 <a className="profile-avatar-overlay" onClick={() => uploadAvatar.current.click()}>{translations[language].profile.updateAvatar}</a>
                 <input type="file" id="file" ref={ uploadAvatar } onChange={ (event) => onChangeAvatar(event) } style={{display: "none"}}/>
-                <img src={user.avatar} alt={`Avatar ${user.username}`} />
+                <img src={avatar} alt={`Avatar ${user.username}`} />
               </div>
               <div style={{marginTop: 20}}>
                 <div>{user.firstname} {user.lastname} <span style={{fontStyle: 'italic', fontSize: '.8em'}}>{translations[language].profile.you}</span></div>

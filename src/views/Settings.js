@@ -53,7 +53,7 @@ const Settings = () => {
           </div>
           <div style={{display: 'flex', justifyContent: 'space-between'}}>
             <input className="dark-input" type="email" value={user.email} placeholder={translations[language].settings.email} onChange={(event) => onChange(event, "email")} style={{width: '49%', marginTop: 5, marginBottom: 5}} />
-            <input className="dark-input" type="number" value={user.phone} placeholder={translations[language].settings.phone} onChange={(event) => onChange(event, "phone")} style={{width: '49%', marginTop: 5, marginBottom: 5}} />
+            <input className="dark-input" type="number" value={user.phone || ""} placeholder={translations[language].settings.phone} onChange={(event) => onChange(event, "phone")} style={{width: '49%', marginTop: 5, marginBottom: 5}} />
           </div>
           <div style={{display: 'flex', justifyContent: 'space-between'}}>
             <input className="dark-input" type="password" placeholder={translations[language].settings.newPassword} style={{width: '49%', marginRight: '1%', marginTop: 5, marginBottom: 5}} />
@@ -61,14 +61,14 @@ const Settings = () => {
           </div>
           <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: 20}}>
             <input className="dark-input" type="text" value={user.country || ""} placeholder={translations[language].settings.country} onChange={(event) => onChange(event, "country")} style={{width: '35%',  marginTop: 5, marginBottom: 5}} />
-            <input className="dark-input" type="text" value={user.city} placeholder={translations[language].settings.city} onChange={(event) => onChange(event, "city")} style={{width: '35%', marginTop: 5, marginBottom: 5}} />
+            <input className="dark-input" type="text" value={user.city || ""} placeholder={translations[language].settings.city} onChange={(event) => onChange(event, "city")} style={{width: '35%', marginTop: 5, marginBottom: 5}} />
             <select className="dark-input" onChange={handleChangeLanguage} style={{width: '26%', marginTop: 5 }}>
-              <option>{translations[language].settings.languages.french}</option>
-              <option>{translations[language].settings.languages.english}</option>
+              <option value="fr">{translations[language].settings.languages.french}</option>
+              <option value="en">{translations[language].settings.languages.english}</option>
             </select>
           </div>
           <div className="row" style={{ justifyContent: 'space-around' }}>
-            <div onClick={() => handleSubmit()}><Button content={translations[language].settings.submit} /></div>
+            <Button action={ (event) => handleSubmit(event) } content={translations[language].settings.submit} />
           </div>
         </div>
       ) : <Loading />

@@ -8,19 +8,18 @@ import { UserConsumer } from 'store';
 
 const Search = (props) => {
 
-  const [search, updateSearch] = useState("")
+  //const [search, updateSearch] = useState("")
   const [movies, updateMovies] = useState([])
   const [_isLoaded, updateIsLoaded] = useState(false)
   const [_status, updateStatus] = useState(undefined)
-  const { language } = context
   const context = useContext(UserConsumer)
+  const { language, search } = context
 
   useEffect(() => {
     fetchMovies()
   }, [])
 
   const fetchMovies = async() => {
-    const search = context.search;
     if (search.trim() !== '') {
       const response = await axios.get(`http://${config.hostname}:${config.port}/torrents/yts/search/${search}`)
       if (response.data.count !== 0) {

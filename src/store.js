@@ -6,7 +6,9 @@ class Provider extends Component {
 
     state = {
         language: "fr",
-	    search: "",
+        search: "",
+        avatar: "",
+        updateAvatar: (avatar) => this.setState({ avatar }),
         updateSearch: (search) => this.setState({ search }),
         updateLanguage: (language) => this.setState({ language })
     }
