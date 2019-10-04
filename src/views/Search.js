@@ -12,6 +12,7 @@ const Search = (props) => {
   const [movies, updateMovies] = useState([])
   const [_isLoaded, updateIsLoaded] = useState(false)
   const [_status, updateStatus] = useState(undefined)
+  let inProgress = false
   const context = useContext(UserConsumer)
   const { language, search } = context
 
@@ -26,6 +27,8 @@ const Search = (props) => {
         updateMovies(response.data.results.data.movies)
       }
       updateStatus("no results")
+    } else if (search.trim() === "") {
+      updateMovies([])
     } else {
       updateStatus("empty")
       //alert('empty search');
@@ -34,8 +37,11 @@ const Search = (props) => {
   }
 
   const checkDatabase = async(ytsID) => {
+    if (inProgress)
+      return;
     const responseMovies = await axios.get(`http://${config.hostname}:${config.port}/movies/yts/${ytsID}`)
     if (!responseMovies.data.success) {
+      inProgress = true
       const responseYts = await axios.get(`http://${config.hostname}:${config.port}/torrents/yts/${ytsID}`)
       if (responseYts) {
         const movie = responseYts.data.result.data.movie;
@@ -58,6 +64,8 @@ const Search = (props) => {
         else {
           alert('Could not create entry in Database for this movie');
         }
+      } else {
+        inProgress = false
       }
     } else {
       props.history.push(`/watch/${responseMovies.data.movie._id}`);
@@ -71,7 +79,6 @@ const Search = (props) => {
           <div className="posters-list row wrap">
           {
             movies.map((movie, index) => {
-                console.log(movie)
                 if (!movie.large_cover_image)
                   movie.large_cover_image = 'http://story-one.com/wp-content/uploads/2016/02/Poster_Not_Available2.jpg';
                 return (

@@ -33,14 +33,15 @@ const Movie = (props) => {
   const [togglePlayer, updateTogglePlayer] = useState(false)
   const [moviePath, updateMoviePath] = useState("https://file-examples.com/wp-content/uploads/2017/04/file_example_MP4_1280_10MG.mp4")
   const player = useRef(null)
+  let _isMounted = true
 
   useEffect(() => {
     fetchMovie()
 
     return () => {
+      _isMounted = false
       document.removeEventListener('scroll', handleScroll, false);
-      document.removeEventListener('scroll', onEnter, false);
-      document.removeEventListener('scroll', onEscape, false);
+      document.removeEventListener('keydown', onEscape, false);
     }
   }, []);
 
@@ -74,8 +75,7 @@ const Movie = (props) => {
         //   })
         // })
 
-        document.addEventListener('scroll', handleScroll, false);
-        document.querySelector('.comment-input').addEventListener('keydown', onEnter, false);
+  //      document.addEventListener('scroll', handleScroll, false);
         document.addEventListener('keydown', onEscape, false);
 
         // Remove les Events Listener dans le WillUnmount - sinon Memory Leaks -
@@ -113,19 +113,22 @@ const Movie = (props) => {
   }
 
   const handleScroll = () => {
-    const moviePoster = document.getElementById('movie-page-poster-fullsize');
-    const movieInfos = document.getElementById('movie-infos-fullsize');
-    const top = window.pageYOffset;
+    if (_isMounted) {
+      const moviePoster = document.getElementById('movie-page-poster-fullsize');
+      const movieInfos = document.getElementById('movie-infos-fullsize');
+      const top = window.pageYOffset;
 
-    const maxBottom = movieInfos.offsetHeight + movieInfos.offsetTop
-    const posterHeight = moviePoster.offsetHeight + movieInfos.offsetTop;
+      const maxBottom = movieInfos.offsetHeight + movieInfos.offsetTop
+      const posterHeight = moviePoster.offsetHeight + movieInfos.offsetTop;
 
-    if (top + posterHeight <= maxBottom)
-      moviePoster.style.marginTop = `${top}px`;
+      if (top + posterHeight <= maxBottom)
+        moviePoster.style.marginTop = `${top}px`;
+    }
   }
-  const onEnter = (e) => { if (e.keyCode === 13) addComment(); }
-  const onEscape = (e) => { if (e.keyCode === 27) hidePlayer(); }
 
+  const onEnter = (e) => { if (e.keyCode === 13) addComment(); }
+
+  const onEscape = (e) => { if (e.keyCode === 27) hidePlayer(); }
 
   const addComment = async() => {
     const newComment = {
@@ -269,7 +272,7 @@ const Movie = (props) => {
                       )
                     }
                     </div>
-                    <input className="dark-input comment-input" placeholder={translations[language].movie.reviewPlaceholder} style={{width: '100%', marginBottom: 20}} value={comment} onChange={e => updateComment(e.target.value)} />
+                    <input className="dark-input comment-input" onKeyDown={ onEnter } placeholder={translations[language].movie.reviewPlaceholder} style={{width: '100%', marginBottom: 20}} value={comment} onChange={e => updateComment(e.target.value)} />
                     <Button content={translations[language].movie.reviewSubmit} style={{float: 'right'}} action={() => addComment()} />
                   </div>
                 </div>

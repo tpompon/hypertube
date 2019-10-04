@@ -57,6 +57,7 @@ const MoviesList = () => {
   useEffect(() => {
     fetchMovies()
   }, [])
+  
   useEffect(() => {
     updateIsLoaded(true)
   })
