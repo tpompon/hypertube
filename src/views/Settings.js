@@ -14,15 +14,19 @@ const Settings = () => {
   const [language, updateLanguage] = useState(context.language)
 
   useEffect(() => {
-    axios.get(`http://${config.hostname}:${config.port}/auth`)
-      .then((res) => {
-        axios.get(`http://${config.hostname}:${config.port}/user/${res.data.user._id}`)
-          .then((res) => {
-            updateUser(res.data.user[0])
-            updateIsLoaded(true)
-          })
-      })
+    getDataUser()
   }, [])
+
+  const getDataUser = async() => {
+    const responseAuth = await axios.get(`http://${config.hostname}:${config.port}/auth`)
+    if (responseAuth) {
+      const responseUser = await axios.get(`http://${config.hostname}:${config.port}/user/${responseAuth.data.user._id}`)
+      if (responseUser) {
+        updateUser(responseUser.data.user[0])
+        updateIsLoaded(true)
+      }
+    }
+  }
 
   const onChange = (event, option) => {
     updateUser({ ...user, [option]: event.target.value })
@@ -32,11 +36,11 @@ const Settings = () => {
     updateLanguage(event.target.value)
   }
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async(event) => {
     const key = event.which || event.keyCode
     if (key === 13) {
-      axios.put(`http://${config.hostname}:${config.port}/user/${user._id}`, user)
-        .then(res => console.log(res.data))
+      const response = await axios.put(`http://${config.hostname}:${config.port}/user/${user._id}`, user)
+      console.log(response.data)
     }
   }
 

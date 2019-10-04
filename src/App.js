@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios'
 import config from './config'
 import './App.css';
@@ -29,18 +29,16 @@ const App = () => {
   const [_isLoaded, updateIsLoaded] = useState(false)
 
   useEffect(() => {
-    axios.get(`http://${config.hostname}:${config.port}/auth`)
-      .then((res) => {
-        if (res.data.auth) {
-          updateIsAuth(true)
-          //updateIsLoaded(true)
-        }
-        updateIsLoaded(true)
-        //else {
-        //  updateIsLoaded(true)
-        //}
-      })
+    fetchDataUser()
   }, [])
+
+  const fetchDataUser = async() => {
+    const response = await axios.get(`http://${config.hostname}:${config.port}/auth`)
+    if (response.data.auth) {
+      updateIsAuth(true)
+    }
+    updateIsLoaded(true)
+  }
 
   return (
     <Router>

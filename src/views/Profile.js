@@ -41,7 +41,6 @@ const Profile = () => {
     const check = await axios.get(`${config.serverURL}/auth`);
     if (check.data.auth) {
       const res = await API.user.dataById.get(check.data.user._id);
-      console.log(res)
       if (res.data.success) {
         updateUser(res.data.user[0])
         const getMovies = await getMoviesList(res.data.user[0].heartbeat)
@@ -96,7 +95,7 @@ const Profile = () => {
     API.user.dataById.put(user._id, body);
   }
 
-  const onChangeAvatar = async (event) => {
+  const onChangeAvatar = async(event) => {
     if (event.target.files[0]) {
       event.preventDefault();
       const data = new FormData();

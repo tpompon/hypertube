@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useContext } from 'react'
+import React, { useState, useEffect } from 'react'
 import { ReactComponent as TerminalIcon } from 'svg/terminal.svg'
 import { ReactComponent as Close } from 'svg/close.svg'
+import { commands } from "utils/commandsTerminal"
 
 const Terminal = () => {
 
@@ -15,8 +16,8 @@ const Terminal = () => {
 	const handleKeyDown = (e) => {
 		const key = e.which || e.keyCode;
 		if (key === 13 && input.trim() !== '') {
-			updateHistory([...history, input]);
-			updateInput("");
+			updateHistory(commands(input, history))
+			updateInput("")
 		}
 	}
 

@@ -43,11 +43,14 @@ const Register = () => {
     console.log(key);
   };
 
-  const register = () => {
+  const register = async() => {
     console.log(recaptchaRef.current.execute());
+
     if (newUser.password === newUser.confirmPassword && newUser.password.length >= 8) {
-      axios.post(`http://${config.hostname}:${config.port}/users`, newUser)
-       .then(() => updateToggleSuccess(true))
+      const response = await axios.post(`http://${config.hostname}:${config.port}/users`, newUser)
+      if (response) {
+        updateToggleSuccess(true)
+      }
     } else {
       console.log('Invalid password');
     }
@@ -77,6 +80,7 @@ const Register = () => {
       data.append('file', event.target.files[0]);
       data.append('filename', event.target.files[0].name);
       const res = await axios.post(`${config.serverURL}/register/avatar`, data);
+      console.log(res)
       if (res.data.success) {
         updatenewUser({ ...newUser, avatar: `http://${config.hostname}:${config.port}/public/avatars/tmp/${res.data.file}` });
       }

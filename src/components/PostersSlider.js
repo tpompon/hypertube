@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from "react";
-import config from "config";
+import React, { useState } from "react";
 import Poster from "./Poster";
 import { Link } from "react-router-dom";
 import { ReactComponent as ArrowLeft } from "svg/arrow-point-to-left.svg";
