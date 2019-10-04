@@ -3,6 +3,7 @@ import axios from 'axios'
 import config from 'config'
 import translations from 'translations'
 import Button from 'components/Button'
+import ReCAPTCHA from 'react-google-recaptcha'
 import { Link } from "react-router-dom";
 import { UserConsumer } from 'store';
 
@@ -30,6 +31,7 @@ const Register = () => {
   const [warnMatch, updateWarnMatch] = useState(false)
   const [warnLength, updateWarnLength] = useState(false)
   const uploadAvatar = useRef(null)
+  const recaptchaRef= useRef(null)
   const context = useContext(UserConsumer)
   const { language } = context
 
@@ -37,7 +39,12 @@ const Register = () => {
     verifyPasswords()
   })
 
+  const onChangeReCAPTCHA = (key) => {
+    console.log(key);
+  };
+
   const register = () => {
+    console.log(recaptchaRef.current.execute());
     if (newUser.password === newUser.confirmPassword && newUser.password.length >= 8) {
       axios.post(`http://${config.hostname}:${config.port}/users`, newUser)
        .then(() => updateToggleSuccess(true))
@@ -85,6 +92,13 @@ const Register = () => {
         <img src={newUser.avatar} alt={`Upload avatar`} />
       </div>
 
+      <ReCAPTCHA
+        ref={recaptchaRef}
+        size="invisible"
+        sitekey="6LfG57sUAAAAAKw1pjiU7uAgDgtOFEAhpEWdirAw"
+        onChange={onChangeReCAPTCHA}
+      />
+
       <h2>{translations[language].register.title}</h2>
       {
         (toggleSuccess) ? (
@@ -110,8 +124,9 @@ const Register = () => {
         { warnMatch ? <p style={{ display: "block" }} className="warn">{translations[language].register.warns.match}</p> : null }
         { warnLength ? <p style={{ display: "block" }} className="warn">{translations[language].register.warns.length}</p> : null }
       </div>
-      <div className="row" style={{ justifyContent: 'space-around' }} onClick={() => register()}>
-        <Button content={translations[language].register.submit} />
+
+      <div className="row" style={{ justifyContent: 'space-around' }}>
+        <Button action={() => register()} content={translations[language].register.submit} />
       </div>
       <div className="link center" style={{ marginTop: 20, fontSize: '.8em', opacity: .8 }}>
         <Link to="/login">Login</Link>

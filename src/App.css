@@ -521,6 +521,7 @@ App
   position: relative;
 }
 .profile-avatar-overlay {
+  border-radius: 100%;
   align-items: center;
   bottom: 0;
   display: flex;

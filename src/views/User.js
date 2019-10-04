@@ -8,6 +8,7 @@ import MoviesSlider from "components/MoviesSlider";
 import Loading from "components/Loading";
 import { ReactComponent as VerifiedIcon } from "svg/verified.svg";
 import { UserConsumer } from "store";
+import API from "controllers"
 
 const User = props => {
   const [user, updateUser] = useState(null);
@@ -23,9 +24,8 @@ const User = props => {
   }, []);
 
   const fetchData = async () => {
-    const res = await axios.get(
-      `http://${config.hostname}:${config.port}/user/username/${match.params.username}`
-    );
+    console.log(API)
+    const res = await API.user.dataByUsername.get(match.params.username)
     if (res.data.success) {
       updateUser(res.data.user[0]);
       const getMovies = await getMoviesList(res.data.user[0].heartbeat);

@@ -12,6 +12,7 @@ import { ReactComponent as JapanIcon } from 'svg/japan-icon.svg'
 import { ReactComponent as AnimalsIcon } from 'svg/animals-icon.svg'
 import { ReactComponent as FruitsIcon } from 'svg/fruits-icon.svg'
 import { UserConsumer } from 'store';
+import API from "controllers"
 
 const covers = ['cinema', 'japan', 'animals', 'fruits'];
 
@@ -39,7 +40,8 @@ const Profile = () => {
   const fetchData = async () => {
     const check = await axios.get(`${config.serverURL}/auth`);
     if (check.data.auth) {
-      const res = await axios.get(`${config.serverURL}/user/${check.data.user._id}`);
+      const res = await API.user.dataById.get(check.data.user._id);
+      console.log(res)
       if (res.data.success) {
         updateUser(res.data.user[0])
         const getMovies = await getMoviesList(res.data.user[0].heartbeat)
@@ -91,22 +93,20 @@ const Profile = () => {
       updateCover(cover);
       body.cover = cover;
     }
-    axios.put(`http://${config.hostname}:${config.port}/user/${user._id}`, body);
+    API.user.dataById.put(user._id, body);
   }
 
-  const onChangeAvatar = (event) => {
+  const onChangeAvatar = async (event) => {
     if (event.target.files[0]) {
       event.preventDefault();
       const data = new FormData();
       data.append('file', event.target.files[0]);
       data.append('filename', event.target.files[0].name);
-      axios.post(`${config.serverURL}/user/${user._id}/avatar`, data)
-        .then((res) => {
-          if (res.data.success) {
-            updateAvatar(`http://${config.hostname}:${config.port}/${res.data.file}`)
-            updateUser({ ...user, avatar: `http://${config.hostname}:${config.port}/${res.data.file}` })
-          }
-        });
+      const response = await API.user.avatarById.post(user._id, data);
+      if (response.data.success) {
+        updateAvatar(`http://${config.hostname}:${config.port}/${response.data.file}`)
+        updateUser({ ...user, avatar: `http://${config.hostname}:${config.port}/${response.data.file}` })
+      }
     }
   }
 
