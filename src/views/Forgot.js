@@ -6,6 +6,7 @@ import translations from 'translations'
 import Loading from 'components/Loading'
 import { ReactComponent as CheckMark } from 'svg/checkmark.svg'
 import Button from 'components/Button'
+import API from 'controllers'
 
 const Forgot = (props) => {
 
@@ -21,7 +22,7 @@ const Forgot = (props) => {
   }, [])
 
   const fetchKey = async() => {
-    const response = await axios.get(`${config.serverURL}/auth/forgot/${key}`)
+    const response = await API.auth.forgotByKey.get(key)
     if (response.data.success) {
       updateStatus("ok")
       updateUser(response.data.user[0])
@@ -38,7 +39,7 @@ const Forgot = (props) => {
 
     if (password === confirmPassword && password.length >= 8) {
       const body = { passwd: password };
-      const response = await axios.post(`${config.serverURL}/auth/forgot/${key}`, body)
+      const response = await API.auth.forgotByKey.post(key, body)
       if (response.data.success) {
         console.log("updated")
       } else {

@@ -16,7 +16,7 @@ const Register = () => {
     username: "",
     password: "",
     confirmPassword: "",
-    avatar: `http://${config.hostname}:${config.port}/public/avatars/default_avatar.png`,
+    avatar: `${config.serverURL}/public/avatars/default_avatar.png`,
     // cover: req.body.cover,
     // birthdate: req.body.birthdate,
     // age: req.body.age,

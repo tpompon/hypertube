@@ -1,9 +1,10 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useRef } from 'react';
 import axios from 'axios'
 import config from 'config'
 import translations from 'translations'
 import { Link } from "react-router-dom";
 import Button from 'components/Button'
+import ReCAPTCHA from 'react-google-recaptcha'
 import { ReactComponent as TwitterIcon } from 'svg/twitter.svg'
 import { ReactComponent as FourtyTwoIcon } from 'svg/42.svg'
 import { ReactComponent as GoogleIcon } from 'svg/google.svg'
@@ -21,7 +22,12 @@ const Login = () => {
   const [error, updateError] = useState("none")
   const [secondError, updateSecondError] = useState("none")
   const [forgot, updateForgot] = useState(false)
-  const [link, updateLink] = useState(translations[language].login.inputs.forgotPassword)  
+  const [link, updateLink] = useState(translations[language].login.inputs.forgotPassword)
+  const recaptchaRef= useRef(null)
+
+  const onChangeReCAPTCHA = (key) => {
+    console.log(key);
+  };
 
   const toggleForgot = () => {
     updateForgot(!forgot)
@@ -69,6 +75,12 @@ const Login = () => {
   return (
     <div onKeyDown={ (event) => onEnter(event) } className="dark-card center text-center">
       <h2>{translations[language].login.title}</h2>
+      <ReCAPTCHA
+        ref={recaptchaRef}
+        size="invisible"
+        sitekey="6LfG57sUAAAAAKw1pjiU7uAgDgtOFEAhpEWdirAw"
+        onChange={onChangeReCAPTCHA}
+      />
       {
         forgot ? (
           <div>

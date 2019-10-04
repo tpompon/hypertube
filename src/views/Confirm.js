@@ -6,6 +6,8 @@ import translations from '../translations'
 import Loading from 'components/Loading'
 import { ReactComponent as CheckMark } from 'svg/checkmark.svg'
 
+import API from 'controllers'
+
 const Confirm = (props) => {
   
   const { key } = props.match.params
@@ -17,7 +19,8 @@ const Confirm = (props) => {
   }, [])
 
   const fetchData = async() => {
-    const response = await axios.post(`${config.serverURL}/auth/confirm`, { key })
+    const response = await API.auth.confirm({ key })
+    console.log(response.data)
     if (response.data.success) {
       updateStatus("ok")
       updateIsLoaded(true)

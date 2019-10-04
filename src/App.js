@@ -21,6 +21,8 @@ import Forgot from './views/Forgot'
 import NotFound from './views/NotFound'
 import Loading from './components/Loading'
 
+import API from 'controllers'
+
 import { BrowserRouter as Router, Route, Switch, Redirect } from "react-router-dom";
 
 const App = () => {
@@ -33,7 +35,7 @@ const App = () => {
   }, [])
 
   const fetchDataUser = async() => {
-    const response = await axios.get(`http://${config.hostname}:${config.port}/auth`)
+    const response = await API.auth.check()
     if (response.data.auth) {
       updateIsAuth(true)
     }

@@ -14,6 +14,7 @@ import { ReactComponent as Close } from 'svg/close.svg'
 import { ReactComponent as AddFav } from 'svg/add_heart.svg'
 import { ReactComponent as RemoveFav } from 'svg/remove_heart.svg'
 import { UserConsumer } from 'store'
+import API from 'controllers'
 
 const Movie = (props) => {
 
@@ -33,13 +34,11 @@ const Movie = (props) => {
   const [togglePlayer, updateTogglePlayer] = useState(false)
   const [moviePath, updateMoviePath] = useState("https://file-examples.com/wp-content/uploads/2017/04/file_example_MP4_1280_10MG.mp4")
   const player = useRef(null)
-  let _isMounted = true
 
   useEffect(() => {
     fetchMovie()
 
     return () => {
-      _isMounted = false
       document.removeEventListener('scroll', handleScroll, false);
       document.removeEventListener('keydown', onEscape, false);
     }
@@ -51,7 +50,7 @@ const Movie = (props) => {
   }, [id]);
 
   const fetchMovie = async() => {
-    const reponseMovie = await axios.get(`http://${config.hostname}:${config.port}/movies/${id}`)
+    const reponseMovie = await API.movies.byId.get(id)
     if (reponseMovie) {
       updateMovie(reponseMovie.data.movie[0])
       updateLoaded(true)
@@ -75,7 +74,7 @@ const Movie = (props) => {
         //   })
         // })
 
-  //      document.addEventListener('scroll', handleScroll, false);
+        document.addEventListener('scroll', handleScroll, false);
         document.addEventListener('keydown', onEscape, false);
 
         // Remove les Events Listener dans le WillUnmount - sinon Memory Leaks -
@@ -93,18 +92,18 @@ const Movie = (props) => {
         // })
       }
     }
-    const responseUser = await axios.get(`http://${config.hostname}:${config.port}/auth`)
+    const responseUser =  await API.auth.check()
     if (responseUser) {
       updateUser(responseUser.data.user)
       const responseHeartbeat = await axios.get(`http://${config.hostname}:${config.port}/movie/${id}/heartbeat`, { params: { uid: responseUser.data.user._id } })
       if (responseHeartbeat.data.success && responseHeartbeat.data.found > 0) {
         updateHeartbeat(true)
       }
-      const responseRating = await axios.get(`http://${config.hostname}:${config.port}/movie/${id}/ratings/${responseUser.data.user._id}`)
+      const responseRating = await API.movie.ratingsByIdAndUID.get(id, responseUser.data.user._id)
       if (responseRating.data.rating) {
         updateRating(responseRating.data.rating)
       }
-      const responseRatingCount = await axios.get(`http://${config.hostname}:${config.port}/movie/${id}/ratings`)
+      const responseRatingCount = await API.movie.ratingsById.get(id)
       if (responseRatingCount.data.success) {
         updateRatingAverage(responseRatingCount.data.ratingAverage)
         updateRatingCount(responseRatingCount.data.ratingCount)
@@ -113,17 +112,15 @@ const Movie = (props) => {
   }
 
   const handleScroll = () => {
-    if (_isMounted) {
-      const moviePoster = document.getElementById('movie-page-poster-fullsize');
-      const movieInfos = document.getElementById('movie-infos-fullsize');
-      const top = window.pageYOffset;
+    const moviePoster = document.getElementById('movie-page-poster-fullsize');
+    const movieInfos = document.getElementById('movie-infos-fullsize');
+    const top = window.pageYOffset;
 
-      const maxBottom = movieInfos.offsetHeight + movieInfos.offsetTop
-      const posterHeight = moviePoster.offsetHeight + movieInfos.offsetTop;
+    const maxBottom = movieInfos.offsetHeight + movieInfos.offsetTop
+    const posterHeight = moviePoster.offsetHeight + movieInfos.offsetTop;
 
-      if (top + posterHeight <= maxBottom)
-        moviePoster.style.marginTop = `${top}px`;
-    }
+    if (top + posterHeight <= maxBottom)
+      moviePoster.style.marginTop = `${top}px`;
   }
 
   const onEnter = (e) => { if (e.keyCode === 13) addComment(); }
@@ -140,7 +137,7 @@ const Movie = (props) => {
     // user.username et comment vides lorsque que l'on envoie avec la touche ENTER
 
     if (newComment.content.trim() !== '') {
-      const response = await axios.post(`http://${config.hostname}:${config.port}/movie/${id}/comments`, newComment)
+      const response = await API.movie.commentsById.post(id, newComment)
       if (response) {
         console.log(response.data)
       }
@@ -154,10 +151,10 @@ const Movie = (props) => {
       uid: user._id,
       rating: value,
     }
-    const response = await axios.post(`http://${config.hostname}:${config.port}/movie/${id}/ratings`, newRating)
+    const response = await API.movie.ratingsById.post(id, newRating)
     if (response) {
       updateRating(value)
-      const responseRating = await axios.get(`http://${config.hostname}:${config.port}/movie/${id}/ratings`)
+      const responseRating = await API.movie.ratingsById.get(id)
       if (responseRating.data.success) {
         updateRatingAverage(responseRating.data.ratingAverage)
         updateRatingCount(responseRating.data.ratingCount)
@@ -178,15 +175,15 @@ const Movie = (props) => {
 
   const toggleHeartbeat = async() => {
     if (!heartbeat) {
-      axios.post(`http://${config.hostname}:${config.port}/movie/${id}/heartbeat`, { uid: user._id }); // ipare ID (replace with logged user id)
+      axios.post(`http://${config.hostname}:${config.port}/movie/${id}/heartbeat`, { uid: user._id });
     } else {
-      axios.delete(`http://${config.hostname}:${config.port}/movie/${id}/heartbeat`, { data: { uid: user._id } }); // ipare ID (replace with logged user id)
+      axios.delete(`http://${config.hostname}:${config.port}/movie/${id}/heartbeat`, { data: { uid: user._id } });
     }
     updateHeartbeat(!heartbeat)
   }
 
   const reportComment = async(id) => {
-    const response = await axios.post(`${config.serverURL}/movie/${movie._id}/comments/report`, { commId: id })
+    const response = await API.movie.reportCommentById(movie._id, { commId: id })
     console.log(response)
   }
 
