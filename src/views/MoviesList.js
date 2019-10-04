@@ -6,6 +6,7 @@ import Poster from 'components/Poster'
 import Loading from 'components/Loading'
 import { UserConsumer } from 'store';
 import { Link } from "react-router-dom";
+import API from 'controllers'
 
 function compare(a, b) {
   const nameA = a.name.toUpperCase();
@@ -63,7 +64,7 @@ const MoviesList = () => {
   })
 
   const fetchMovies = async() => {
-    const response = await axios.get(`http://${config.hostname}:${config.port}/movies`)
+    const response = await API.movies.get()
     if (response.data.success) {
       updateMovies(response.data.movies)
     }

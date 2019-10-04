@@ -40,7 +40,7 @@ const Profile = () => {
   const fetchData = async () => {
     const check = await axios.get(`${config.serverURL}/auth`);
     if (check.data.auth) {
-      const res = await API.user.dataById.get(check.data.user._id);
+      const res = await API.user.byId.get(check.data.user._id);
       if (res.data.success) {
         updateUser(res.data.user[0])
         const getMovies = await getMoviesList(res.data.user[0].heartbeat)
@@ -92,7 +92,7 @@ const Profile = () => {
       updateCover(cover);
       body.cover = cover;
     }
-    API.user.dataById.put(user._id, body);
+    API.user.byId.put(user._id, body);
   }
 
   const onChangeAvatar = async(event) => {

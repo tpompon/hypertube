@@ -1,17 +1,19 @@
 import axios from "axios"
 import config from "config";
 
+const url = `${config.serverURL}/user/`
+
 export const user = {
-	dataById: {
-		get: async(uid) => await axios.get(`${config.serverURL}/user/${uid}`),
-		put: async(uid, body) => await axios.put(`${config.serverURL}/user/${uid}`, body),
-		delete: async(uid) => await axios.delete(`${config.serverURL}/user/${uid}`)
+	byId: {
+		get: (uid) => axios.get(url + uid),
+		put: (uid, body) => axios.put(url + uid, body),
+		delete: (uid) => axios.delete(url + uid)
 	},
-	dataByUsername: {
-		get: async(username) => await axios.get(`${config.serverURL}/user/username/${username}`)
+	byUsername: {
+		get: (username) => axios.get(url + `username/${username}`)
 	},
 	avatarById: {
-		post: async(uid, data) => await axios.post(`${config.serverURL}/user/${uid}/avatar`, data)
+		post: (uid, data) => axios.post(url + `${uid}/avatar`, data)
 	}
 }
 

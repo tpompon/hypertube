@@ -25,7 +25,7 @@ const User = props => {
 
   const fetchData = async () => {
     console.log(API)
-    const res = await API.user.dataByUsername.get(match.params.username)
+    const res = await API.user.byUsername.get(match.params.username)
     if (res.data.success) {
       updateUser(res.data.user[0]);
       const getMovies = await getMoviesList(res.data.user[0].heartbeat);

@@ -26,6 +26,8 @@ const UserSchema = new Schema({
   verified: Boolean,
   confirmKey: String,
   forgotKey: String,
+  admin: { type: Boolean, default: false },
+  bantime: { type: Number, default: 0 },
   created_at: Date,
   updated_at: Date
 });

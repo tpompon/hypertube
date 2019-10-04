@@ -5,6 +5,7 @@ import translations from 'translations'
 import { ReactComponent as SearchIcon } from 'svg/search.svg'
 import { Link } from "react-router-dom";
 import { UserConsumer } from "store"
+import API from "controllers"
 
 axios.defaults.withCredentials = true;
 
@@ -39,15 +40,15 @@ const Header = (props) => {
   }, [searchInProgress])
 
   const fetchData = async() => {
-    const responseAuth = await axios.get(`http://${config.hostname}:${config.port}/auth`)
+    const responseAuth = await API.auth.check()
     if (responseAuth.data.auth) {
       updateIsAuth(true)
       window.addEventListener("mousedown", closeMenu)
-      const responseUser = await axios.get(`http://${config.hostname}:${config.port}/user/${responseAuth.data.user._id}`)
+      const responseUser = await API.user.byId.get(responseAuth.data.user._id)
       if (responseUser.data.success) {
         updateUser(responseUser.data.user[0])
         updateAvatar(responseUser.data.user[0].avatar)
-        const responseMovies = await axios.get(`http://${config.hostname}:${config.port}/movies`)
+        const responseMovies = await API.movies.get()
         if (responseMovies.data.success) {
           updateMovies(responseMovies.data.movies)
         }

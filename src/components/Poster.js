@@ -6,6 +6,7 @@ import Rating from "react-rating";
 import ProgressBar from "components/ProgressBar";
 import { ReactComponent as StarFull } from "svg/star-full.svg";
 import { ReactComponent as StarEmpty } from "svg/star-empty.svg";
+import API from 'controllers'
 
 const Poster = (props) => {
 
@@ -19,7 +20,7 @@ const Poster = (props) => {
 
 
   const fetchMovieData = async() => {
-    const response = await axios.get(`${config.serverURL}/movie/${movie._id}/ratings`)
+    const response = await API.movie.ratingsById.get(movie._id)
     if (response.data.success) {
       updateRatingAverage(response.data.ratingAverage)
       updateRatingCount(response.data.ratingCount)
