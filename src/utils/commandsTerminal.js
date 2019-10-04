@@ -1,3 +1,5 @@
+import API from "controllers"
+
 const help =
 `
 	Voici la liste de commande
@@ -10,20 +12,62 @@ const help =
 	-torrents: prend deux arguments (action (les infos ou la suppression) et le nom)
 `
 
-const getUsers = () => {
-	return
+const getUsers = async() => {
+	let users = ""
+	const response = await API.users.get()
+	if (response.data.success) {
+		response.data.users.map((user, i) => {
+			users += `${user.username}${(i < response.data.users.length - 1) ? ", " : ""}`
+		})
+		return [users]
+	} else {
+		return []
+	}
 }
 
-const getDataUser = (user) => {
-	return
+const getDataUser = async(user) => {
+	const response = await API.user.byUsername.get(user)
+	if (response.data.user.length > 0) {
+		let string = ""
+		Object.entries(response.data.user[0]).forEach((entry) => {
+			string += `${entry[0]}: ${entry[1]}, `
+		})
+		return [string]
+	} else {
+		return ["User not found"]
+	}
 }
 
-const getMovies = () => {
-	return
+const getMovies = async() => {
+	let movies = ""
+	const response = await API.movies.get()
+	if (response.data.success) {
+		response.data.movies.map((movie, i) => {
+			movies += `${movie.name}${(i < response.data.movies.length - 1) ? ", " : ""} / id: ${movie._id}`
+		})
+		return [movies]
+	} else {
+		return []
+	}
 }
 
-const getDataMovie = (movieId) => {
-	return
+const getDataMovie = async(movieId, specificField = null) => {
+	let movie = ""
+	const response = await API.movies.byId.get(movieId)
+	if (response.data.success) {
+		if (specificField === null) {
+			movie = response.data.movie[0].name
+			return [movie]
+		} else {
+			if (response.data.movie[0][specificField] === undefined) {
+				return ["The specific field doesn't exist"]
+			} else {
+				return [response.data.movie[0][specificField]]
+			}
+		}
+	} else {
+		return ["The movie doesn't exist"]
+	}
 }
 
 const banUser = (user, time) => {
@@ -34,7 +78,7 @@ const getTorrents = (action, id) => {
 	return
 }
 
-export const commands = (command, history) => {
+export const commands = async(command, history) => {
 	const argv = command.trim().split(" ");
 	switch (argv[0]) {
 
@@ -43,20 +87,20 @@ export const commands = (command, history) => {
 		case "clear":
 			return [] // Clear the history of terminal
 		case "users":
-			return getUsers() // Display User Collection
+			return [...history, ...await getUsers()] // Display User Collection
 		case "user":
-			return getDataUser() // Display user object depends on id (argv[1])
+			return [...history, ...await getDataUser(argv[1])] // Display user object depends on id (argv[1])
 		case "movies":
-			return getMovies() // Display Movie Collection
+			return [...history, ...await getMovies()] // Display Movie Collection
 		case "movie":
-			return getDataMovie() // Display movie object depends on id (argv[1]), specific field [name, ] (argv[2])
+			return [...history, ...await getDataMovie(argv[1], argv[2])] // Display movie object depends on id (argv[1]), specific field [name, ] (argv[2])
 		case "ban":
 			return banUser() // Ban user - 2 args: user (argv[1]), bantime (argv[2])
 		case "torrents":
 			return getTorrents() // 2 args - action [infos, delete] (argv[1]), id/name (argv[2])
 
 		default:
-			return [...history, argv[0]]
+			return [...history, `command not found: ${argv[0]}`]
 
 	}
 }

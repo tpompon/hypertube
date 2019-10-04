@@ -13,10 +13,11 @@ const Terminal = () => {
 		// DidMount
 	}, []);
  
-	const handleKeyDown = (e) => {
+	const handleKeyDown = async(e) => {
 		const key = e.which || e.keyCode;
 		if (key === 13 && input.trim() !== '') {
-			updateHistory(commands(input, history))
+			const response = await commands(input, history)
+			updateHistory(response)
 			updateInput("")
 		}
 	}
