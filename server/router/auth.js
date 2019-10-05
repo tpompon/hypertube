@@ -1,77 +1,82 @@
 const express = require("express");
 const router = express.Router();
-const passport = require('passport');
+const passport = require("passport");
 
-const User = require('../models/user');
+const User = require("../models/user");
 
-const uuidv4 = require('uuid/v4');
-const sgMail = require('@sendgrid/mail');
+const uuidv4 = require("uuid/v4");
+const sgMail = require("@sendgrid/mail");
 
-require('dotenv').config();
+require("dotenv").config();
 
 sgMail.setApiKey(process.env.SG_API_KEY);
 
-router.route('/')
-.get((req, res) => {
-	if (req.isAuthenticated())
-		res.json({ auth: true, user: req.user });
-	else
-		res.json({ auth: false });
-})
+router.route("/").get((req, res) => {
+  if (req.isAuthenticated()) res.json({ auth: true, user: req.user });
+  else res.json({ auth: false });
+});
 
-router.route('/logout')
-.get((req, res) => {
+router.route("/logout").get((req, res) => {
   req.logout();
   res.json({ disconnected: true });
-})
+});
 
-router.route('/login/:strategy')
-.post((req, res, next) => {
+router.route("/login/:strategy").post((req, res, next) => {
   const strategy = req.params.strategy;
-  if (strategy === 'local') {
-    passport.authenticate('local', (err, user, info) => {
-      req.login(user, (err) => {
+  if (strategy === "local") {
+    passport.authenticate("local", (err, user, info) => {
+      req.login(user, err => {
         if (err) {
           res.json({ success: false, status: info.message });
         } else if (user) {
-          res.json({ success: true, status: "Authentication success", user: req.user });
+          res.json({
+            success: true,
+            status: "Authentication success",
+            user: req.user
+          });
         } else {
           res.json({ success: false, status: info.message });
         }
-      })
+      });
     })(req, res, next);
   } else {
-    res.json({ success: false, status: "Authentication failed, strategy error" });
+    res.json({
+      success: false,
+      status: "Authentication failed, strategy error"
+    });
   }
-})
+});
 
-router.route('/confirm')
-.post((req, res) => {
+router.route("/confirm").post((req, res) => {
   const key = req.body.key;
-  User.findOneAndUpdate({ confirmKey: key }, { confirmKey: 'confirmed' }, (err, user) => {
-		if (err)
-		  return res.json({ success: false, error: err });
-		else if (user)
-		  return res.json({ success: true });
-    else
-      return res.json({ success: false })
-  });
-})
+  User.findOneAndUpdate(
+    { confirmKey: key },
+    { confirmKey: "confirmed" },
+    (err, user) => {
+      if (err) return res.json({ success: false, error: err });
+      else if (user) return res.json({ success: true });
+      else return res.json({ success: false });
+    }
+  );
+});
 
-router.route('/forgot')
-.post((req, res) => {
+router.route("/forgot").post((req, res) => {
   const forgotKey = uuidv4();
   const forgotLink = `${req.body.origin}/forgot/${forgotKey}`;
 
-  User.findOneAndUpdate({email: req.body.email}, {forgotKey: forgotKey}, {new: true}, (err, model) => {
-    if (err) {
-      res.json({ success: false, error: err });
-    } else if (model) {
-      const msg = {
-        to: req.body.email,
-        from: 'no-reply@hypertube.com',
-        subject: 'HyperTube - Instructions to reset your password',
-        html: `
+  User.findOneAndUpdate(
+    { email: req.body.email },
+    { forgotKey: forgotKey },
+    { new: true },
+    (err, model) => {
+      if (err) {
+        res.json({ success: false, error: err });
+      } else if (model) {
+        const msg = {
+          to: req.body.email,
+          from: "no-reply@hypertube.com",
+          subject: "HyperTube - Instructions to reset your password",
+          html: `
         <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html style="width:100%;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;padding:0;Margin:0;"><head><meta charset="UTF-8"><meta content="width=device-width, initial-scale=1" name="viewport"><meta name="x-apple-disable-message-reformatting"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta content="telephone=no" name="format-detection"><title>Copy of Nouveau modèle de courrier électronique 2019-09-22</title> <!--[if (mso 16)]><style type="text/css">     a {text-decoration: none;}     </style><![endif]--> <!--[if gte mso 9]><style>sup { font-size: 100% !important; }</style><![endif]--> <!--[if !mso]><!-- --><link href="https://fonts.googleapis.com/css?family=Lato:400,400i,700,700i" rel="stylesheet"> <!--<![endif]--><style type="text/css">
         @media only screen and (max-width:600px) {p, ul li, ol li, a { font-size:16px!important; line-height:150%!important } h1 { font-size:30px!important; text-align:center; line-height:120%!important } h2 { font-size:26px!important; text-align:center; line-height:120%!important } h3 { font-size:20px!important; text-align:center; line-height:120%!important } h1 a { font-size:30px!important } h2 a { font-size:26px!important } h3 a { font-size:20px!important } .es-menu td a { font-size:16px!important } .es-header-body p, .es-header-body ul li, .es-header-body ol li, .es-header-body a { font-size:16px!important } .es-footer-body p, .es-footer-body ul li, .es-footer-body ol li, .es-footer-body a { font-size:16px!important } .es-infoblock p, .es-infoblock ul li, .es-infoblock ol li, .es-infoblock a { font-size:12px!important } *[class="gmail-fix"] { display:none!important } .es-m-txt-c, .es-m-txt-c h1, .es-m-txt-c h2, .es-m-txt-c h3 { 
         text-align:center!important } .es-m-txt-r, .es-m-txt-r h1, .es-m-txt-r h2, .es-m-txt-r h3 { text-align:right!important } .es-m-txt-l, .es-m-txt-l h1, .es-m-txt-l h2, .es-m-txt-l h3 { text-align:left!important } .es-m-txt-r img, .es-m-txt-c img, .es-m-txt-l img { display:inline!important } .es-button-border { display:block!important } a.es-button { font-size:20px!important; display:block!important; border-width:15px 25px 15px 25px!important } .es-btn-fw { border-width:10px 0px!important; text-align:center!important } .es-adaptive table, .es-btn-fw, .es-btn-fw-brdr, .es-left, .es-right { width:100%!important } .es-content table, .es-header table, .es-footer table, .es-content, .es-footer, .es-header { width:100%!important; max-width:600px!important } .es-adapt-td { display:block!important; width:100%!important } .adapt-img { width:100%!important; height:auto!important } .es-m-p0 { padding:0px!important } .es-m-p0r { 
@@ -92,41 +97,44 @@ router.route('/forgot')
         <p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-size:18px;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;line-height:27px;color:#666666;"><br></p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-size:18px;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;line-height:27px;color:#666666;">Made at 42 by tpompon, syboeuf, evbelico &amp;&nbsp;mthiery</p></td></tr></table></td></tr></table></td></tr></table></td></tr></table></td></tr></table></div></body>
         </html>
         `
-      };
-      sgMail.send(msg);
-      res.json({ success: true, updated: model });
-    } else {
-      res.json({ success: false, status: 'Mail not found' });
+        };
+        sgMail.send(msg);
+        res.json({ success: true, updated: model });
+      } else {
+        res.json({ success: false, status: "Mail not found" });
+      }
     }
-  });
-})
+  );
+});
 
-router.route('/forgot/:key')
-.get((req, res) => {
-  User.find({ forgotKey: req.params.key }, (err, result) => {
-    if (err) {
-      res.json({ success: false, error: err });
-    } else if (result.length > 0) {
-      res.json({ success: true, user: result });
-    } else {
-      res.json({ success: false, status: 'not_found' });
-    }
+router
+  .route("/forgot/:key")
+  .get((req, res) => {
+    User.find({ forgotKey: req.params.key }, (err, result) => {
+      if (err) {
+        res.json({ success: false, error: err });
+      } else if (result.length > 0) {
+        res.json({ success: true, user: result });
+      } else {
+        res.json({ success: false, status: "not_found" });
+      }
+    });
   })
-})
-.post((req, res) => {
-  const updateQuery = {
-    forgotKey: '',
-    password: req.body.passwd
-  }
+  .post((req, res) => {
+    const updateQuery = {
+      forgotKey: "",
+      password: req.body.passwd
+    };
 
-  User.findOneAndUpdate({ forgotKey: req.params.key }, updateQuery, (err, user) => {
-    if (err)
-      res.json({ success: false, error: err });
-    else if (user)
-      res.json({ success: true });
-    else
-      res.json({ success: false })
+    User.findOneAndUpdate(
+      { forgotKey: req.params.key },
+      updateQuery,
+      (err, user) => {
+        if (err) res.json({ success: false, error: err });
+        else if (user) res.json({ success: true });
+        else res.json({ success: false });
+      }
+    );
   });
-})
 
 module.exports = router;

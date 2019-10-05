@@ -2,57 +2,56 @@ const express = require("express");
 const bcrypt = require("bcrypt");
 const router = express.Router();
 
-const config = require('../config');
+const config = require("../config");
 
-const uuidv4 = require('uuid/v4');
-const sgMail = require('@sendgrid/mail');
+const uuidv4 = require("uuid/v4");
+const sgMail = require("@sendgrid/mail");
 
-require('dotenv').config();
+require("dotenv").config();
 
 sgMail.setApiKey(process.env.SG_API_KEY);
 
 // Models
-const User = require('../models/user');
+const User = require("../models/user");
 
-router.route('/')
-.get((req, res) => {
-  User.find({}, (err, users) => {
-    if (err)
-      res.json({ success: false });
-    else
-      res.json({ success: true, users: users });
-  });
-})
-.post((req, res) => {
-  const confirmKey = uuidv4();
-  const confirmationLink = `${req.body.origin}/confirm/${confirmKey}`;
+router
+  .route("/")
+  .get((req, res) => {
+    User.find({}, (err, users) => {
+      if (err) res.json({ success: false });
+      else res.json({ success: true, users: users });
+    });
+  })
+  .post((req, res) => {
+    const confirmKey = uuidv4();
+    const confirmationLink = `${req.body.origin}/confirm/${confirmKey}`;
 
-  // const hash = await bcrypt.hash(req.body.password, 10);
-	const newUser = User({
-    firstname: req.body.firstname,
-    lastname: req.body.lastname,
-    username: req.body.username,
-    password: bcrypt.hashSync(req.body.password, 10),
-    avatar: req.body.avatar,
-    cover: 'cinema',
-    birthdate: req.body.birthdate,
-    age: req.body.age,
-    gender: req.body.gender,
-    language: req.body.language,
-    email: req.body.email,
-    phone: req.body.phone,
-    city: req.body.city,
-    country: req.body.country,
-    verified: false,
-    confirmKey: confirmKey,
-    forgotKey: ''
-  });
+    // const hash = await bcrypt.hash(req.body.password, 10);
+    const newUser = User({
+      firstname: req.body.firstname,
+      lastname: req.body.lastname,
+      username: req.body.username,
+      password: bcrypt.hashSync(req.body.password, 10),
+      avatar: req.body.avatar,
+      cover: "cinema",
+      birthdate: req.body.birthdate,
+      age: req.body.age,
+      gender: req.body.gender,
+      language: req.body.language,
+      email: req.body.email,
+      phone: req.body.phone,
+      city: req.body.city,
+      country: req.body.country,
+      verified: false,
+      confirmKey: confirmKey,
+      forgotKey: ""
+    });
 
-  const msg = {
-    to: req.body.email,
-    from: 'no-reply@hypertube.com',
-    subject: 'HyperTube - Please verify your email',
-    html: `
+    const msg = {
+      to: req.body.email,
+      from: "no-reply@hypertube.com",
+      subject: "HyperTube - Please verify your email",
+      html: `
     <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html style="width:100%;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;padding:0;Margin:0;"><head><meta charset="UTF-8"><meta content="width=device-width, initial-scale=1" name="viewport"><meta name="x-apple-disable-message-reformatting"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta content="telephone=no" name="format-detection"><title>Nouveau modèle de courrier électronique 2019-09-22</title> <!--[if (mso 16)]><style type="text/css">     a {text-decoration: none;}     </style><![endif]--> <!--[if gte mso 9]><style>sup { font-size: 100% !important; }</style><![endif]--> <!--[if !mso]><!-- --><link href="https://fonts.googleapis.com/css?family=Lato:400,400i,700,700i" rel="stylesheet"> <!--<![endif]--><style type="text/css">
     @media only screen and (max-width:600px) {p, ul li, ol li, a { font-size:16px!important; line-height:150%!important } h1 { font-size:30px!important; text-align:center; line-height:120%!important } h2 { font-size:26px!important; text-align:center; line-height:120%!important } h3 { font-size:20px!important; text-align:center; line-height:120%!important } h1 a { font-size:30px!important } h2 a { font-size:26px!important } h3 a { font-size:20px!important } .es-menu td a { font-size:16px!important } .es-header-body p, .es-header-body ul li, .es-header-body ol li, .es-header-body a { font-size:16px!important } .es-footer-body p, .es-footer-body ul li, .es-footer-body ol li, .es-footer-body a { font-size:16px!important } .es-infoblock p, .es-infoblock ul li, .es-infoblock ol li, .es-infoblock a { font-size:12px!important } *[class="gmail-fix"] { display:none!important } .es-m-txt-c, .es-m-txt-c h1, .es-m-txt-c h2, .es-m-txt-c h3 { 
     text-align:center!important } .es-m-txt-r, .es-m-txt-r h1, .es-m-txt-r h2, .es-m-txt-r h3 { text-align:right!important } .es-m-txt-l, .es-m-txt-l h1, .es-m-txt-l h2, .es-m-txt-l h3 { text-align:left!important } .es-m-txt-r img, .es-m-txt-c img, .es-m-txt-l img { display:inline!important } .es-button-border { display:block!important } a.es-button { font-size:20px!important; display:block!important; border-width:15px 25px 15px 25px!important } .es-btn-fw { border-width:10px 0px!important; text-align:center!important } .es-adaptive table, .es-btn-fw, .es-btn-fw-brdr, .es-left, .es-right { width:100%!important } .es-content table, .es-header table, .es-footer table, .es-content, .es-footer, .es-header { width:100%!important; max-width:600px!important } .es-adapt-td { display:block!important; width:100%!important } .adapt-img { width:100%!important; height:auto!important } .es-m-p0 { padding:0px!important } .es-m-p0r { 
@@ -73,18 +72,145 @@ router.route('/')
     <p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-size:18px;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;line-height:27px;color:#666666;"><br></p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-size:18px;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;line-height:27px;color:#666666;">Made at 42 by tpompon, syboeuf, evbelico &amp;&nbsp;mthiery</p></td></tr></table></td></tr></table></td></tr></table></td></tr></table></td></tr></table></div></body>
     </html>
     `
-  };
-  
+    };
 
-  newUser.save((err) => {
-    if (err) {
-      console.log(err);
-      res.json({ success: false });
-    } else {
-      sgMail.send(msg);
-      res.json({ success: true, user: newUser });
-    }
+    newUser.save(err => {
+      if (err) {
+        console.log(err);
+        res.json({ success: false });
+      } else {
+        sgMail.send(msg);
+        res.json({ success: true, user: newUser });
+      }
+    });
+  })
+  .delete((req, res) => {
+    User.remove({}, err => {
+      if (err) res.json({ success: false, error: err });
+      else res.json({ success: true });
+    });
   });
-})
+
+router
+  .route("/:id")
+  .get((req, res) => {
+    User.find({ _id: req.params.id }, (err, user) => {
+      if (err) {
+        res.json({ success: false });
+      } else {
+        res.json({ success: true, user: user });
+      }
+    });
+  })
+  .delete((req, res) => {
+    User.findOneAndRemove({ _id: req.params.id }, err => {
+      if (err) {
+        res.json({ success: false });
+      } else {
+        res.json({ success: true });
+      }
+    });
+  })
+  .put((req, res) => {
+    const updateQuery = {};
+
+    if (req.body.firstname) updateQuery.firstname = req.body.firstname;
+    if (req.body.lastname) updateQuery.lastname = req.body.lastname;
+    if (req.body.username) updateQuery.username = req.body.username;
+    if (req.body.password) updateQuery.password = req.body.password;
+    if (req.body.avatar) updateQuery.avatar = req.body.avatar;
+    if (req.body.cover) updateQuery.cover = req.body.cover;
+    if (req.body.birthdate) updateQuery.birthdate = req.body.birthdate;
+    if (req.body.city) updateQuery.city = req.body.city;
+    if (req.body.country) updateQuery.country = req.body.country;
+    if (req.body.age) updateQuery.age = req.body.age;
+    if (req.body.gender) updateQuery.gender = req.body.gender;
+    if (req.body.language) updateQuery.language = req.body.language;
+    if (req.body.email) updateQuery.email = req.body.email;
+    if (req.body.phone) updateQuery.phone = req.body.phone;
+
+    User.findOneAndUpdate(
+      { _id: req.params.id },
+      updateQuery,
+      { upsert: true },
+      (err, user) => {
+        if (err) return res.json({ success: false });
+        else return res.json({ success: true, updated: user });
+      }
+    );
+  });
+
+router
+  .route("/n/:username")
+  .get((req, res) => {
+    User.find({ username: req.params.username }, (err, user) => {
+      if (err) {
+        res.json({ success: false });
+      } else {
+        res.json({ success: true, user: user });
+      }
+    });
+  })
+  .delete((req, res) => {
+    User.findOneAndRemove({ username: req.params.username }, err => {
+      if (err) {
+        res.json({ success: false });
+      } else {
+        res.json({ success: true });
+      }
+    });
+  })
+  .put((req, res) => {
+    const updateQuery = {};
+
+    if (req.body.firstname) updateQuery.firstname = req.body.firstname;
+    if (req.body.lastname) updateQuery.lastname = req.body.lastname;
+    if (req.body.username) updateQuery.username = req.body.username;
+    if (req.body.password) updateQuery.password = req.body.password;
+    if (req.body.avatar) updateQuery.avatar = req.body.avatar;
+    if (req.body.cover) updateQuery.cover = req.body.cover;
+    if (req.body.birthdate) updateQuery.birthdate = req.body.birthdate;
+    if (req.body.city) updateQuery.city = req.body.city;
+    if (req.body.country) updateQuery.country = req.body.country;
+    if (req.body.age) updateQuery.age = req.body.age;
+    if (req.body.gender) updateQuery.gender = req.body.gender;
+    if (req.body.language) updateQuery.language = req.body.language;
+    if (req.body.email) updateQuery.email = req.body.email;
+    if (req.body.phone) updateQuery.phone = req.body.phone;
+
+    User.findOneAndUpdate(
+      { username: req.params.username },
+      updateQuery,
+      { upsert: true },
+      (err, user) => {
+        if (err) return res.json({ success: false });
+        else return res.json({ success: true, updated: user });
+      }
+    );
+  });
+
+router.route("/:id/avatar").post((req, res) => {
+  const imageFile = req.files.file;
+  const timestamp = Date.now();
+  imageFile.mv(
+    `${__basedir}/public/avatars/${req.params.id}_${timestamp}.jpg`,
+    err => {
+      if (err) res.json({ success: false, error: err });
+      else {
+        User.update(
+          { _id: req.params.id },
+          {
+            avatar: `http://${config.server.host}:${config.server.port}/public/avatars/${req.params.id}_${timestamp}.jpg`
+          },
+          (a, b) => console.log(a, b)
+        );
+        res.json({
+          success: true,
+          file: `public/avatars/${req.params.id}_${timestamp}.jpg`
+        });
+      }
+    }
+  );
+});
 
 module.exports = router;

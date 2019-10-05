@@ -6,31 +6,29 @@ import Rating from "react-rating";
 import ProgressBar from "components/ProgressBar";
 import { ReactComponent as StarFull } from "svg/star-full.svg";
 import { ReactComponent as StarEmpty } from "svg/star-empty.svg";
-import API from 'controllers'
+import API from "controllers";
 
-const Poster = (props) => {
-
-  const { movie } = props
-  const [ratingAverage, updateRatingAverage] = useState(0)
-  const [ratingCount, updateRatingCount] = useState(0)
+const Poster = props => {
+  const { movie } = props;
+  const [ratingAverage, updateRatingAverage] = useState(0);
+  const [ratingCount, updateRatingCount] = useState(0);
 
   useEffect(() => {
-    fetchMovieData()
-  }, [])
+    fetchMovieData();
+  }, []);
 
-
-  const fetchMovieData = async() => {
-    const response = await API.movie.ratingsById.get(movie._id)
+  const fetchMovieData = async () => {
+    const response = await API.movies.ratingsById.get(movie._id);
     if (response.data.success) {
-      updateRatingAverage(response.data.ratingAverage)
-      updateRatingCount(response.data.ratingCount)
+      updateRatingAverage(response.data.ratingAverage);
+      updateRatingCount(response.data.ratingCount);
     }
-  }
+  };
 
   return (
     <div className="poster-container">
       <img className="movie-poster" src={movie.poster} alt={movie.name} />
-      <ProgressBar progress={70} />{" "}
+      <ProgressBar progress={25} />{" "}
       {/* To replace with the progression watch time of the user on the movie */}
       <div className="poster-overlay">
         <div className="poster-content">
@@ -44,9 +42,7 @@ const Poster = (props) => {
                 emptySymbol={
                   <StarEmpty width="15" height="15" fill="#FFD700" />
                 }
-                fullSymbol={
-                  <StarFull width="15" height="15" fill="#FFD700" />
-                }
+                fullSymbol={<StarFull width="15" height="15" fill="#FFD700" />}
                 fractions={2}
               />
             </span>
@@ -55,8 +51,7 @@ const Poster = (props) => {
         </div>
       </div>
     </div>
-  )
-
-}
+  );
+};
 
 export default Poster;

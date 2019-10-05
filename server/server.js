@@ -239,11 +239,12 @@ app.post('/register/avatar', (req, res) => {
   });
 });
 
+// API Documentation
+app.use('/', express.static('documentation'));
+
 app.use('/auth', require('./router/auth'));
 app.use('/users', require('./router/users'));
-app.use('/user', require('./router/user'));
 app.use('/movies', require('./router/movies'));
-app.use('/movie', require('./router/movie'));
 app.use('/torrents', require('./router/torrents'));
 
 app.listen(4001, () => {

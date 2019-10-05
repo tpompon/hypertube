@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="shortcut icon" href="favicon.ico" />
+	  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/style.css">
+
+    <title>HyperTube</title>
+  </head>
+  <body>
+
+    <div id="menu" class="menu-side">
+      <h2 style="margin-bottom: 10px; padding: 30px 40px;">Menu</h2>
+      <div class="menu-side-item">
+        Auth
+      </div>
+      <div class="menu-side-item">
+        Users
+      </div>
+      <div class="menu-side-item">
+        Movies
+      </div>
+      <div class="menu-side-item">
+        Torrents
+      </div>
+    </div>
+
+    <div class="header row center-vert" style="justify-content: space-between">
+      <div>
+        <span class="bold">HyperTube</span> - API Documentation
+      </div>
+      <div id="menu-toggle" class="btn" onclick="toggleMenu()">Show menu</div>
+    </div>
+
+    <div class="body">
+      <table>
+        <tbody>
+          <tr>
+            <td width="300">Resource</td>
+            <td width="300"><span class="bold">GET</span><br><span style="color: royalblue">read</span></td>
+            <td width="300"><span class="bold">POST</span><br><span style="color: royalblue">create</span></td>
+            <td width="300"><span class="bold">PUT</span><br><span style="color: royalblue">update</span></td>
+            <td width="300"><span class="bold">DELETE</span><br><span style="color: royalblue">delete</span></td>
+          </tr>
+          <tr>
+            <td width="300"><code>/movies</code></td>
+            <td width="300">Returns a list of movies</td>
+            <td width="300">Create a new movie</td>
+            <td width="300">-</td>
+            <td width="300">Delete all movies</td>
+          </tr>
+          <tr>
+            <td width="300"><code>/movies/:id</code></td>
+            <td width="300">Returns a specific movie</td>
+            <td width="300">-</td>
+            <td width="300">Updates a specific movie</td>
+            <td width="300">Deletes a specific movie</td>
+          </tr>
+          <tr>
+            <td width="300"><code>/users</code></td>
+            <td width="300">Returns a list of users</td>
+            <td width="300">Create a new user</td>
+            <td width="300">-</td>
+            <td width="300">Delete all users</td>
+          </tr>
+          <tr>
+            <td width="300"><code>/users/:id</code></td>
+            <td width="300">Returns a specific user</td>
+            <td width="300">-</td>
+            <td width="300">Updates a specific user</td>
+            <td width="300">Deletes a specific user</td>
+          </tr>
+          <tr>
+            <td width="300"><code>/users/:id/avatar</a/code></td>
+            <td width="300">-</td>
+            <td width="300">Save avatar for a specific user</td>
+            <td width="300">-</td>
+            <td width="300">-</td>
+          </tr>
+          <tr>
+            <td width="300"><code>/users/n/:username</code></td>
+            <td width="300">Returns a specific user</td>
+            <td width="300">-</td>
+            <td width="300">Updates a specific user</td>
+            <td width="300">Deletes a specific user</td>
+          </tr>
+          <tr>
+            <td width="300"><code>/auth</code></td>
+            <td width="300">Returns user authenticated</td>
+            <td width="300">-</td>
+            <td width="300">-</td>
+            <td width="300">-</td>
+          </tr>
+          <tr>
+            <td width="300"><code>/auth/:strategy</code></td>
+            <td width="300">-</td>
+            <td width="300">Authenticate user on a strategy</td>
+            <td width="300">-</td>
+            <td width="300">-</td>
+          </tr>
+          <tr>
+            <td width="300"><code>/auth/confirm</code></td>
+            <td width="300">-</td>
+            <td width="300">Confirm account user depends on key (body)</td>
+            <td width="300">-</td>
+            <td width="300">-</td>
+          </tr>
+          <tr>
+            <td width="300"><code>/auth/forgot</code></td>
+            <td width="300">-</td>
+            <td width="300">Send forgot link to an user</td>
+            <td width="300">-</td>
+            <td width="300">-</td>
+          </tr>
+          <tr>
+            <td width="300"><code>/auth/forgot/:key</code></td>
+            <td width="300">Returns user depends on key</td>
+            <td width="300">Update password depends on key</td>
+            <td width="300">-</td>
+            <td width="300">-</td>
+          </tr>
+          <tr>
+            <td width="300"><code>/auth/logout</code></td>
+            <td width="300">Disconnect user authenticated</td>
+            <td width="300">-</td>
+            <td width="300">-</td>
+            <td width="300">-</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    
+    <script>
+      const toggleMenu = () => {
+        const menu = document.getElementById('menu');
+        const btn = document.getElementById('menu-toggle');
+
+        if (menu.style.right === '0px') {
+          menu.style.right = "-400px";
+          btn.innerText = "Show menu";
+          btn.style.marginRight = "0px"
+        } else {
+          menu.style.right = '0px';
+          btn.innerText = "Hide menu";
+          btn.style.marginRight = "400px"
+        }
+      }
+    </script>
+  </body>
+</html>
