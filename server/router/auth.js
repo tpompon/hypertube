@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const passport = require("passport");
+const bcrypt = require("bcrypt");
 
 const User = require("../models/user");
 
@@ -123,7 +124,7 @@ router
   .post((req, res) => {
     const updateQuery = {
       forgotKey: "",
-      password: req.body.passwd
+      password: bcrypt.hashSync(req.body.passwd, 10)
     };
 
     User.findOneAndUpdate(

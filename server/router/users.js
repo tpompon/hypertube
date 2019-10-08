@@ -117,7 +117,7 @@ router
     if (req.body.firstname) updateQuery.firstname = req.body.firstname;
     if (req.body.lastname) updateQuery.lastname = req.body.lastname;
     if (req.body.username) updateQuery.username = req.body.username;
-    if (req.body.password) updateQuery.password = req.body.password;
+    if (req.body.password) updateQuery.password = bcrypt.hashSync(req.body.password, 10);
     if (req.body.avatar) updateQuery.avatar = req.body.avatar;
     if (req.body.cover) updateQuery.cover = req.body.cover;
     if (req.body.birthdate) updateQuery.birthdate = req.body.birthdate;
@@ -129,15 +129,23 @@ router
     if (req.body.email) updateQuery.email = req.body.email;
     if (req.body.phone) updateQuery.phone = req.body.phone;
 
-    User.findOneAndUpdate(
-      { _id: req.params.id },
-      updateQuery,
-      { upsert: true },
-      (err, user) => {
-        if (err) return res.json({ success: false });
-        else return res.json({ success: true, updated: user });
+    User.find({$or: [{ email: req.body.email}, {username: req.body.username }]}, (err, user) => {
+      if (user.username == req.body.username || user.email == req.body.email) {
+        return res.json({ success: false });
       }
-    );
+      if (err) { return res.json({success: false}); }
+      else if (!user || !err ) {
+        User.findOneAndUpdate(
+          { _id: req.params.id },
+          updateQuery,
+          { upsert: true },
+          (err, user) => {
+            if (err) return res.json({ success: false })
+            else { return res.json({ success: true, updated: user })}
+          }
+        );
+      }
+    })
   });
 
 router
