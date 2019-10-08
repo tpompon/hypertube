@@ -27,7 +27,7 @@ const User = props => {
     const res = await API.users.byUsername.get(match.params.username);
     if (res.data.success) {
       updateUser(res.data.user[0]);
-      const getMovies = await getMoviesList(res.data.user[0].heartbeat);
+      const getMovies = await getMoviesList(res.data.user[0].heartbeat); // Context problem
       updateHeartbeat(getMovies);
       updateIsLoaded(true);
     }

@@ -63,7 +63,7 @@ const languages = {
 			submit: "Register",
 			warns: {
 				match: "Passwords don't match",
-				length: "Password must contains at least 8 characters"
+				length: "Password must contain at least 8 characters"
 			}
 		},
 		login: {

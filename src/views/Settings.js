@@ -39,14 +39,17 @@ const Settings = () => {
     updateLanguage(event.target.value);
   };
 
-  const handleSubmit = async event => {
+  const handleSubmit = async () => {
+    const response = await axios.put(
+      `http://${config.hostname}:${config.port}/users/${user._id}`,
+      user
+    );
+  };
+
+  const enterKeyDown = async event => {
     const key = event.which || event.keyCode;
     if (key === 13) {
-      const response = await axios.put(
-        `http://${config.hostname}:${config.port}/users/${user._id}`,
-        user
-      );
-      console.log(response.data);
+      handleSubmit();
     }
   };
 
@@ -54,7 +57,7 @@ const Settings = () => {
     <div>
       {_isLoaded ? (
         <div
-          onKeyDown={event => handleSubmit(event)}
+          onKeyDown={event => enterKeyDown(event)}
           className="dark-card center text-center"
           style={{ width: "40%" }}
         >
@@ -165,7 +168,7 @@ const Settings = () => {
           </div>
           <div className="row" style={{ justifyContent: "space-around" }}>
             <Button
-              action={event => handleSubmit(event)}
+              action={() => handleSubmit()}
               content={translations[language].settings.submit}
             />
           </div>

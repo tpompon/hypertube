@@ -74,10 +74,12 @@ const MoviesList = () => {
       `http://${config.hostname}:${config.port}/movies?genre=${filter.genre}&minyear=${filter.minYear}&maxyear=${filter.maxYear}&minrating=${filter.minRating}&maxRating=${filter.maxRating}`
     );
     if (response.data.success) {
-      if (response.data.success) {
+      // console.log(response.data.success);
+      // if (response.data.success) {
         updateMovies(response.data.movies);
+        console.log(response.data.movies);
       }
-    }
+    //}
   };
 
   return (
