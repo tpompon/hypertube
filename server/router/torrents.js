@@ -1,15 +1,11 @@
 const express = require("express");
 const router = express.Router();
+const config = require("../config");
 
 const torrentStream = require("torrent-stream");
-const PirateBay = require("thepiratebay");
-const movieArt = require("movie-art");
 const path = require("path");
-const fs = require("fs");
 
 const request = require("request");
-
-const config = require("../config");
 
 const sources = ["https://yst.am/api/v2", "https://yts.lt/api/v2"];
 const selectedSource = sources[1];
@@ -74,94 +70,40 @@ router.route("/yts/:id").get((req, res) => {
       }
     }
   );
-});
+})
 
-// router.route('/piratebay/:search')
-// .get(async (req, res) => {
-// 	const searchResults = await PirateBay.search(req.params.search, {
-// 		orderBy: 'seeds',
-// 		sortBy: 'desc'
-// 	}).catch((err) => console.log(err));
-// 	if (searchResults.length > 0) {
-// 		movieArt(req.params.search, (error, response) => {
-// 			res.json({ success: true, poster: response, results: searchResults });
-// 		});
-// 	} else {
-// 		res.json({ success: false });
-// 	}
-// })
 
-// router.route('/download/:search')
-// .get(async (req, res) => {
-// 	const searchResults = await PirateBay.search(req.params.search, {
-// 	  orderBy: 'seeds',
-// 	  sortBy: 'desc'
-// 	}).catch((err) => console.log(err));
-// 	if (searchResults.length > 0) {
-// 	  movieArt(req.params.search, (error, response) => {
-// 		const engine = torrentStream(searchResults[0].magnetLink);
+const write206Headers = (res, metadata) => {
+  res.writeHead(206, {
+    "Accept-Ranges": "bytes",
+    "Content-Range": "bytes " + metadata.start + "-" + metadata.end + "/" + metadata.total,
+    "Connection": "keep-alive",
+    "Content-Length": metadata.chunksize,
+    "Content-Type": "video/mp4"
+  })
+}
 
-// 		engine.on('ready', () => {
-// 			engine.files.forEach(async (file) => {
-// 			  if (path.extname(file.name) === '.mp4' || path.extname(file.name) === '.mkv' || path.extname(file.name) === '.avi') {
-// 				let stream = await file.createReadStream();
-// 				let writeStream = await fs.createWriteStream(__basedir + `/torrents/${req.params.search}${path.extname(file.name)}`);
-// 				stream.pipe(writeStream);
-
-// 				console.log('filename:', file.name);
-// 				res.json({ poster: response, result: searchResults[0], moviePath: `http://${config.server.host}:${config.server.port}/torrents/${req.params.search}${path.extname(file.name)}` });
-
-// 				writeStream.on('finish', () => {
-// 				  console.log(writeStream.path);
-// 				  console.log("Write completed.");
-// 				});
-// 				writeStream.on('error', (err) => {
-// 				  console.log(err.stack);
-// 				});
-// 			  }
-// 			});
-// 		});
-// 	  });
-// 	} else {
-// 	  res.json({ success: false });
-// 	}
-// })
-
-router.route("/download").post(async (req, res) => {
-  const engine = torrentStream(
-    "magnet:?xt=urn:btih:4d5d1fb084d04418576c025c585814decff31662&dn=SpiderMan+Far+From+Home+2019+720p+NEW+HDCAM-1XBET&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.openbittorrent.com%3A80&tr=udp%3A%2F%2Fopen.demonii.com%3A1337&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Fexodus.desync.com%3A6969"
-  );
-
-  engine.on("ready", () => {
-    engine.files.forEach(async file => {
-      if (
-        path.extname(file.name) === ".mp4" ||
-        path.extname(file.name) === ".mkv" ||
-        path.extname(file.name) === ".avi"
-      ) {
-        let stream = await file.createReadStream();
-        let writeStream = await fs.createWriteStream(
-          __basedir + `/torrents/${req.body.name}${path.extname(file.name)}`
-        );
-        stream.pipe(writeStream);
-
-        console.log("filename:", file.name);
-        res.json({
-          moviePath: `http://${config.server.host}:${
-            config.server.port
-          }/torrents/${req.body.name}${path.extname(file.name)}`
-        });
-
-        writeStream.on("finish", () => {
-          console.log(writeStream.path);
-          console.log("Write completed.");
-        });
-        writeStream.on("error", err => {
-          console.log(err.stack);
-        });
-      }
+router.route("/stream/:magnet").get(async (req, res) => {
+  const range = req.headers.range
+  const engine = torrentStream(req.params.magnet, { path: `./torrents` });
+    engine.on("ready", () => {
+      engine.files.forEach((file) => {
+        if (
+          path.extname(file.name) === ".mp4" ||
+          path.extname(file.name) === ".mkv" ||
+          path.extname(file.name) === ".avi"
+        ) {
+          if (range) {
+            let [start, end] = range.replace(/bytes=/, "").split("-").map((e) => e && parseInt(e))
+            end = end || file.length - 1
+            const chunksize = (end - start) + 1
+            let stream = file.createReadStream({ start, end });
+            write206Headers(res, { start, end, total: file.length, chunksize })
+            stream.pipe(res)
+          }
+        }
+      });
     });
-  });
-});
+})
 
 module.exports = router;

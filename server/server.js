@@ -247,6 +247,6 @@ app.use('/users', require('./router/users'));
 app.use('/movies', require('./router/movies'));
 app.use('/torrents', require('./router/torrents'));
 
-app.listen(4001, () => {
+app.listen(config.server.port, () => {
   console.log("\x1b[33m%s\x1b[0m", `Server running on http://${config.server.host}:${config.server.port}/`);
 });

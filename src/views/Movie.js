@@ -21,7 +21,6 @@ const Movie = props => {
   const context = useContext(UserConsumer);
   const { language } = context;
   const { id } = match.params;
-  //const [id, updateId] = useState(parseInt(id))
   const [movie, updateMovie] = useState({});
   const [user, updateUser] = useState({});
   const [comment, updateComment] = useState("");
@@ -31,14 +30,9 @@ const Movie = props => {
   const [ratingCount, updateRatingCount] = useState(0);
   const [loaded, updateLoaded] = useState(false);
   const [togglePlayer, updateTogglePlayer] = useState(false);
-  const [moviePath, updateMoviePath] = useState(
-    "https://file-examples.com/wp-content/uploads/2017/04/file_example_MP4_1280_10MG.mp4"
-  );
   const player = useRef(null);
 
   useEffect(() => {
-    fetchMovie();
-
     return () => {
       document.removeEventListener("scroll", handleScroll, false);
       document.removeEventListener("keydown", onEscape, false);
@@ -53,42 +47,17 @@ const Movie = props => {
   const fetchMovie = async () => {
     const reponseMovie = await API.movies.byId.get(id);
     if (reponseMovie) {
-      updateMovie(reponseMovie.data.movie[0]);
-      updateLoaded(true);
       if (reponseMovie.data.movie[0]) {
-        // Download torrent
-        // const { movie } = this.state;
-        // const body = {
-        //   name: movie.ytsData.slug,
-        //   magnet: movie.ytsData.torrents[0].magnet
-        // }
-        // axios.post(`${config.serverURL}/torrents/download`, body)
-        // .then((res) => {
-        //   console.log(res.data);
-        //   this.setState({moviePath: res.data.moviePath}, () => {
-        //     const videoPlayer = document.getElementsByClassName('video-player')[0];
-        //     videoPlayer.load();
-        //     videoPlayer.addEventListener('timeupdate', (ret) => {
-        //       console.log('Actual time showing:', videoPlayer.currentTime)
-        //       console.log('Duration:', videoPlayer.duration)
-        //     });
-        //   })
-        // })
-
         document.addEventListener("scroll", handleScroll, false);
         document.addEventListener("keydown", onEscape, false);
-
-        // Download torrent and display
-        // axios.get(`http://${config.hostname}:${config.port}/torrents/download/${this.state.movie.name}`)
-        // .then(res => {
-        //   this.setState({ moviePath: res.data.moviePath });
-        //   console.log(this.state.moviePath)
-        //   setTimeout(() => {
-        //     const videoPlayer = document.getElementsByClassName('video-player')[0];
-        //     videoPlayer.load();
-        //     alert('loaded');
-        //   }, 1000);
-        // })
+        // const videoPlayer = document.getElementsByClassName('video-player')[0];
+        // videoPlayer.addEventListener('timeupdate', async(ret) => {
+        //   console.log(ret)
+        //   console.log('Actual time showing:', videoPlayer.currentTime)
+        //   console.log('Duration:', videoPlayer.duration)
+        // });
+        updateMovie(reponseMovie.data.movie[0]);
+        updateLoaded(true);
       }
     }
     const responseUser = await API.auth.check();
@@ -556,7 +525,7 @@ const Movie = props => {
                 controls
                 controlsList="nodownload"
               >
-                {moviePath ? <source src={moviePath} type="video/mp4" /> : null}
+                <source src={ `http://${config.hostname}:${config.port}/torrents/stream/${encodeURIComponent(movie.ytsData.torrents[0].magnet)}` } />
               </video>
             </div>
           </div>
