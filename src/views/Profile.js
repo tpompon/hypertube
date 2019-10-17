@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef, useContext } from "react";
 import axios from "axios";
 import config from "config";
-import MoviesSlider from "components/MoviesSlider";
 import PostersSlider from "components/PostersSlider";
 import translations from "translations";
 import Loading from "components/Loading";
@@ -43,8 +42,12 @@ const Profile = () => {
       const res = await API.users.byId.get(check.data.user._id);
       if (res.data.success) {
         updateUser(res.data.user[0]);
-        const getMovies = await getMoviesList(res.data.user[0].heartbeat);
-        updateHeartbeat(getMovies);
+        const getHeartbeatList = await getMoviesList(res.data.user[0].heartbeat);
+        updateHeartbeat(getHeartbeatList);
+        const getRecentsList = await getMoviesList(res.data.user[0].recents);
+        updateRecents(getRecentsList);
+        const getInProgressList = await getMoviesList(res.data.user[0].inProgress);
+        updateInProgress(getInProgressList);
         updateCoverBackground(res.data.user[0].cover);
         updateIsLoaded(true);
       }
@@ -235,12 +238,12 @@ const Profile = () => {
               </div>
             </div>
           </div>
-          <h2>{translations[language].profile.list.heartbeat}</h2>
-          <PostersSlider number={1} movies={heartbeat} language={language} />
-          <h2>{translations[language].profile.list.recents}</h2>
-          <MoviesSlider number={2} movies={recents} language={language} />
           <h2>{translations[language].profile.list.continue}</h2>
-          <MoviesSlider number={3} movies={inProgress} language={language} />
+          <PostersSlider number={1} movies={inProgress} language={language} />
+          <h2>{translations[language].profile.list.heartbeat}</h2>
+          <PostersSlider number={2} movies={heartbeat} language={language} />
+          <h2>{translations[language].profile.list.recents}</h2>
+          <PostersSlider number={3} movies={recents} language={language} />
         </div>
       ) : (
         <Loading />

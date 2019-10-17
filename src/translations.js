@@ -100,7 +100,7 @@ const languages = {
 			title: "This page doesn't exist"
 		},
 		footer: {
-			title: "42 project by tpompon, syboeuf, evbelico & mthiery"
+			title: "42 project by tpompon, syboeuf, evbelico"
 		}
 	},
 	"fr": {
@@ -204,7 +204,7 @@ const languages = {
 			title: "Cette page n'existe pas"
 		},
 		footer: {
-			title: "Projet 42 par tpompon, syboeuf, evbelico & mthiery"
+			title: "Projet 42 par tpompon, syboeuf, evbelico"
 		}
 	},
 	"es": {
@@ -307,7 +307,7 @@ const languages = {
 			title: "Esta pagina no existe"
 		},
 		footer: {
-			title: "Proyecto 42 de tpompon, syboeuf, evbelico & mthiery"
+			title: "Proyecto 42 de tpompon, syboeuf, evbelico"
 		}
 	}
 }

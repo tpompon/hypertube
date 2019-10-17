@@ -51,7 +51,7 @@ const App = () => {
             _isLoaded ? (
               <Switch>
                 <Route exact path='/' component={() => (
-                  _isAuth ? <MoviesList /> : <Redirect to="/login" />
+                  _isAuth ? <Search /> : <Redirect to="/login" />
                 )}/>
                 <Route exact path='/watch/:id' component={() => (
                   _isAuth ? <Movie /> : <Redirect to="/login" />
@@ -75,9 +75,9 @@ const App = () => {
                   _isAuth ? <Redirect to ="/" /> : <Login />
                 )}/>
 
-                <Route exact path='/search' component={() => (
+                {/* <Route exact path='/search' component={() => (
                   _isAuth ? <Search /> : <Redirect to="/login" />
-                )}/>
+                )}/> */}
                 <Route exact path='/confirm/:key' component={() => <Confirm />} />
                 <Route exact path='/forgot/:key' component={() => <Forgot />} />
                 <Route component={() => <NotFound />} />

@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const { genres } = require('../genres.json')
 
 // Models
 const Movie = require("../models/movie");
@@ -8,13 +9,17 @@ const User = require("../models/user");
 router
   .route("/")
   .get((req, res) => {
-    console.log("Movies Filters", req.query);
-    // Query for genre + years
-    // "ytsData.genres": /.*Horror.*/i, $and: [ { "ytsData.year": { $gte: 1990 } }, { "ytsData.year": { $lte: 2010 } } ]
-    Movie.find({}, (err, movies) => {
-      if (err) res.json({ success: false });
-      else res.json({ success: true, movies: movies });
-    });
+    if (req.query.search) {
+      Movie.find({ "name": { "$regex": `${req.query.search}`, opts: 'i' } }, (err, movies) => {
+        if (err) res.json({ success: false });
+        else res.json({ success: true, movies: movies });
+      });
+    } else {
+      Movie.find({}, (err, movies) => {
+        if (err) res.json({ success: false });
+        else res.json({ success: true, movies: movies });
+      });
+    }
   })
   .post((req, res) => {
     const newMovie = Movie({
@@ -41,6 +46,30 @@ router
       else res.json({ success: true });
     });
   });
+
+router
+  .route("/filter")
+  .get((req, res) => {
+    console.log("Movies Filters", req.query);
+
+    if (req.query.minyear === "")
+      req.query.minyear = 1900
+    if (req.query.maxyear === "")
+      req.query.maxyear = new Date().getFullYear()
+
+    if (req.query.genre !== "") {
+      const genreName = (genres.find(obj => obj.id == req.query.genre)).name;
+      Movie.find({"ytsData.genres": genreName, $and: [ { "ytsData.year": { $gte: parseInt(req.query.minyear) } }, { "ytsData.year": { $lte: parseInt(req.query.maxyear) } } ]}, (err, movies) => {
+        if (err) res.json({ success: false });
+        else res.json({ success: true, movies: movies });
+      });
+    } else {
+      Movie.find({ "ytsData.year": { $gte: parseInt(req.query.minyear), $lt: parseInt(req.query.maxyear) } }, (err, movies) => {
+        if (err) res.json({ success: false });
+        else res.json({ success: true, movies: movies });
+      });
+    }
+  })
 
 router
   .route("/:id")
@@ -142,7 +171,7 @@ router
   .get((req, res) => {
     const movie = { id: req.params.id };
     User.findOne(
-      { _id: req.query.uid },
+      { _id: req.user._id },
       { recents: { $elemMatch: { id: movie.id } } },
       (err, result) => {
         if (err) {
@@ -159,14 +188,23 @@ router
   })
   .post((req, res) => {
     const movie = { id: req.params.id };
-    User.findOneAndUpdate(
-      { _id: req.body.uid },
-      { $push: { recents: movie } },
-      err => {
+    User.findOne(
+      { _id: req.user._id, "recents.id": req.params.id },
+      (err, result) => {
         if (err) {
           res.json({ success: false });
-        } else {
-          res.json({ success: true, movie: movie });
+        } else if (!result) {
+          User.findOneAndUpdate(
+            { _id: req.user._id },
+            { $push: { recents: movie } },
+            err => {
+              if (err) {
+                res.json({ success: false });
+              } else {
+                res.json({ success: true, movie: movie });
+              }
+            }
+          );
         }
       }
     );
@@ -174,7 +212,7 @@ router
   .delete((req, res) => {
     const movie = { id: req.params.id };
     User.findOneAndUpdate(
-      { _id: req.body.uid },
+      { _id: req.user._id },
       { $pull: { recents: { id: movie.id } } },
       err => {
         if (err) {
@@ -191,14 +229,14 @@ router
   .get((req, res) => {
     const movie = { id: req.params.id };
     User.findOne(
-      { _id: req.query.uid },
+      { _id: req.user._id },
       { inProgress: { $elemMatch: { id: movie.id } } },
       (err, result) => {
         if (err) {
           res.json({ success: false });
         } else {
           if (result) {
-            res.json({ success: true, found: result.inProgress.length });
+            res.json({ success: true, list: result, found: result.inProgress.length });
           } else {
             res.json({ success: true, found: 0 });
           }
@@ -207,15 +245,48 @@ router
     );
   })
   .post((req, res) => {
-    const movie = { id: req.params.id };
-    User.findOneAndUpdate(
-      { _id: req.body.uid },
-      { $push: { inProgress: movie } },
-      err => {
+    const movie = { id: req.params.id, ytsId: req.body.ytsId, percent: req.body.percent, timecode: req.body.timecode };
+    User.findOne(
+      { _id: req.user._id, "inProgress.id": req.params.id },
+      (err, result) => {
         if (err) {
           res.json({ success: false });
+        } else if (result) {
+          User.updateOne(
+            { _id: req.user._id, "inProgress.id": req.params.id },
+            { $set: {
+                "inProgress.$.percent": req.body.percent,
+                "inProgress.$.timecode": req.body.timecode
+              }
+            },
+            err => {
+              if (err) {
+                res.json({ success: false, error: err });
+              } else {
+                res.json({ success: true });
+              }
+            }
+          );
         } else {
-          res.json({ success: true, movie: movie });
+          User.findOneAndUpdate(
+            { _id: req.user._id },
+            { $push: { inProgress: movie } },
+            err => {
+              if (err) {
+                res.json({ success: false, error: err });
+              } else {
+                User.findOneAndUpdate(
+                  { _id: req.user._id },
+                  {new: true }, err => {
+                  if (err) {
+                    res.json({ success: false, error: err });
+                  } else {
+                    res.json({ success: true });
+                  }
+                })
+              }
+            }
+          );
         }
       }
     );
@@ -223,7 +294,7 @@ router
   .delete((req, res) => {
     const movie = { id: req.params.id };
     User.findOneAndUpdate(
-      { _id: req.body.uid },
+      { _id: req.user._id },
       { $pull: { inProgress: { id: movie.id } } },
       err => {
         if (err) {
@@ -252,7 +323,7 @@ router.route("/:id/comments").post((req, res) => {
 });
 
 router.route("/:id/comments/report").post((req, res) => {
-  Movie.update(
+  MovieupdateOne(
     { _id: req.params.id, "comments._id": req.body.commId },
     {
       $set: {
@@ -302,13 +373,9 @@ router
           console.log(err);
           res.json({ success: false });
         } else if (result) {
-          Movie.update(
+          Movie.updateOne(
             { _id: req.params.id, "ratings.uid": req.body.uid },
-            {
-              $set: {
-                "ratings.$.rating": req.body.rating
-              }
-            },
+            { $set: { "ratings.$.rating": req.body.rating } },
             err => {
               if (err) {
                 console.log(err);
@@ -324,9 +391,17 @@ router
             { $push: { ratings: newRating } },
             err => {
               if (err) {
-                res.json({ success: false });
+                res.json({ success: false, error: err });
               } else {
-                res.json({ success: true });
+                Movie.findOneAndUpdate(
+                  { _id: req.params.id },
+                  {new: true }, err => {
+                  if (err) {
+                    res.json({ success: false, error: err });
+                  } else {
+                    res.json({ success: true });
+                  }
+                })
               }
             }
           );

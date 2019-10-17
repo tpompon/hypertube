@@ -7,6 +7,10 @@ const path = require("path");
 
 const request = require("request");
 
+// Models
+const Movie = require("../models/movie");
+const User = require("../models/user");
+
 const sources = ["https://yst.am/api/v2", "https://yts.lt/api/v2"];
 const selectedSource = sources[1];
 // Don't forget to update source in Search for Poster
@@ -21,12 +25,49 @@ router.route("/yts/search/:search").get(async (req, res) => {
         res.json({ success: false });
       } else {
         const searchResults = JSON.parse(body);
-        if (
-          searchResults.status === "ok" &&
-          searchResults.data.movie_count !== 0
-        ) {
-          let movies = [];
+        if (searchResults.status === "ok" && searchResults.data.movie_count !== 0) {
           searchResults.data.movies.forEach(movie => {
+            Movie.findOne({ _ytsId: movie.id }, (err, result) => {
+              if (result && result.ratings.length > 0) {
+                let count = 0;
+                let total = 0;
+                result.ratings.forEach(el => {
+                  total += el.rating;
+                  count++;
+                });
+                console.log({
+                  ratingAverage: Math.floor((total / count) * 100) / 100,
+                  ratingCount: count
+                })
+                movie.ratingAverage = Math.floor((total / count) * 100) / 100
+              } else {
+                //console.log("no")
+              }
+            });
+
+            User.findOne(
+              { _id: req.user._id },
+              { inProgress: { $elemMatch: { ytsId: movie.id } } },
+              (err, result) => {
+                if (err) {
+                  console.log('erroooor')
+                } else {
+                  if (result.inProgress.length > 0) {
+                    console.log('% watch ', result.inProgress[0].percent);
+                  } else {
+                    //console.log('no inprogress movie')
+                  }
+                }
+              }
+            );
+
+            // const findMovieUser = await Movie.findOne({ _ytsId: movie.id, "ratings.uid": req.user._id }, (err, movie) => {
+            //   if (err) return "Error"
+            //   return movie
+            // })
+            // if (findMovieUser && findMovieUser.ratings.length > 0)
+            //   console.log(findMovieUser.ratings[0])
+
             movie.torrents.forEach(torrent => {
               torrent.magnet = `magnet:?xt=urn:btih:${
                 movie.torrents[0].hash
@@ -46,6 +87,7 @@ router.route("/yts/search/:search").get(async (req, res) => {
             count: searchResults.data.movie_count,
             results: searchResults
           });
+          console.log("res sent")
         } else if (searchResults.data.movie_count === 0) {
           res.json({ success: true, count: 0 });
         } else {

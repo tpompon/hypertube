@@ -71,7 +71,7 @@ const MoviesList = () => {
 
   const searchRequest = async () => {
     const response = await axios.get(
-      `http://${config.hostname}:${config.port}/movies?genre=${filter.genre}&minyear=${filter.minYear}&maxyear=${filter.maxYear}&minrating=${filter.minRating}&maxRating=${filter.maxRating}`
+      `http://${config.hostname}:${config.port}/movies/filter?genre=${filter.genre}&minyear=${filter.minYear}&maxyear=${filter.maxYear}&minrating=${filter.minRating}&maxRating=${filter.maxRating}`
     );
     if (response.data.success) {
       // console.log(response.data.success);
@@ -92,7 +92,7 @@ const MoviesList = () => {
           >
             <input
               min={1900}
-              max={2019}
+              max={new Date().getFullYear()}
               onChange={event =>
                 updateFilter({ ...filter, ["minYear"]: event.target.value })
               }

@@ -129,10 +129,10 @@ router
     if (req.body.email) updateQuery.email = req.body.email;
     if (req.body.phone) updateQuery.phone = req.body.phone;
 
-    User.find({$or: [{ email: req.body.email}, {username: req.body.username }]}, (err, user) => {
-      if (user.username == req.body.username || user.email == req.body.email) {
-        return res.json({ success: false });
-      }
+    User.find({ _id: req.params.id }, (err, user) => {
+      // if (user.username == req.body.username || user.email == req.body.email) {
+      //   return res.json({ success: false });
+      // }
       if (err) { return res.json({success: false}); }
       else if (!user || !err ) {
         User.findOneAndUpdate(

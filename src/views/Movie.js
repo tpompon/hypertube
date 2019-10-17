@@ -36,6 +36,21 @@ const Movie = props => {
     return () => {
       document.removeEventListener("scroll", handleScroll, false);
       document.removeEventListener("keydown", onEscape, false);
+      const videoPlayer = document.getElementsByClassName('video-player')[0];
+      const watchPercent = (videoPlayer.currentTime / videoPlayer.duration * 100).toFixed(0);
+      console.log("Leaving page with timecode: ", videoPlayer.currentTime)
+      console.log('Total duration of movie:', videoPlayer.duration)
+      console.log('% movie watched:', watchPercent + '%')
+      if (videoPlayer.currentTime > 5) {
+        if (watchPercent >= 95) {
+          API.movies.recentsById.post(id, null)
+          API.movies.inprogressById.delete(id, null)
+        } else {
+          API.movies.byId.get(id).then(res => {
+            API.movies.inprogressById.post(id, { ytsId: res.data.movie[0]._ytsId, percent: watchPercent, timecode: videoPlayer.currentTime.toString() })
+          })
+        }
+      }
     };
   }, []);
 
@@ -45,19 +60,19 @@ const Movie = props => {
   }, [id]);
 
   const fetchMovie = async () => {
-    const reponseMovie = await API.movies.byId.get(id);
-    if (reponseMovie) {
-      if (reponseMovie.data.movie[0]) {
+    const resp = await API.movies.byId.get(id);
+    if (resp) {
+      if (resp.data.movie[0]) {
         document.addEventListener("scroll", handleScroll, false);
         document.addEventListener("keydown", onEscape, false);
-        // const videoPlayer = document.getElementsByClassName('video-player')[0];
-        // videoPlayer.addEventListener('timeupdate', async(ret) => {
-        //   console.log(ret)
-        //   console.log('Actual time showing:', videoPlayer.currentTime)
-        //   console.log('Duration:', videoPlayer.duration)
-        // });
-        updateMovie(reponseMovie.data.movie[0]);
+        updateMovie(resp.data.movie[0]);
         updateLoaded(true);
+
+        const res = await API.movies.inprogressById.get(id);
+        if (res.data.success && res.data.found > 0) {
+          const videoPlayer = document.getElementsByClassName('video-player')[0]
+          videoPlayer.currentTime = res.data.list.inProgress[0].timecode;
+        }
       }
     }
     const responseUser = await API.auth.check();
@@ -302,7 +317,15 @@ const Movie = props => {
                           .trim()
                           .split(" ")
                           .filter(x => x.startsWith("@"));
-                        if (tags.length > 0) console.log(tags);
+                        if (tags.length > 0) {
+                          tags.forEach(tag => {
+                            axios.get(`http://${config.hostname}:${config.port}/users/n/${tag.replace('@', '')}`)
+                              .then((res) => {
+                                if (res.data.success && res.data.user[0])
+                                  console.log(`http://localhost:3000/user/${res.data.user[0].username}`)
+                              })
+                          })
+                        }
                         return (
                           <div className="comment" key={`comment-${index}`}>
                             <div
@@ -525,7 +548,8 @@ const Movie = props => {
                 controls
                 controlsList="nodownload"
               >
-                <source src={ `http://${config.hostname}:${config.port}/torrents/stream/${encodeURIComponent(movie.ytsData.torrents[0].magnet)}` } />
+                {/* <source src={ `http://${config.hostname}:${config.port}/torrents/stream/${encodeURIComponent(movie.ytsData.torrents[0].magnet)}` } /> */}
+                <source src="https://file-examples.com/wp-content/uploads/2017/04/file_example_MP4_1280_10MG.mp4" />
               </video>
             </div>
           </div>

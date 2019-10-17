@@ -12,7 +12,12 @@ const UserSchema = new Schema({
   password: { type: String },
   heartbeat: [{ id: String }],
   recents: [{ id: String }],
-  inProgress: [{ id: String }],
+  inProgress: [{
+    id: {type: String, required: true },
+    ytsId: {type: String, required: true},
+    percent: {type: String, required: true },
+    timecode: {type: String, required: true }
+  }],
   avatar: String,
   cover: String,
   birthdate: String,

@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useContext, useRef } from "react";
 import axios from "axios";
-import config from "config";
 import translations from "translations";
 import { ReactComponent as SearchIcon } from "svg/search.svg";
 import { Link } from "react-router-dom";
@@ -191,14 +190,6 @@ const Header = props => {
                 className="avatar-dropdown"
                 style={{ display: toggleAvatarDropdown ? "block" : "none" }}
               >
-                <Link
-                  to="/search"
-                  onClick={() =>
-                    updateToggleAvatarDropdown(!toggleAvatarDropdown)
-                  }
-                >
-                  <div className="avatar-dropdown-item">Search</div>
-                </Link>
                 <Link
                   to="/profile"
                   onClick={() =>

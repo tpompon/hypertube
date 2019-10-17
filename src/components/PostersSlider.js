@@ -5,7 +5,7 @@ import { ReactComponent as ArrowLeft } from "svg/arrow-point-to-left.svg";
 import { ReactComponent as ArrowRight } from "svg/arrow-point-to-right.svg";
 
 const PostersSlider = props => {
-  const { movies, language } = props;
+  const { movies, language, number } = props;
   const [currentPos, updateCurrentPos] = useState(0);
 
   return (
@@ -35,7 +35,7 @@ const PostersSlider = props => {
           }}
         >
           {movies.map(movie => (
-            <Link to={`/watch/${movie._id}`} key={`movie-${movie._id}`}>
+            <Link to={`/watch/${movie._id}`} key={`movie-${movie._id}-${number}`}>
               <Poster movie={movie} language={language} />
             </Link>
           ))}

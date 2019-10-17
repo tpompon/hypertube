@@ -4,7 +4,6 @@ import axios from "axios";
 import config from "config";
 import translations from "translations";
 import PostersSlider from "components/PostersSlider";
-import MoviesSlider from "components/MoviesSlider";
 import Loading from "components/Loading";
 import { ReactComponent as VerifiedIcon } from "svg/verified.svg";
 import { UserConsumer } from "store";
@@ -29,8 +28,10 @@ const User = props => {
     if (res.data.success) {
       updateUser(res.data.user[0]);
       if (res.data.user[0]) {
-        const getMovies = await getMoviesList(res.data.user[0].heartbeat); // Context problem
-        updateHeartbeat(getMovies);
+        const getHeartbeatList = await getMoviesList(res.data.user[0].heartbeat);
+        updateHeartbeat(getHeartbeatList);
+        const getRecentsList = await getMoviesList(res.data.user[0].recents);
+        updateRecents(getRecentsList);
       }
       updateIsLoaded(true);
     }
@@ -116,7 +117,7 @@ const User = props => {
                 language={language}
               />
               <h2>{translations[language].user.list.recents}</h2>
-              <MoviesSlider number={2} movies={recents} language={language} />
+              <PostersSlider number={2} movies={recents} language={language} />
             </div>
           ) : (
             <h2>{translations[language].user.notFound}</h2>

@@ -1,32 +1,87 @@
 import React, { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import config from "config";
+import Button from "components/Button";
+import Poster from "components/Poster";
 import PosterYTS from "components/PosterYTS";
 import Loading from "components/Loading";
 import { Link, withRouter } from "react-router-dom";
 import { UserConsumer } from "store";
+import API from "controllers";
+
+function compareYTS(a, b) {
+  const nameA = a.title.toUpperCase();
+  const nameB = b.title.toUpperCase();
+
+  let comparison = 0;
+  if (nameA > nameB) {
+    comparison = 1;
+  } else if (nameA < nameB) {
+    comparison = -1;
+  }
+  return comparison;
+}
+
+const dropDownOptions = [
+  { value: "", genre: "Genre:" },
+  { value: "0", genre: "Comedy" },
+  { value: "1", genre: "Sci-Fi" },
+  { value: "2", genre: "Horror" },
+  { value: "3", genre: "Romance" },
+  { value: "4", genre: "Action" },
+  { value: "5", genre: "Thriller" },
+  { value: "6", genre: "Drama" },
+  { value: "7", genre: "Mystery" },
+  { value: "8", genre: "Crime" },
+  { value: "9", genre: "Animation" },
+  { value: "10", genre: "Adventure" },
+  { value: "11", genre: "Fantasy" },
+  { value: "12", genre: "Superhero" },
+  { value: "13", genre: "Documentary" },
+  { value: "14", genre: "Music" },
+  { value: "15", genre: "Family" }
+];
 
 const Search = props => {
   //const [search, updateSearch] = useState("")
   const [movies, updateMovies] = useState([]);
+  const [moviesYTS, updateMoviesYTS] = useState([]);
   const [_isLoaded, updateIsLoaded] = useState(false);
   const [_status, updateStatus] = useState(undefined);
+  const [filter, updateFilter] = useState({
+    genre: "",
+    minYear: "",
+    maxYear: "",
+    minRating: "",
+    maxRating: ""
+  });
   let inProgress = false;
   const context = useContext(UserConsumer);
   const { language, search } = context;
 
   useEffect(() => {
+    fetchMoviesDb();
+  }, []);
+
+  useEffect(() => {
+    fetchMoviesDb();
     fetchMovies();
   }, [search]);
+
+  const fetchMoviesDb = async () => {
+    const response = await axios.get(`http://${config.hostname}:${config.port}/movies?search=${search}`)
+    if (response.data.success) {
+      updateMovies(response.data.movies);
+    }
+  };
 
   const fetchMovies = async () => {
     if (search.trim() !== "") {
       const response = await axios.get(
         `http://${config.hostname}:${config.port}/torrents/yts/search/${search}`
       );
-      if (response.data.count !== 0) {
-        updateMovies(response.data.results.data.movies);
-      }
+      if (response.data.count !== 0)
+        updateMoviesYTS(response.data.results.data.movies);
       updateStatus("no results");
     } else if (search.trim() === "") {
       updateMovies([]);
@@ -35,6 +90,16 @@ const Search = props => {
       //alert('empty search');
     }
     updateIsLoaded(true);
+  };
+
+  const searchRequest = async () => {
+    const response = await axios.get(
+      `http://${config.hostname}:${config.port}/movies/filter?genre=${filter.genre}&minyear=${filter.minYear}&maxyear=${filter.maxYear}&minrating=${filter.minRating}&maxRating=${filter.maxRating}`
+    );
+    if (response.data.success) {
+      updateMovies(response.data.movies);
+      console.log(response.data.movies);
+    }
   };
 
   const checkDatabase = async ytsID => {
@@ -89,24 +154,84 @@ const Search = props => {
   return (
     <div>
       {_isLoaded ? (
-        <div className="posters-list row wrap">
-          {movies.map((movie, index) => {
-            if (!movie.large_cover_image)
-              movie.large_cover_image =
-                "http://story-one.com/wp-content/uploads/2016/02/Poster_Not_Available2.jpg";
-            return (
-              // If doesn't exist in db create it and redirect on /watch/_id
-              // <Link to={`/watchyts/${movie.id}`} key={`movie-${movie.slug}`}>
-              //   <Poster movie={movie} language={language} />
-              // </Link>
-              <div
-                key={`movie-${index}`}
-                onClick={() => checkDatabase(movie.id)}
-              >
-                <PosterYTS from="yts" movie={movie} language={language} />
-              </div>
-            );
-          })}
+        <div className="col">
+          <div
+            className="row wrap"
+            style={{ justifyContent: "center", marginBottom: 20 }}
+          >
+            <input
+              min={1900}
+              max={new Date().getFullYear()}
+              onChange={event =>
+                updateFilter({ ...filter, ["minYear"]: event.target.value })
+              }
+              className="dark-input"
+              type="number"
+              placeholder="Min. Year"
+            />
+            <input
+              min={1900}
+              max={new Date().getFullYear()}
+              onChange={event =>
+                updateFilter({ ...filter, ["maxYear"]: event.target.value })
+              }
+              className="dark-input"
+              type="number"
+              placeholder="Max. Year"
+              style={{ marginLeft: 10, marginRight: 30 }}
+            />
+            <select
+              onChange={event =>
+                updateFilter({ ...filter, ["genre"]: event.target.value })
+              }
+              className="dark-input"
+            >
+              {dropDownOptions.map(option => (
+                <option key={`option-${option.value}`} value={option.value}>
+                  {option.genre}
+                </option>
+              ))}
+            </select>
+            <input
+              onChange={event =>
+                updateFilter({ ...filter, ["minRating"]: event.target.value })
+              }
+              className="dark-input"
+              type="number"
+              placeholder="Min. Rating"
+              style={{ marginLeft: 30 }}
+            />
+            <input
+              onChange={event =>
+                updateFilter({ ...filter, ["maxRating"]: event.target.value })
+              }
+              className="dark-input"
+              type="number"
+              placeholder="Max. Rating"
+              style={{ marginLeft: 10 }}
+            />
+            <Button
+              style={{ marginLeft: 20 }}
+              action={() => searchRequest()}
+              content="Search"
+            />
+          </div>
+          <div className="posters-list row wrap">
+            {moviesYTS.sort(compareYTS).map((movie, index) => {
+              if (!movie.large_cover_image)
+                movie.large_cover_image = "http://story-one.com/wp-content/uploads/2016/02/Poster_Not_Available2.jpg";
+              // console.log(movie.rating_total)
+              return (
+                <div
+                  key={`movie-${index}`}
+                  onClick={() => checkDatabase(movie.id)}
+                >
+                  {movie.ratingAverage}
+                  <PosterYTS from="yts" movie={movie} language={language} />
+                </div>
+              );
+            })}
+          </div>
         </div>
       ) : (
         <Loading />
