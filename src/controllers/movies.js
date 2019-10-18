@@ -40,7 +40,7 @@ export const movies = {
     post: (id, body) => axios.post(url + id + "/ratings", body)
   },
   ratingsByIdAndUID: {
-    get: (id, uid) => axios.get(url + id + "/ratings/" + uid)
+    get: (id) => axios.get(url + id + "/user/ratings")
   }
 };
 

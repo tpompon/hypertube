@@ -122,7 +122,7 @@ router
   .get((req, res) => {
     const movie = { id: req.params.id };
     User.findOne(
-      { _id: req.query.uid },
+      { _id: req.user._id },
       { heartbeat: { $elemMatch: { id: movie.id } } },
       (err, result) => {
         if (err) {
@@ -140,7 +140,7 @@ router
   .post((req, res) => {
     const movie = { id: req.params.id };
     User.findOneAndUpdate(
-      { _id: req.body.uid },
+      { _id: req.user._id },
       { $push: { heartbeat: movie } },
       err => {
         if (err) {
@@ -154,7 +154,7 @@ router
   .delete((req, res) => {
     const movie = { id: req.params.id };
     User.findOneAndUpdate(
-      { _id: req.body.uid },
+      { _id: req.user._id },
       { $pull: { heartbeat: { id: movie.id } } },
       err => {
         if (err) {
@@ -364,17 +364,17 @@ router
     });
   })
   .post((req, res) => {
-    const newRating = { uid: req.body.uid, rating: req.body.rating };
+    const newRating = { uid: req.user._id, rating: req.body.rating };
 
     Movie.findOne(
-      { _id: req.params.id, "ratings.uid": req.body.uid },
+      { _id: req.params.id, "ratings.uid": req.user._id },
       (err, result) => {
         if (err) {
           console.log(err);
           res.json({ success: false });
         } else if (result) {
           Movie.updateOne(
-            { _id: req.params.id, "ratings.uid": req.body.uid },
+            { _id: req.params.id, "ratings.uid": req.user._id },
             { $set: { "ratings.$.rating": req.body.rating } },
             err => {
               if (err) {
@@ -410,11 +410,12 @@ router
     );
   });
 
-router.route("/:id/ratings/:uid").get((req, res) => {
+router.route("/:id/user/ratings").get((req, res) => {
   Movie.findOne(
-    { _id: req.params.id, "ratings.uid": req.params.uid },
+    { _id: req.params.id, "ratings.uid": req.user._id },
     { "ratings.$": 1 },
     (err, result) => {
+      if (err) res.json({ error: err })
       if (result) {
         res.json({ success: true, rating: result.ratings[0].rating });
       } else {
@@ -423,5 +424,19 @@ router.route("/:id/ratings/:uid").get((req, res) => {
     }
   );
 });
+
+router.route("/:id/progress").get((req, res) => {
+  User.findOne(
+    { _id: req.user._id },
+    { inProgress: { $elemMatch: { id: req.params.id } } },
+    (err, result) => {
+      if (err) res.json({ success: false })
+      else res.json({
+        success: true,
+        watchPercent: (result.inProgress.length > 0) ? result.inProgress[0].percent : 0
+      })
+    }
+  );
+})
 
 module.exports = router;

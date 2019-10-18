@@ -16,7 +16,7 @@ const Poster = ({ movie, language, from }) => (
       }
       alt={movie.title}
     />
-    <ProgressBar progress={0} />{" "}
+    <ProgressBar progress={movie.watchPercent ? movie.watchPercent : 0} />
     {/* To replace with the progression watch time of the user on the movie */}
     <div className="poster-overlay">
       <div className="poster-content">
@@ -26,7 +26,7 @@ const Poster = ({ movie, language, from }) => (
           <span style={{ marginTop: 2.75 }}>
             <Rating
               readonly={true}
-              initialRating={0}
+              initialRating={movie.ratingAverage ? movie.ratingAverage : 0}
               emptySymbol={
                 <StarEmpty width="15" height="15" fill="#FFD700" />
               }
@@ -34,7 +34,7 @@ const Poster = ({ movie, language, from }) => (
               fractions={2}
             />
           </span>
-          <span style={{ marginLeft: 5 }}>(0)</span>
+          <span style={{ marginLeft: 5 }}>({movie.ratingCount ? movie.ratingCount : 0})</span>
         </div>
       </div>
     </div>

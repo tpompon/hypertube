@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import config from "config";
-import translations from "translations";
 import Rating from "react-rating";
 import ProgressBar from "components/ProgressBar";
 import { ReactComponent as StarFull } from "svg/star-full.svg";
@@ -12,6 +11,7 @@ const Poster = props => {
   const { movie } = props;
   const [ratingAverage, updateRatingAverage] = useState(0);
   const [ratingCount, updateRatingCount] = useState(0);
+  const [progress, setProgress] = useState(0);
 
   useEffect(() => {
     fetchMovieData();
@@ -23,12 +23,15 @@ const Poster = props => {
       updateRatingAverage(response.data.ratingAverage);
       updateRatingCount(response.data.ratingCount);
     }
+    const resp = await axios.get(`${config.serverURL}/movies/${movie._id}/progress`)
+    if (resp.data.success)
+      setProgress(resp.data.watchPercent)
   };
 
   return (
     <div className="poster-container">
       <img className="movie-poster" src={movie.poster} alt={movie.name} />
-      <ProgressBar progress={25} />{" "}
+      <ProgressBar progress={progress} />
       {/* To replace with the progression watch time of the user on the movie */}
       <div className="poster-overlay">
         <div className="poster-content">

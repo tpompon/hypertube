@@ -44,10 +44,8 @@ const dropDownOptions = [
 
 const Search = props => {
   //const [search, updateSearch] = useState("")
-  const [movies, updateMovies] = useState([]);
   const [moviesYTS, updateMoviesYTS] = useState([]);
   const [_isLoaded, updateIsLoaded] = useState(false);
-  const [_status, updateStatus] = useState(undefined);
   const [filter, updateFilter] = useState({
     genre: "",
     minYear: "",
@@ -60,34 +58,20 @@ const Search = props => {
   const { language, search } = context;
 
   useEffect(() => {
-    fetchMoviesDb();
-  }, []);
-
-  useEffect(() => {
-    fetchMoviesDb();
-    fetchMovies();
-  }, [search]);
-
-  const fetchMoviesDb = async () => {
-    const response = await axios.get(`http://${config.hostname}:${config.port}/movies?search=${search}`)
-    if (response.data.success) {
-      updateMovies(response.data.movies);
-    }
-  };
+    fetchMovies()
+  }, [])
 
   const fetchMovies = async () => {
+    console.log(search)
     if (search.trim() !== "") {
+      updateIsLoaded(false);
       const response = await axios.get(
         `http://${config.hostname}:${config.port}/torrents/yts/search/${search}`
       );
       if (response.data.count !== 0)
-        updateMoviesYTS(response.data.results.data.movies);
-      updateStatus("no results");
+        updateMoviesYTS(response.data.results);
     } else if (search.trim() === "") {
-      updateMovies([]);
-    } else {
-      updateStatus("empty");
-      //alert('empty search');
+      updateMoviesYTS([]);
     }
     updateIsLoaded(true);
   };
@@ -97,7 +81,7 @@ const Search = props => {
       `http://${config.hostname}:${config.port}/movies/filter?genre=${filter.genre}&minyear=${filter.minYear}&maxyear=${filter.maxYear}&minrating=${filter.minRating}&maxRating=${filter.maxRating}`
     );
     if (response.data.success) {
-      updateMovies(response.data.movies);
+      updateMoviesYTS(response.data.movies);
       console.log(response.data.movies);
     }
   };
@@ -159,6 +143,7 @@ const Search = props => {
             className="row wrap"
             style={{ justifyContent: "center", marginBottom: 20 }}
           >
+            <Button content="Fetch" action={() => fetchMovies()} />
             <input
               min={1900}
               max={new Date().getFullYear()}
@@ -220,13 +205,12 @@ const Search = props => {
             {moviesYTS.sort(compareYTS).map((movie, index) => {
               if (!movie.large_cover_image)
                 movie.large_cover_image = "http://story-one.com/wp-content/uploads/2016/02/Poster_Not_Available2.jpg";
-              // console.log(movie.rating_total)
+
               return (
                 <div
                   key={`movie-${index}`}
                   onClick={() => checkDatabase(movie.id)}
                 >
-                  {movie.ratingAverage}
                   <PosterYTS from="yts" movie={movie} language={language} />
                 </div>
               );

@@ -10,7 +10,7 @@ axios.defaults.withCredentials = true;
 
 const Header = props => {
   const { extended } = props;
-  const [searchMovie, updateSearchMovie] = useState("");
+  const [searchMovie, updateBarSearchMovie] = useState("");
   const [movies, updateMovies] = useState([]);
   const [user, updateUser] = useState({});
   const [_isAuth, updateIsAuth] = useState(false);
@@ -76,7 +76,7 @@ const Header = props => {
   };
 
   const resetSearchBar = () => {
-    updateSearchMovie("");
+    updateBarSearchMovie("");
     updateSearchInProgress(false);
     updateSearch("");
   };
@@ -89,7 +89,7 @@ const Header = props => {
         updateSearchInProgress(false);
       }
     }
-    updateSearchMovie(event.target.value);
+    updateBarSearchMovie(event.target.value);
     context.updateSearch(event.target.value);
   };
 

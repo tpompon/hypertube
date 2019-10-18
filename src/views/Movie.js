@@ -79,16 +79,12 @@ const Movie = props => {
     if (responseUser) {
       updateUser(responseUser.data.user);
       const responseHeartbeat = await axios.get(
-        `http://${config.hostname}:${config.port}/movies/${id}/heartbeat`,
-        { params: { uid: responseUser.data.user._id } }
+        `http://${config.hostname}:${config.port}/movies/${id}/heartbeat`
       );
       if (responseHeartbeat.data.success && responseHeartbeat.data.found > 0) {
         updateHeartbeat(true);
       }
-      const responseRating = await API.movies.ratingsByIdAndUID.get(
-        id,
-        responseUser.data.user._id
-      );
+      const responseRating = await API.movies.ratingsByIdAndUID.get(id);
       if (responseRating.data.rating) {
         updateRating(responseRating.data.rating);
       }
@@ -138,7 +134,6 @@ const Movie = props => {
 
   const updatingRating = async value => {
     const newRating = {
-      uid: user._id,
       rating: value
     };
     const response = await API.movies.ratingsById.post(id, newRating);
@@ -165,13 +160,11 @@ const Movie = props => {
   const toggleHeartbeat = async () => {
     if (!heartbeat) {
       axios.post(
-        `http://${config.hostname}:${config.port}/movies/${id}/heartbeat`,
-        { uid: user._id }
+        `http://${config.hostname}:${config.port}/movies/${id}/heartbeat`
       );
     } else {
       axios.delete(
-        `http://${config.hostname}:${config.port}/movies/${id}/heartbeat`,
-        { data: { uid: user._id } }
+        `http://${config.hostname}:${config.port}/movies/${id}/heartbeat`
       );
     }
     updateHeartbeat(!heartbeat);
