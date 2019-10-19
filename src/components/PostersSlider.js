@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { withRouter } from "react-router-dom"
 import Poster from "./Poster";
 import { ReactComponent as ArrowLeft } from "svg/arrow-point-to-left.svg";
@@ -7,10 +7,24 @@ import { ReactComponent as ArrowRight } from "svg/arrow-point-to-right.svg";
 const valuePos = 300
 
 const PostersSlider = props => {
-  const { movies, language, history, number } = props;
+  const { movies, language, history, number, username } = props;
   const [isDraging, updateIsDraging] = useState(false)
   const [currentPos, updateCurrentPos] = useState(0)
-  
+  const [pageWidth, setWindowSize] = useState(window.innerWidth)
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowSize(getSize())
+      newCurrentPos(currentPos)
+    }
+    window.addEventListener("resize", handleResize)
+    return () => window.removeEventListener("resize", handleResize)
+  }, [])
+
+  const getSize = () => {
+    return window.innerWidth
+  }
+
   const mouseDown = (e) => {
     const startX = e.pageX
     let distanceTravelled = 0
@@ -25,6 +39,7 @@ const PostersSlider = props => {
         newCurrentPos(currentPos + distanceTravelled)
       }
     }
+
     const onMouseUp = () => {
       document.removeEventListener("mousemove", onMouseMove)
       document.removeEventListener("mouseup", onMouseUp)
@@ -33,18 +48,23 @@ const PostersSlider = props => {
       }
       updateIsDraging(false)
     }
+
     document.addEventListener("mousemove", onMouseMove)
     document.addEventListener("mouseup", onMouseUp)
   }
+
   const newCurrentPos = (pos) => {
-    const pageWidth = window.innerWidth
-    const maxPosterShowInPage = Math.floor(pageWidth / valuePos)
-    const index = Math.floor(-pos / valuePos)
+    const maxPosterShowInPage = pageWidth / valuePos
+    const index = -pos / valuePos
     const length = movies.length
+
+    if (length * valuePos < pageWidth) {
+      return
+    }
     if (pos > 0) {
       updateCurrentPos(0)
     } else if ((length - index) <= maxPosterShowInPage) {
-      updateCurrentPos((length - 1 - maxPosterShowInPage) * -valuePos - (pageWidth - (maxPosterShowInPage * valuePos)))
+      updateCurrentPos((((length - maxPosterShowInPage) * -valuePos) - (maxPosterShowInPage * 20)) - (pageWidth - (maxPosterShowInPage * valuePos)))
     } else {
       updateCurrentPos(pos)
     }
@@ -81,7 +101,7 @@ const PostersSlider = props => {
               key={`movie-${movie._id}-${number}`}
               onMouseUp={ () => (!isDraging) ? history.push(`/watch/${movie._id}`) : null }
             >
-              <Poster movie={movie}language={language} />
+              <Poster movie={movie}language={language} username={username ? username : null} />
             </div>
           ))}
         </div>

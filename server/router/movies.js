@@ -439,4 +439,18 @@ router.route("/:id/progress").get((req, res) => {
   );
 })
 
+router.route("/:id/:username/progress").get((req, res) => {
+  User.findOne(
+    { username: req.params.username },
+    { inProgress: { $elemMatch: { id: req.params.id } } },
+    (err, result) => {
+      if (err) res.json({ success: false })
+      else res.json({
+        success: true,
+        watchPercent: (result.inProgress.length > 0) ? result.inProgress[0].percent : 0
+      })
+    }
+  );
+})
+
 module.exports = router;

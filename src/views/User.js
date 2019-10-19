@@ -115,9 +115,10 @@ const User = props => {
                 number={1}
                 movies={heartbeat}
                 language={language}
+                username={match.params.username}
               />
               <h2>{translations[language].user.list.recents}</h2>
-              <PostersSlider number={2} movies={recents} language={language} />
+              <PostersSlider number={2} movies={recents} language={language} username={match.params.username} />
             </div>
           ) : (
             <h2>{translations[language].user.notFound}</h2>

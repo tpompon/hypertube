@@ -7,6 +7,7 @@ const uuid = require('uuid/v4');
 const session = require('express-session');
 
 const User = require('./models/user');
+const Movie = require('./models/movie');
 
 require('dotenv').config();
 global.__basedir = __dirname;

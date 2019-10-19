@@ -15,8 +15,19 @@ const sources = ["https://yst.am/api/v2", "https://yts.lt/api/v2"];
 const selectedSource = sources[1];
 // Don't forget to update source in Search for Poster
 
+router.route("/yts").get((req, res) => {
+  request.get({url: `${selectedSource}/list_movies.json?sort_by=rating${req.query.page ? '&page=' + req.query.page : ''}`},
+    (err, result, body) => {
+      const searchResults = JSON.parse(body.replace(/^\ufeff/g,""));
+      if (err) res.json({ success: false, error: err })
+      else if (searchResults) res.json({ success: true, results: searchResults })
+      else res.json({ success: true, count: 0, results: [] })
+    }
+  )
+})
+
 router.route("/yts/search/:search").get(async (req, res) => {
-  request.get({url: `${selectedSource}/list_movies.json?query_term=${req.params.search}`},
+  request.get({url: `${selectedSource}/list_movies.json?query_term=${req.params.search}${req.query.genre ? ('&genre=' + req.query.genre) : '' }` },
   async (err, results, body) => {
     if (err) {
       res.json({ success: false });
@@ -29,6 +40,7 @@ router.route("/yts/search/:search").get(async (req, res) => {
             results: searchResults
           });
         }
+        else res.json({ success: true, count: 0, results: [] })
     }
   });
 });
@@ -83,7 +95,7 @@ const setMoviesInfo = (uid, body) => {
       })
     )
   }
-  //return searchResults
+  return false
 }
 
 router.route("/yts/:id").get((req, res) => {

@@ -24,32 +24,33 @@ function compareYTS(a, b) {
 
 const dropDownOptions = [
   { value: "", genre: "Genre:" },
-  { value: "0", genre: "Comedy" },
-  { value: "1", genre: "Sci-Fi" },
-  { value: "2", genre: "Horror" },
-  { value: "3", genre: "Romance" },
-  { value: "4", genre: "Action" },
-  { value: "5", genre: "Thriller" },
-  { value: "6", genre: "Drama" },
-  { value: "7", genre: "Mystery" },
-  { value: "8", genre: "Crime" },
-  { value: "9", genre: "Animation" },
-  { value: "10", genre: "Adventure" },
-  { value: "11", genre: "Fantasy" },
-  { value: "12", genre: "Superhero" },
-  { value: "13", genre: "Documentary" },
-  { value: "14", genre: "Music" },
-  { value: "15", genre: "Family" }
+  { value: "comedy", genre: "Comedy" },
+  { value: "sci-fi", genre: "Sci-Fi" },
+  { value: "horror", genre: "Horror" },
+  { value: "romance", genre: "Romance" },
+  { value: "action", genre: "Action" },
+  { value: "thriller", genre: "Thriller" },
+  { value: "drama", genre: "Drama" },
+  { value: "mystery", genre: "Mystery" },
+  { value: "crime", genre: "Crime" },
+  { value: "animation", genre: "Animation" },
+  { value: "adventure", genre: "Adventure" },
+  { value: "fantasy", genre: "Fantasy" },
+  { value: "superhero", genre: "Superhero" },
+  { value: "documentary", genre: "Documentary" },
+  { value: "music", genre: "Music" },
+  { value: "family", genre: "Family" }
 ];
 
 const Search = props => {
   //const [search, updateSearch] = useState("")
+  const [page, setPage] = useState(1)
   const [moviesYTS, updateMoviesYTS] = useState([]);
   const [_isLoaded, updateIsLoaded] = useState(false);
   const [filter, updateFilter] = useState({
-    genre: "",
-    minYear: "",
-    maxYear: "",
+    genre: '',
+    minYear: "1900",
+    maxYear: "2019",
     minRating: "",
     maxRating: ""
   });
@@ -61,30 +62,26 @@ const Search = props => {
     fetchMovies()
   }, [])
 
+
   const fetchMovies = async () => {
-    console.log(search)
     if (search.trim() !== "") {
       updateIsLoaded(false);
       const response = await axios.get(
-        `http://${config.hostname}:${config.port}/torrents/yts/search/${search}`
+        `http://${config.hostname}:${config.port}/torrents/yts/search/${search}${(filter.genre !== '') ? '?genre=' + filter.genre : '' }`
       );
-      if (response.data.count !== 0)
-        updateMoviesYTS(response.data.results);
+      updateMoviesYTS(response.data.results);
     } else if (search.trim() === "") {
-      updateMoviesYTS([]);
+      const resp = await axios.get(`http://${config.hostname}:${config.port}/torrents/yts`)
+      updateMoviesYTS(resp.data.results.data.movies)
     }
     updateIsLoaded(true);
   };
 
-  const searchRequest = async () => {
-    const response = await axios.get(
-      `http://${config.hostname}:${config.port}/movies/filter?genre=${filter.genre}&minyear=${filter.minYear}&maxyear=${filter.maxYear}&minrating=${filter.minRating}&maxRating=${filter.maxRating}`
-    );
-    if (response.data.success) {
-      updateMoviesYTS(response.data.movies);
-      console.log(response.data.movies);
-    }
-  };
+  const loadMore = async () => {
+    setPage(curr => curr + 1);
+    const resp = await axios.get(`http://${config.hostname}:${config.port}/torrents/yts?page=${page + 1}`)
+    updateMoviesYTS(prevArray => ([ ...prevArray, ...resp.data.results.data.movies ]))
+  }
 
   const checkDatabase = async ytsID => {
     if (inProgress) return;
@@ -143,7 +140,6 @@ const Search = props => {
             className="row wrap"
             style={{ justifyContent: "center", marginBottom: 20 }}
           >
-            <Button content="Fetch" action={() => fetchMovies()} />
             <input
               min={1900}
               max={new Date().getFullYear()}
@@ -197,7 +193,7 @@ const Search = props => {
             />
             <Button
               style={{ marginLeft: 20 }}
-              action={() => searchRequest()}
+              action={() => fetchMovies()}
               content="Search"
             />
           </div>
@@ -216,6 +212,7 @@ const Search = props => {
               );
             })}
           </div>
+          <Button content="More" action={() => loadMore()} style={{margin: '0 auto'}} />
         </div>
       ) : (
         <Loading />

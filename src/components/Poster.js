@@ -8,7 +8,7 @@ import { ReactComponent as StarEmpty } from "svg/star-empty.svg";
 import API from "controllers";
 
 const Poster = props => {
-  const { movie } = props;
+  const { movie, username } = props;
   const [ratingAverage, updateRatingAverage] = useState(0);
   const [ratingCount, updateRatingCount] = useState(0);
   const [progress, setProgress] = useState(0);
@@ -23,9 +23,15 @@ const Poster = props => {
       updateRatingAverage(response.data.ratingAverage);
       updateRatingCount(response.data.ratingCount);
     }
-    const resp = await axios.get(`${config.serverURL}/movies/${movie._id}/progress`)
-    if (resp.data.success)
-      setProgress(resp.data.watchPercent)
+    if (!username) {
+      const resp = await axios.get(`${config.serverURL}/movies/${movie._id}/progress`)
+      if (resp.data.success)
+        setProgress(resp.data.watchPercent)
+    } else {
+      const resp = await axios.get(`${config.serverURL}/movies/${movie._id}/${username}/progress`)
+      if (resp.data.success)
+        setProgress(resp.data.watchPercent)
+    }
   };
 
   return (
