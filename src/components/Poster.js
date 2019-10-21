@@ -41,7 +41,7 @@ const Poster = props => {
       {/* To replace with the progression watch time of the user on the movie */}
       <div className="poster-overlay">
         <div className="poster-content">
-          <h3>{movie.name}</h3>
+          <h3>{movie.name} ({movie.ytsData.year})</h3>
           <p>{movie.description}</p>
           <div className="row center">
             <span style={{ marginTop: 2.75 }}>

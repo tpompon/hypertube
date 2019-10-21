@@ -138,7 +138,7 @@ router
     );
   })
   .post((req, res) => {
-    const movie = { id: req.params.id };
+    const movie = { id: req.params.id, time: Date.now() };
     User.findOneAndUpdate(
       { _id: req.user._id },
       { $push: { heartbeat: movie } },
@@ -187,7 +187,7 @@ router
     );
   })
   .post((req, res) => {
-    const movie = { id: req.params.id };
+    const movie = { id: req.params.id, time: Date.now() };
     User.findOne(
       { _id: req.user._id, "recents.id": req.params.id },
       (err, result) => {
@@ -245,7 +245,7 @@ router
     );
   })
   .post((req, res) => {
-    const movie = { id: req.params.id, ytsId: req.body.ytsId, percent: req.body.percent, timecode: req.body.timecode };
+    const movie = { id: req.params.id, ytsId: req.body.ytsId, percent: req.body.percent, timecode: req.body.timecode, time: Date.now() };
     User.findOne(
       { _id: req.user._id, "inProgress.id": req.params.id },
       (err, result) => {

@@ -44,44 +44,62 @@ const dropDownOptions = [
 
 const Search = props => {
   //const [search, updateSearch] = useState("")
-  const [page, setPage] = useState(1)
+  const [page, setPage] = useState(1);
   const [moviesYTS, updateMoviesYTS] = useState([]);
   const [_isLoaded, updateIsLoaded] = useState(false);
   const [filter, updateFilter] = useState({
-    genre: '',
+    genre: "",
     minYear: "1900",
     maxYear: "2019",
-    minRating: "",
-    maxRating: ""
+    minRating: "0",
+    maxRating: "5"
   });
   let inProgress = false;
   const context = useContext(UserConsumer);
   const { language, search } = context;
 
   useEffect(() => {
-    fetchMovies()
-  }, [])
-
+    fetchMovies();
+  }, []);
 
   const fetchMovies = async () => {
+    updateIsLoaded(false);
     if (search.trim() !== "") {
-      updateIsLoaded(false);
       const response = await axios.get(
-        `http://${config.hostname}:${config.port}/torrents/yts/search/${search}${(filter.genre !== '') ? '?genre=' + filter.genre : '' }`
+        `http://${config.hostname}:${
+          config.port
+        }/torrents/yts/search?search=${search}${
+          filter.genre !== "" ? "&genre=" + filter.genre : ""
+        }${filter.minYear !== "" ? "&minyear=" + filter.minYear : ""}${
+          filter.maxYear !== "" ? "&maxyear=" + filter.maxYear : ""
+        }${filter.minRating !== "" ? "&minrating=" + filter.minRating : ""}${
+          filter.maxRating !== "" ? "&maxrating=" + filter.maxRating : ""
+        }`
       );
       updateMoviesYTS(response.data.results);
     } else if (search.trim() === "") {
-      const resp = await axios.get(`http://${config.hostname}:${config.port}/torrents/yts`)
-      updateMoviesYTS(resp.data.results.data.movies)
+      const resp = await axios.get(
+        `http://${config.hostname}:${config.port}/torrents/yts`
+      );
+      updateMoviesYTS(resp.data.results.data.movies);
     }
     updateIsLoaded(true);
   };
 
   const loadMore = async () => {
     setPage(curr => curr + 1);
-    const resp = await axios.get(`http://${config.hostname}:${config.port}/torrents/yts?page=${page + 1}`)
-    updateMoviesYTS(prevArray => ([ ...prevArray, ...resp.data.results.data.movies ]))
-  }
+    const resp = await axios.get(
+      `http://${config.hostname}:${config.port}/torrents/yts?page=${page + 1}`
+    );
+    updateMoviesYTS(prevArray => [
+      ...prevArray,
+      ...resp.data.results.data.movies
+    ]);
+  };
+
+  const setNewFilter = (e, option) => {
+    updateFilter({ ...filter, [option]: e.target.value });
+  };
 
   const checkDatabase = async ytsID => {
     if (inProgress) return;
@@ -134,89 +152,86 @@ const Search = props => {
 
   return (
     <div>
-      {_isLoaded ? (
-        <div className="col">
-          <div
-            className="row wrap"
-            style={{ justifyContent: "center", marginBottom: 20 }}
+      <div className="col">
+        <div
+          className="row wrap"
+          style={{ justifyContent: "center", marginBottom: 20 }}
+        >
+          <input
+            min={1900}
+            max={new Date().getFullYear()}
+            onChange={e => setNewFilter(e, ["minYear"])}
+            className="dark-input"
+            type="number"
+            placeholder="Min. Year"
+          />
+          <input
+            min={1900}
+            max={new Date().getFullYear()}
+            onChange={e => setNewFilter(e, ["maxYear"])}
+            className="dark-input"
+            type="number"
+            placeholder="Max. Year"
+            style={{ marginLeft: 10, marginRight: 30 }}
+          />
+          <select
+            onChange={e => setNewFilter(e, ["genre"])}
+            className="dark-input"
           >
-            <input
-              min={1900}
-              max={new Date().getFullYear()}
-              onChange={event =>
-                updateFilter({ ...filter, ["minYear"]: event.target.value })
-              }
-              className="dark-input"
-              type="number"
-              placeholder="Min. Year"
-            />
-            <input
-              min={1900}
-              max={new Date().getFullYear()}
-              onChange={event =>
-                updateFilter({ ...filter, ["maxYear"]: event.target.value })
-              }
-              className="dark-input"
-              type="number"
-              placeholder="Max. Year"
-              style={{ marginLeft: 10, marginRight: 30 }}
-            />
-            <select
-              onChange={event =>
-                updateFilter({ ...filter, ["genre"]: event.target.value })
-              }
-              className="dark-input"
-            >
-              {dropDownOptions.map(option => (
-                <option key={`option-${option.value}`} value={option.value}>
-                  {option.genre}
-                </option>
-              ))}
-            </select>
-            <input
-              onChange={event =>
-                updateFilter({ ...filter, ["minRating"]: event.target.value })
-              }
-              className="dark-input"
-              type="number"
-              placeholder="Min. Rating"
-              style={{ marginLeft: 30 }}
-            />
-            <input
-              onChange={event =>
-                updateFilter({ ...filter, ["maxRating"]: event.target.value })
-              }
-              className="dark-input"
-              type="number"
-              placeholder="Max. Rating"
-              style={{ marginLeft: 10 }}
-            />
-            <Button
-              style={{ marginLeft: 20 }}
-              action={() => fetchMovies()}
-              content="Search"
-            />
-          </div>
-          <div className="posters-list row wrap">
-            {moviesYTS.sort(compareYTS).map((movie, index) => {
-              if (!movie.large_cover_image)
-                movie.large_cover_image = "http://story-one.com/wp-content/uploads/2016/02/Poster_Not_Available2.jpg";
-
-              return (
-                <div
-                  key={`movie-${index}`}
-                  onClick={() => checkDatabase(movie.id)}
-                >
-                  <PosterYTS from="yts" movie={movie} language={language} />
-                </div>
-              );
-            })}
-          </div>
-          <Button content="More" action={() => loadMore()} style={{margin: '0 auto'}} />
+            {dropDownOptions.map(option => (
+              <option key={`option-${option.value}`} value={option.value}>
+                {option.genre}
+              </option>
+            ))}
+          </select>
+          <input
+            onChange={e => setNewFilter(e, ["minRating"])}
+            className="dark-input"
+            type="number"
+            placeholder="Min. Rating"
+            style={{ marginLeft: 30 }}
+          />
+          <input
+            onChange={e => setNewFilter(e, ["maxRating"])}
+            className="dark-input"
+            type="number"
+            placeholder="Max. Rating"
+            style={{ marginLeft: 10 }}
+          />
+          <Button
+            style={{ marginLeft: 20 }}
+            action={() => fetchMovies()}
+            content="Search"
+          />
         </div>
-      ) : (
-        <Loading />
-      )}
+        {_isLoaded ? (
+          <div>
+            <div className="posters-list row wrap">
+              {moviesYTS.sort(compareYTS).map((movie, index) => {
+                if (!movie.large_cover_image)
+                  movie.large_cover_image =
+                    "http://story-one.com/wp-content/uploads/2016/02/Poster_Not_Available2.jpg";
+
+                return (
+                  <div
+                    key={`movie-${index}`}
+                    onClick={() => checkDatabase(movie.id)}
+                  >
+                    <PosterYTS from="yts" movie={movie} language={language} />
+                  </div>
+                );
+              })}
+            </div>
+            <Button
+              content="More"
+              action={() => loadMore()}
+              style={{ margin: "0 auto" }}
+            />
+          </div>
+        ) : (
+          <Loading />
+        )}
+      </div>
     </div>
   );
 };

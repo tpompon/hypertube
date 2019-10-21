@@ -26,7 +26,7 @@ const Register = () => {
     city: ""
     // country: req.body.country
   });
-  const [toggleSuccess, updateToggleSuccess] = useState(false);
+  const [success, setSuccess] = useState(false);
   const [warnMatch, updateWarnMatch] = useState(false);
   const [warnLength, updateWarnLength] = useState(false);
   const uploadAvatar = useRef(null);
@@ -39,11 +39,11 @@ const Register = () => {
   });
 
   const onChangeReCAPTCHA = key => {
-    console.log(key);
+    // console.log(key);
   };
 
   const register = async () => {
-    console.log(recaptchaRef.current.execute());
+    // console.log(recaptchaRef.current.execute());
 
     if (
       newUser.password === newUser.confirmPassword &&
@@ -53,9 +53,7 @@ const Register = () => {
         `http://${config.hostname}:${config.port}/users`,
         newUser
       );
-      if (response) {
-        updateToggleSuccess(true);
-      }
+      if (response) setSuccess(true);
     } else {
       console.log("Invalid password");
     }
@@ -85,7 +83,6 @@ const Register = () => {
       data.append("file", event.target.files[0]);
       data.append("filename", event.target.files[0].name);
       const res = await axios.post(`${config.serverURL}/register/avatar`, data);
-      console.log(res);
       if (res.data.success) {
         updatenewUser({
           ...newUser,
@@ -124,11 +121,11 @@ const Register = () => {
       />
 
       <h2>{translations[language].register.title}</h2>
-      {toggleSuccess ? (
+      {success ? (
         <div
           className="success"
           style={{ display: "block" }}
-          onClick={() => updateToggleSuccess(false)}
+          onClick={() => setSuccess(false)}
         >
           Account created, confirmation email has been sent
         </div>

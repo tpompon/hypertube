@@ -20,7 +20,7 @@ const Poster = ({ movie, language, from }) => (
     {/* To replace with the progression watch time of the user on the movie */}
     <div className="poster-overlay">
       <div className="poster-content">
-        <h3>{movie.title}</h3>
+        <h3>{movie.title} ({movie.year})</h3>
         <p>{movie.summary}</p>
         <div className="row center">
           <span style={{ marginTop: 2.75 }}>

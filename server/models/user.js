@@ -10,13 +10,20 @@ const UserSchema = new Schema({
   lastname: { type: String, required: true },
   username: { type: String, required: true, unique: true },
   password: { type: String },
-  heartbeat: [{ id: String }],
-  recents: [{ id: String }],
+  heartbeat: [{
+    id: {type: String, required: true },
+    time: {type: Number, required: true}
+  }],
+  recents: [{
+    id: {type: String, required: true },
+    time: {type: Number, required: true}
+  }],
   inProgress: [{
     id: {type: String, required: true },
     ytsId: {type: String, required: true},
-    percent: {type: String, required: true },
-    timecode: {type: String, required: true }
+    percent: {type: String, required: true},
+    timecode: {type: String, required: true},
+    time: {type: Number, required: true}
   }],
   avatar: String,
   cover: String,

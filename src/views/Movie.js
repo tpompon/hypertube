@@ -543,6 +543,7 @@ const Movie = props => {
               >
                 {/* <source src={ `http://${config.hostname}:${config.port}/torrents/stream/${encodeURIComponent(movie.ytsData.torrents[0].magnet)}` } /> */}
                 <source src="https://file-examples.com/wp-content/uploads/2017/04/file_example_MP4_1280_10MG.mp4" />
+                {/* <track label="English Test" kind="captions" srcLang="en" src="https://iandevlin.github.io/mdn/video-player-with-captions/subtitles/vtt/sintel-de.vtt" default /> */}
               </video>
             </div>
           </div>

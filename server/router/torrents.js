@@ -26,14 +26,24 @@ router.route("/yts").get((req, res) => {
   )
 })
 
-router.route("/yts/search/:search").get(async (req, res) => {
-  request.get({url: `${selectedSource}/list_movies.json?query_term=${req.params.search}${req.query.genre ? ('&genre=' + req.query.genre) : '' }` },
+router.route("/yts/search").get(async (req, res) => {
+  request.get({url: `${selectedSource}/list_movies.json?query_term=${req.query.search}${req.query.genre ? ('&genre=' + req.query.genre) : '' }` },
   async (err, results, body) => {
     if (err) {
       res.json({ success: false });
     } else {
-        const searchResults = await setMoviesInfo(req.user._id, body)
+        const parseBody = JSON.parse(body.replace(/^\ufeff/g,""))
+
+        let searchResults = await setMoviesInfo(req.user._id, parseBody)
         if (searchResults) {
+          const { minrating, maxrating, minyear, maxyear } = req.query
+          const moviesFiltered = [];
+            searchResults.map((movie) => {
+              if (!movie.ratingAverage) movie.ratingAverage = 0;
+              if (movie.ratingAverage >= parseInt(minrating) && movie.ratingAverage <= parseInt(maxrating) && movie.year >= minyear && movie.year <= maxyear)
+                moviesFiltered.push(movie);
+            })
+          searchResults = moviesFiltered;
           res.json({
             success: true,
             count: searchResults.length,
@@ -46,7 +56,7 @@ router.route("/yts/search/:search").get(async (req, res) => {
 });
 
 const setMoviesInfo = (uid, body) => {
-  const searchResults = JSON.parse(body.replace(/^\ufeff/g,""));
+  const searchResults = body
   if (searchResults.status === "ok" && searchResults.data.movie_count !== 0) {
     return Promise.all(
       searchResults.data.movies.map(async movie => {
@@ -65,6 +75,7 @@ const setMoviesInfo = (uid, body) => {
             //console.log("no")
           }
         }
+
         const responseWatchPercent = await User.findOne(
           { _id: uid },
           { inProgress: { $elemMatch: { ytsId: movie.id } } }).exec()
@@ -76,7 +87,7 @@ const setMoviesInfo = (uid, body) => {
               //console.log('no inprogress movie')
             }
           }
-  
+
         movie.torrents.map(torrent => {
           torrent.magnet = `magnet:?xt=urn:btih:${
             movie.torrents[0].hash
@@ -146,6 +157,10 @@ router.route("/stream/:magnet").get(async (req, res) => {
         }
       });
     });
+})
+
+router.route("/subtitles").get((req, res) => {
+  //res.sendFile(__dirname + '/subtitles.srt');
 })
 
 module.exports = router;
