@@ -30,6 +30,7 @@ const Movie = props => {
   const [ratingCount, updateRatingCount] = useState(0);
   const [loaded, updateLoaded] = useState(false);
   const [togglePlayer, updateTogglePlayer] = useState(false);
+  const [subtitles, updateSubtitles] = useState({})
   const player = useRef(null);
 
   useEffect(() => {
@@ -63,10 +64,17 @@ const Movie = props => {
     const resp = await API.movies.byId.get(id);
     if (resp) {
       if (resp.data.movie[0]) {
+        updateMovie(resp.data.movie[0]);
+
+        const resSubtitles = await axios.get(`${config.serverURL}/torrents/subtitles/${resp.data.movie[0].ytsData.imdb_code}`)
+        if (resSubtitles) {
+          updateSubtitles(resSubtitles.data.subtitles)
+        }
+
+        updateLoaded(true);
+
         document.addEventListener("scroll", handleScroll, false);
         document.addEventListener("keydown", onEscape, false);
-        updateMovie(resp.data.movie[0]);
-        updateLoaded(true);
 
         const res = await API.movies.inprogressById.get(id);
         if (res.data.success && res.data.found > 0) {
@@ -539,11 +547,23 @@ const Movie = props => {
                 className="video-player"
                 width="100%"
                 controls
+                preload="metadata"
                 controlsList="nodownload"
               >
-                {/* <source src={ `http://${config.hostname}:${config.port}/torrents/stream/${encodeURIComponent(movie.ytsData.torrents[0].magnet)}` } /> */}
-                <source src="https://file-examples.com/wp-content/uploads/2017/04/file_example_MP4_1280_10MG.mp4" />
-                {/* <track label="English Test" kind="captions" srcLang="en" src="https://iandevlin.github.io/mdn/video-player-with-captions/subtitles/vtt/sintel-de.vtt" default /> */}
+                {<source src={ `http://${config.hostname}:${config.port}/torrents/stream/${encodeURIComponent(movie.ytsData.torrents[0].magnet)}` } /> }
+                {/*<source src="https://file-examples.com/wp-content/uploads/2017/04/file_example_MP4_1280_10MG.mp4" /> */}
+                {
+                  Object.entries(subtitles).map(entry => (
+                    <track
+                      label={translations[language].movie.subtitles[entry[0]]}
+                      key={ `language-${entry[0]}` }
+                      kind="subtitles"
+                      srcLang={entry[0]}
+                      src={ `data:text/vtt;base64, ${entry[1]}` }
+                      default={ entry[0] === language ? true : false }
+                    />
+                  ))
+                }
               </video>
             </div>
           </div>

@@ -19,6 +19,11 @@ const languages = {
 			tooltip: {
 				heartbeatAdd: "Add to heartbeat list",
 				heartbeatRemove: "Remove from heartbeat list"
+			},
+			subtitles: {
+				fr: "French",
+				en: "English",
+				es: "Spanish"
 			}
 		},
 		poster: {
@@ -123,6 +128,11 @@ const languages = {
 			tooltip: {
 				heartbeatAdd: "Ajouter aux coups de cœur",
 				heartbeatRemove: "Retirer des coups de cœur"
+			},
+			subtitles: {
+				fr: "Français",
+				en: "Anglais",
+				es: "Espagnol"
 			}
 		},
 		poster: {
@@ -227,6 +237,11 @@ const languages = {
 			tooltip: {
 				heartbeatAdd: "Añadir a favoritos",
 				heartbeatRemove: "Eliminar de favoritos"
+			},
+			subtitles: {
+				fr: "Francés",
+				en: "Inglés",
+				es: "Español"
 			}
 		},
 		poster: {

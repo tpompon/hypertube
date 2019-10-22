@@ -1,8 +1,15 @@
+const fs = require("fs")
+const http = require("http")
 const express = require("express");
 const router = express.Router();
 const config = require("../config");
 
 const torrentStream = require("torrent-stream");
+const OpenSubtitles = require("opensubtitles-api")
+const OS = new OpenSubtitles({
+  useragent: "TemporaryUserAgent",
+  ssl: false,
+})
 const path = require("path");
 
 const request = require("request");
@@ -14,6 +21,12 @@ const User = require("../models/user");
 const sources = ["https://yst.am/api/v2", "https://yts.lt/api/v2"];
 const selectedSource = sources[1];
 // Don't forget to update source in Search for Poster
+
+OS.login()
+  .then((res) => {
+    console.log("Connect to opensubtitles")
+  })
+  .catch((error) => console.log(error))
 
 router.route("/yts").get((req, res) => {
   request.get({url: `${selectedSource}/list_movies.json?sort_by=rating${req.query.page ? '&page=' + req.query.page : ''}`},
@@ -136,6 +149,18 @@ const write206Headers = (res, metadata) => {
   })
 }
 
+const checkDirectory = (directory) => {
+  try {
+    if (fs.existsSync(directory)) {
+      console.log("directory " + directory.length)
+    } else {
+      console.log("pas top")
+    }
+  } catch (error) {
+    console.log(error)
+  }
+}
+
 router.route("/stream/:magnet").get(async (req, res) => {
   const range = req.headers.range
   const engine = torrentStream(req.params.magnet, { path: `./torrents` });
@@ -146,21 +171,83 @@ router.route("/stream/:magnet").get(async (req, res) => {
           path.extname(file.name) === ".mkv" ||
           path.extname(file.name) === ".avi"
         ) {
+          checkDirectory(`./torrents/${file.path}`)
           if (range) {
             let [start, end] = range.replace(/bytes=/, "").split("-").map((e) => e && parseInt(e))
             end = end || file.length - 1
             const chunksize = (end - start) + 1
-            let stream = file.createReadStream({ start, end });
+            let stream = file.createReadStream({ start, end })
             write206Headers(res, { start, end, total: file.length, chunksize })
             stream.pipe(res)
+          } else {
+            const head = {
+              "Content-length": file.length,
+              "Content-Type": "video/mp4",
+            }
+            res.writeHead(200, head)
+            fs.createReadStream(`./torrents/${file.path}`).pipe(res)
           }
         }
-      });
-    });
+      })
+    })
 })
 
-router.route("/subtitles").get((req, res) => {
-  //res.sendFile(__dirname + '/subtitles.srt');
+const getSubtitles = async(imdbid, langs) => {
+  try {
+    const response = await OS.search({ imdbid, sublanguageid: langs.join(), limit: 'best' })
+    return Promise.all(
+      Object.entries(response).map(async(entry) => {
+        const langCode = entry[0]
+        return new Promise ((resolve, reject) => {
+          let req = http.get(entry[1].vtt)
+          req.on("response", (res) => {
+            const file = fs.createWriteStream(`./subtitles/${imdbid}_${langCode}`)
+            const stream = res.pipe(file)
+            stream.on('finish', () => {
+              fs.readFile(`./subtitles/${imdbid}_${langCode}`, "utf8", (err, content) => {
+                if (err) throw err;
+                const buffer = Buffer.from(content);
+                resolve({ key: langCode, value: buffer.toString("base64") })
+              })
+            })
+          })
+          req.on("error", error => {
+            reject(error)
+          })
+        })
+      })
+    )
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+router.route("/subtitles/:imdbid").get(async(req, res) => {
+  const { imdbid } = req.params
+  // Function to check subtitles exist or not
+  // try {
+  //   const path = `./subtitles/${imdbid}`
+  //   if (fs.existsSync(path)) {
+  //     console.log("test")
+  //   }
+  // } catch (error) {
+  //   console.log(error)
+  // }
+  const langs = ["fre", "eng"]
+  try {
+    const response = await getSubtitles(imdbid, langs)
+    let subtitles = {}
+    response.forEach((subtitle) => {
+      subtitles = {
+        ...subtitles,
+        [subtitle.key]: subtitle.value,
+      }
+    })
+    res.json({ subtitles })
+  } catch (error) {
+    console.log(error)
+    res.json({ error })
+  }
 })
 
 module.exports = router;
