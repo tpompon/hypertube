@@ -12,7 +12,6 @@ const Header = props => {
   const { extended } = props;
   const [searchMovie, updateBarSearchMovie] = useState("");
   const [movies, updateMovies] = useState([]);
-  const [user, updateUser] = useState({});
   const [_isAuth, updateIsAuth] = useState(false);
   const [searchInProgress, updateSearchInProgress] = useState(false);
   const [toggleSearchBarCollapse, updateToggleSearchBarCollapse] = useState(
@@ -25,48 +24,49 @@ const Header = props => {
   const refAvatar = useRef(null);
 
   useEffect(() => {
+
+    const fetchData = async () => {
+      const responseAuth = await API.auth.check();
+      if (responseAuth.data.auth) {
+        updateIsAuth(true);
+        window.addEventListener("mousedown", closeMenu);
+        const responseUser = await API.users.byId.get(responseAuth.data.user._id);
+        if (responseUser.data.success) {
+          updateAvatar(responseUser.data.user[0].avatar);
+          const responseMovies = await API.movies.get();
+          if (responseMovies.data.success) {
+            updateMovies(responseMovies.data.movies);
+          }
+        }
+      }
+    };
+
     fetchData();
     return () => {
       window.removeEventListener("mousedown", closeMenu);
     };
-  }, []);
+  }, [updateAvatar]);
 
   useEffect(() => {
+    const closeSearchBar = event => {
+      if (refSearchBar.current.contains(event.target)) {
+        if (searchMovie.trim() !== "") {
+          updateSearchInProgress(true);
+        }
+        return;
+      }
+      updateSearchInProgress(false);
+      updateToggleSearchBarCollapse(false);
+    };
+
     if (_isAuth) {
       window.addEventListener("mousedown", closeSearchBar);
       return () => {
         window.removeEventListener("mousedown", closeSearchBar);
       };
     }
-  }, [searchInProgress]);
+  }, [searchInProgress, _isAuth, searchMovie]);
 
-  const fetchData = async () => {
-    const responseAuth = await API.auth.check();
-    if (responseAuth.data.auth) {
-      updateIsAuth(true);
-      window.addEventListener("mousedown", closeMenu);
-      const responseUser = await API.users.byId.get(responseAuth.data.user._id);
-      if (responseUser.data.success) {
-        updateUser(responseUser.data.user[0]);
-        updateAvatar(responseUser.data.user[0].avatar);
-        const responseMovies = await API.movies.get();
-        if (responseMovies.data.success) {
-          updateMovies(responseMovies.data.movies);
-        }
-      }
-    }
-  };
-
-  const closeSearchBar = event => {
-    if (refSearchBar.current.contains(event.target)) {
-      if (searchMovie.trim() !== "") {
-        updateSearchInProgress(true);
-      }
-      return;
-    }
-    updateSearchInProgress(false);
-    updateToggleSearchBarCollapse(false);
-  };
 
   const closeMenu = event => {
     if (refAvatar.current.contains(event.target)) {

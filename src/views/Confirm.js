@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { withRouter } from "react-router-dom";
-import translations from "../translations";
 import Loading from "components/Loading";
 import { ReactComponent as CheckMark } from "svg/checkmark.svg";
 
@@ -12,23 +11,23 @@ const Confirm = props => {
   const [_isLoaded, updateIsLoaded] = useState(false);
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    const fetchData = async () => {
+      const response = await API.auth.confirm({ key });
+      console.log(response.data);
+      if (response.data.success) {
+        updateStatus("ok");
+        updateIsLoaded(true);
+        setTimeout(() => {
+          window.location.href = "http://localhost:3000/login";
+        }, 1000);
+      } else {
+        updateStatus("not found");
+        updateIsLoaded(true);
+      }
+    };
 
-  const fetchData = async () => {
-    const response = await API.auth.confirm({ key });
-    console.log(response.data);
-    if (response.data.success) {
-      updateStatus("ok");
-      updateIsLoaded(true);
-      setTimeout(() => {
-        window.location.href = "http://localhost:3000/login";
-      }, 1000);
-    } else {
-      updateStatus("not found");
-      updateIsLoaded(true);
-    }
-  };
+    fetchData();
+  }, [key]);
 
   return _isLoaded ? (
     <div style={{ textAlign: "center" }}>

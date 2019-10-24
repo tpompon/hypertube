@@ -2,6 +2,7 @@ import React, { useState, useContext, useEffect, useRef } from "react";
 import axios from "axios";
 import config from "config";
 import translations from "translations";
+import path from "path";
 import Button from "components/Button";
 import ReCAPTCHA from "react-google-recaptcha";
 import { Link } from "react-router-dom";
@@ -76,18 +77,40 @@ const Register = () => {
     updatenewUser({ ...newUser, [option]: event.target.value });
   };
 
+  const verifyAvatarExt = (avatar) => {
+    const ext = path.extname(avatar.name);
+    const mimeType = avatar.type;
+
+    if (ext === '.png' || ext !== '.jpg' || ext !== '.jpeg')
+      if (mimeType === 'image/png' || mimeType === 'image/jpg' || mimeType === 'image/jpeg')
+        return true;
+    return false;
+  }
+
+  const verifyAvatarSize = (avatar) => {
+    return avatar.size < 5000000;
+  }
+
   const onChangeAvatar = async event => {
     if (event.target.files[0]) {
-      event.preventDefault();
-      const data = new FormData();
-      data.append("file", event.target.files[0]);
-      data.append("filename", event.target.files[0].name);
-      const res = await axios.post(`${config.serverURL}/register/avatar`, data);
-      if (res.data.success) {
-        updatenewUser({
-          ...newUser,
-          avatar: `http://${config.hostname}:${config.port}/public/avatars/tmp/${res.data.file}`
-        });
+      if (verifyAvatarExt(event.target.files[0])) {
+        if (verifyAvatarSize(event.target.files[0])) {
+          event.preventDefault();
+          const data = new FormData();
+          data.append("file", event.target.files[0]);
+          data.append("filename", event.target.files[0].name);
+          const res = await axios.post(`${config.serverURL}/register/avatar`, data);
+          if (res.data.success) {
+            updatenewUser({
+              ...newUser,
+              avatar: `http://${config.hostname}:${config.port}/public/avatars/tmp/${res.data.file}`
+            });
+          }
+        } else {
+          console.log("Avatar size too high")
+        }
+      } else {
+        console.log("Avatar extension invalid")
       }
       // Treat image upload and show it on form, save it temp, and move it in the user folder only if register success
     }
@@ -96,12 +119,12 @@ const Register = () => {
   return (
     <div className="dark-card center text-center">
       <div className="profile-avatar center">
-        <a
+        <div
           className="profile-avatar-overlay"
           onClick={() => uploadAvatar.current.click()}
         >
           Upload avatar
-        </a>{" "}
+        </div>
         {/* To translate */}
         <input
           type="file"
@@ -131,24 +154,26 @@ const Register = () => {
         </div>
       ) : null}
 
-      <input
-        className="dark-input"
-        type="text"
-        value={newUser.firstname}
-        onChange={event => onChange(event, "firstname")}
-        placeholder={translations[language].register.firstname}
-        style={{ marginRight: 10, marginTop: 5, marginBottom: 5 }}
-        required
-      />
-      <input
-        className="dark-input"
-        type="text"
-        value={newUser.lastname}
-        onChange={event => onChange(event, "lastname")}
-        placeholder={translations[language].register.lastname}
-        style={{ marginLeft: 10, marginTop: 5, marginBottom: 5 }}
-        required
-      />
+      <div className="row" style={{width: '100%'}}>
+        <input
+          className="dark-input"
+          type="text"
+          value={newUser.firstname}
+          onChange={event => onChange(event, "firstname")}
+          placeholder={translations[language].register.firstname}
+          style={{ marginRight: 10, marginTop: 5, marginBottom: 5, width: '100%' }}
+          required
+        />
+        <input
+          className="dark-input"
+          type="text"
+          value={newUser.lastname}
+          onChange={event => onChange(event, "lastname")}
+          placeholder={translations[language].register.lastname}
+          style={{ marginLeft: 10, marginTop: 5, marginBottom: 5, width: '100%' }}
+          required
+        />
+      </div>
       <br />
       <input
         className="dark-input"
@@ -156,18 +181,30 @@ const Register = () => {
         value={newUser.username}
         onChange={event => onChange(event, "username")}
         placeholder={translations[language].register.username}
-        style={{ marginRight: 10, marginTop: 5, marginBottom: 5 }}
+        style={{ width: "100%", marginRight: 10, marginTop: 5, marginBottom: 5 }}
         required
       />
-      <input
-        className="dark-input"
-        type="password"
-        value={newUser.password}
-        onChange={event => onChange(event, "password")}
-        placeholder={translations[language].register.password}
-        style={{ marginLeft: 10, marginTop: 5, marginBottom: 5 }}
-        required
-      />
+      <br />
+      <div className="row" style={{width: '100%'}}>
+        <input
+          className="dark-input"
+          type="password"
+          value={newUser.password}
+          onChange={event => onChange(event, "password")}
+          placeholder={translations[language].register.password}
+          style={{ marginRight: 10, marginTop: 5, marginBottom: 5, width: '100%' }}
+          required
+        />
+        <input
+          className="dark-input"
+          type="password"
+          value={newUser.confirmPassword}
+          onChange={event => onChange(event, "confirmPassword")}
+          placeholder={translations[language].register.confirmPassword}
+          style={{ marginRight: 10, marginTop: 5, marginBottom: 5, width: '100%' }}
+          required
+        />
+      </div>
       <br />
       <input
         className="dark-input"
@@ -179,32 +216,25 @@ const Register = () => {
         required
       />
       <br />
-      <input
-        className="dark-input"
-        type="text"
-        value={newUser.city}
-        onChange={event => onChange(event, "city")}
-        placeholder={translations[language].register.city}
-        style={{ marginRight: 10, marginTop: 5, marginBottom: 5 }}
-      />
-      <input
-        className="dark-input"
-        type="number"
-        value={newUser.phone}
-        onChange={event => onChange(event, "phone")}
-        placeholder={translations[language].register.phone}
-        style={{ marginLeft: 10, marginTop: 5, marginBottom: 5 }}
-      />
-      <br />
-      <input
-        className="dark-input"
-        type="password"
-        value={newUser.confirmPassword}
-        onChange={event => onChange(event, "confirmPassword")}
-        placeholder={translations[language].register.confirmPassword}
-        style={{ width: "100%", marginTop: 5, marginBottom: 10 }}
-        required
-      />
+      <div className="row" style={{width: '100%'}}>
+        <input
+          className="dark-input"
+          type="text"
+          value={newUser.city}
+          onChange={event => onChange(event, "city")}
+          placeholder={translations[language].register.city}
+          style={{ marginRight: 10, marginTop: 5, marginBottom: 5, width: '100%' }}
+        />
+        <input
+          className="dark-input"
+          type="tel"
+          pattern="[0-9]{10}"
+          value={newUser.phone}
+          onChange={event => onChange(event, "phone")}
+          placeholder={translations[language].register.phone}
+          style={{ marginLeft: 10, marginTop: 5, marginBottom: 5, width: '100%' }}
+        />
+      </div>
       <div className="warnings">
         {warnMatch ? (
           <p style={{ display: "block" }} className="warn">

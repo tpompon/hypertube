@@ -1,6 +1,5 @@
 import React, { useContext } from "react";
 import translations from "translations";
-import { Link } from "react-router-dom";
 import { UserConsumer } from "store";
 
 const Footer = () => {

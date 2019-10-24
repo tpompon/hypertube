@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios'
-import config from './config'
 import './App.css';
 import Header from './components/Header'
 import Footer from './components/Footer'
@@ -9,7 +7,6 @@ import Terminal from './components/Terminal'
 import Search from './views/Search'
 
 import Movie from './views/Movie'
-import MoviesList from './views/MoviesList'
 import Profile from './views/Profile'
 import User from './views/User'
 import Settings from './views/Settings'

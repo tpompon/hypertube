@@ -24,6 +24,7 @@ const Movie = props => {
   const [movie, updateMovie] = useState({});
   const [user, updateUser] = useState({});
   const [comment, updateComment] = useState("");
+  const [commentsLimit, setCommentsLimit] = useState(5);
   const [heartbeat, updateHeartbeat] = useState(false);
   const [rating, updateRating] = useState(0);
   const [ratingAverage, updateRatingAverage] = useState(0);
@@ -53,11 +54,13 @@ const Movie = props => {
         }
       }
     };
+    // eslint-disable-next-line
   }, []);
 
   useEffect(() => {
     window.scrollTo(0, 0);
     fetchMovie();
+    // eslint-disable-next-line
   }, [id]);
 
   const fetchMovie = async () => {
@@ -179,9 +182,9 @@ const Movie = props => {
   };
 
   const reportComment = async id => {
-    const response = await API.movies.reportCommentById(movie._id, {
-      commId: id
-    });
+    // const response = await API.movies.reportCommentById(movie._id, {
+    //   commId: id
+    // });
   };
 
   return (
@@ -235,6 +238,7 @@ const Movie = props => {
                   <div className="hr"></div>
                   <div className="container-ytb" style={{ marginBottom: 20 }}>
                     <iframe
+                      title="trailer-high-size"
                       src={`//www.youtube.com/embed/${movie.ytsData.yt_trailer_code}?autoplay=1`}
                       allow="autoplay"
                       frameBorder="0"
@@ -266,6 +270,7 @@ const Movie = props => {
                             className="pointer"
                             href={`https://www.imdb.com/name/nm${person.imdb_code}`}
                             target="_blank"
+                            rel="noopener noreferrer"
                             key={`${person.name}-${index}`}
                           >
                             <img
@@ -313,38 +318,49 @@ const Movie = props => {
                   <div className="hr"></div>
                   <div className="comments col">
                     {movie.comments.length > 0 ? (
-                      movie.comments.map((comment, index) => {
-                        const tags = comment.content
-                          .trim()
-                          .split(" ")
-                          .filter(x => x.startsWith("@"));
-                        if (tags.length > 0) {
-                          tags.forEach(tag => {
-                            axios.get(`http://${config.hostname}:${config.port}/users/n/${tag.replace('@', '')}`)
-                              .then((res) => {
-                                if (res.data.success && res.data.user[0])
-                                  console.log(`http://localhost:3000/user/${res.data.user[0].username}`)
-                              })
+                      <div>
+                        {
+                          movie.comments.reverse().map((comment, index) => {
+                            // const tags = comment.content
+                            //   .trim()
+                            //   .split(" ")
+                            //   .filter(x => x.startsWith("@"));
+                            // if (tags.length > 0) {
+                            //   tags.forEach(async tag => {
+                            //     try {
+                            //       const res = await axios.get(`http://${config.hostname}:${config.port}/users/n/${tag.replace('@', '')}`)
+                            //       if (res && res.data.success && res.data.user[0])
+                            //         comment.content = comment.content.replace(tag, `<a target="_blank" href='http://localhost:3000/user/${tag.replace('@', '')}' style="font-weight: bold; color: yellow;">${tag}</a>`);
+                            //     } catch (error) {  
+                            //       console.error(error)
+                            //     }
+                            //   })
+                            // }
+                            if (index < commentsLimit) {
+                              return (
+                                <div className="comment" key={`comment-${index}`}>
+                                  <div
+                                    onClick={() => reportComment(`${comment._id}`)}
+                                    className="report-flag"
+                                  >
+                                    <ReportFlag width="20" height="20" />
+                                  </div>
+                                  <div className="comment-name">
+                                    {comment.author}
+                                    <span style={{ marginLeft: 10 }}>
+                                      <VerifiedIcon width="15" height="15" />
+                                    </span>
+                                  </div>
+                                  {comment.content}
+                                  {/* <div dangerouslySetInnerHTML={{ __html: comment.content }} /> */}
+                                </div>
+                              );
+                            }
+                            return null;
                           })
                         }
-                        return (
-                          <div className="comment" key={`comment-${index}`}>
-                            <div
-                              onClick={() => reportComment(`${comment._id}`)}
-                              className="report-flag"
-                            >
-                              <ReportFlag width="20" height="20" />
-                            </div>
-                            <div className="comment-name">
-                              {comment.author}
-                              <span style={{ marginLeft: 10 }}>
-                                <VerifiedIcon width="15" height="15" />
-                              </span>
-                            </div>
-                            {comment.content}
-                          </div>
-                        );
-                      })
+                        <span style={{color: 'gray'}} onClick={() => setCommentsLimit(old => old + 10)}>More</span>
+                      </div>
                     ) : (
                       <div
                         className="no-comments center"
@@ -398,6 +414,7 @@ const Movie = props => {
               <div className="hr"></div>
               <div className="container-ytb" style={{ marginBottom: 20 }}>
                 <iframe
+                  title="trailer-low-size"
                   src={`//www.youtube.com/embed/${movie.ytsData.yt_trailer_code}?autoplay=1`}
                   allow="autoplay"
                   frameBorder="0"
@@ -426,6 +443,7 @@ const Movie = props => {
                         className="pointer"
                         href={`https://www.imdb.com/name/nm${person.imdb_code}`}
                         target="_blank"
+                        rel="noopener noreferrer"
                         key={`${person.name}-${index}`}
                       >
                         <img
@@ -473,30 +491,49 @@ const Movie = props => {
               <div className="hr"></div>
               <div className="comments col">
                 {movie.comments.length > 0 ? (
-                  movie.comments.map((comment, index) => {
-                    const tags = comment.content
-                      .trim()
-                      .split(" ")
-                      .filter(x => x.startsWith("@"));
-                    if (tags.length > 0) console.log(tags);
-                    return (
-                      <div className="comment" key={`comment-${index}`}>
-                        <div
-                          onClick={() => reportComment(comment._id)}
-                          className="report-flag"
-                        >
-                          <ReportFlag width="20" height="20" />
-                        </div>
-                        <div className="comment-name">
-                          {comment.author}
-                          <span style={{ marginLeft: 10 }}>
-                            <VerifiedIcon width="15" height="15" />
-                          </span>
-                        </div>
-                        {comment.content}
-                      </div>
-                    );
-                  })
+                  <div>
+                    {
+                      movie.comments.reverse().map((comment, index) => {
+                        // const tags = comment.content
+                        //   .trim()
+                        //   .split(" ")
+                        //   .filter(x => x.startsWith("@"));
+                        // if (tags.length > 0) {
+                        //   tags.forEach(async tag => {
+                        //     try {
+                        //       const res = await axios.get(`http://${config.hostname}:${config.port}/users/n/${tag.replace('@', '')}`)
+                        //       if (res && res.data.success && res.data.user[0])
+                        //         comment.content = comment.content.replace(tag, `<a target="_blank" href='http://localhost:3000/user/${tag.replace('@', '')}' style="font-weight: bold; color: yellow;">${tag}</a>`);
+                        //     } catch (error) {  
+                        //       console.error(error)
+                        //     }
+                        //   })
+                        // }
+                        if (index < commentsLimit) {
+                          return (
+                            <div className="comment" key={`comment-${index}`}>
+                              <div
+                                onClick={() => reportComment(`${comment._id}`)}
+                                className="report-flag"
+                              >
+                                <ReportFlag width="20" height="20" />
+                              </div>
+                              <div className="comment-name">
+                                {comment.author}
+                                <span style={{ marginLeft: 10 }}>
+                                  <VerifiedIcon width="15" height="15" />
+                                </span>
+                              </div>
+                              {comment.content}
+                              {/* <div dangerouslySetInnerHTML={{ __html: comment.content }} /> */}
+                            </div>
+                          );
+                        }
+                        return null;
+                      })
+                    }
+                    <span style={{color: 'gray'}} onClick={() => setCommentsLimit(old => old + 10)}>More</span>
+                  </div>
                 ) : (
                   <div
                     className="no-comments center"
@@ -550,8 +587,8 @@ const Movie = props => {
                 preload="metadata"
                 controlsList="nodownload"
               >
-                {<source src={ `http://${config.hostname}:${config.port}/torrents/stream/${encodeURIComponent(movie.ytsData.torrents[0].magnet)}` } /> }
-                {/*<source src="https://file-examples.com/wp-content/uploads/2017/04/file_example_MP4_1280_10MG.mp4" /> */}
+                {/* <source src={ `http://${config.hostname}:${config.port}/torrents/stream/${encodeURIComponent(movie.ytsData.torrents[0].magnet)}` } />*/}
+                <source src="https://file-examples.com/wp-content/uploads/2017/04/file_example_MP4_1280_10MG.mp4" />
                 {
                   Object.entries(subtitles).map(entry => (
                     <track

@@ -97,6 +97,7 @@ const Login = () => {
           <div
             id="success"
             className="success"
+            style={{ display: 'none' }}
             onClick={() =>
               (document.getElementById("success").style.display = "none")
             }

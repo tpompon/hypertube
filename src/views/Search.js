@@ -2,25 +2,23 @@ import React, { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import config from "config";
 import Button from "components/Button";
-import Poster from "components/Poster";
 import PosterYTS from "components/PosterYTS";
 import Loading from "components/Loading";
-import { Link, withRouter } from "react-router-dom";
+import {withRouter } from "react-router-dom";
 import { UserConsumer } from "store";
-import API from "controllers";
 
-function compareYTS(a, b) {
-  const nameA = a.title.toUpperCase();
-  const nameB = b.title.toUpperCase();
+// function compareYTS(a, b) {
+//   const nameA = a.title.toUpperCase();
+//   const nameB = b.title.toUpperCase();
 
-  let comparison = 0;
-  if (nameA > nameB) {
-    comparison = 1;
-  } else if (nameA < nameB) {
-    comparison = -1;
-  }
-  return comparison;
-}
+//   let comparison = 0;
+//   if (nameA > nameB) {
+//     comparison = 1;
+//   } else if (nameA < nameB) {
+//     comparison = -1;
+//   }
+//   return comparison;
+// }
 
 const dropDownOptions = [
   { value: "", genre: "Genre:" },
@@ -45,6 +43,7 @@ const dropDownOptions = [
 const Search = props => {
   //const [search, updateSearch] = useState("")
   const [page, setPage] = useState(1);
+  const [loadMore, setLoadMore] = useState(false);
   const [moviesYTS, updateMoviesYTS] = useState([]);
   const [_isLoaded, updateIsLoaded] = useState(false);
   const [filter, updateFilter] = useState({
@@ -52,7 +51,9 @@ const Search = props => {
     minYear: "1900",
     maxYear: "2019",
     minRating: "0",
-    maxRating: "5"
+    maxRating: "5",
+    sort: "title",
+    order: "asc"
   });
   let inProgress = false;
   const context = useContext(UserConsumer);
@@ -60,41 +61,54 @@ const Search = props => {
 
   useEffect(() => {
     fetchMovies();
+    // eslint-disable-next-line
   }, []);
 
   const fetchMovies = async () => {
     updateIsLoaded(false);
-    if (search.trim() !== "") {
-      const response = await axios.get(
-        `http://${config.hostname}:${
-          config.port
-        }/torrents/yts/search?search=${search}${
-          filter.genre !== "" ? "&genre=" + filter.genre : ""
-        }${filter.minYear !== "" ? "&minyear=" + filter.minYear : ""}${
-          filter.maxYear !== "" ? "&maxyear=" + filter.maxYear : ""
-        }${filter.minRating !== "" ? "&minrating=" + filter.minRating : ""}${
-          filter.maxRating !== "" ? "&maxrating=" + filter.maxRating : ""
-        }`
-      );
+    setPage(1);
+    const response = await axios.get(
+      `http://${config.hostname}:${
+        config.port
+      }/torrents/yts/search?search=${search}${
+        filter.genre !== "" ? "&genre=" + filter.genre : ""
+      }${filter.minYear !== "" ? "&minyear=" + filter.minYear : ""}${
+        filter.maxYear !== "" ? "&maxyear=" + filter.maxYear : ""
+      }${filter.minRating !== "" ? "&minrating=" + filter.minRating : ""}${
+        filter.maxRating !== "" ? "&maxrating=" + filter.maxRating : ""
+      }${filter.sort !== "" ? "&sort=" + filter.sort : ""}${
+        filter.order !== "" ? "&order=" + filter.order : ""
+      }`
+    );
+    if (response) {
       updateMoviesYTS(response.data.results);
-    } else if (search.trim() === "") {
-      const resp = await axios.get(
-        `http://${config.hostname}:${config.port}/torrents/yts`
-      );
-      updateMoviesYTS(resp.data.results.data.movies);
+      updateIsLoaded(true);
     }
-    updateIsLoaded(true);
   };
 
-  const loadMore = async () => {
+  const loadMoreMovies = async () => {
     setPage(curr => curr + 1);
+    setLoadMore(true);
     const resp = await axios.get(
-      `http://${config.hostname}:${config.port}/torrents/yts?page=${page + 1}`
+      `http://${config.hostname}:${
+        config.port
+      }/torrents/yts/search?search=${search}${
+        filter.genre !== "" ? "&genre=" + filter.genre : ""
+      }${filter.minYear !== "" ? "&minyear=" + filter.minYear : ""}${
+        filter.maxYear !== "" ? "&maxyear=" + filter.maxYear : ""
+      }${filter.minRating !== "" ? "&minrating=" + filter.minRating : ""}${
+        filter.maxRating !== "" ? "&maxrating=" + filter.maxRating : ""
+      }${filter.sort !== "" ? "&sort=" + filter.sort : ""}${
+        filter.order !== "" ? "&order=" + filter.order : ""}
+      ${page ? "&page=" + (page + 1) : ""}`
     );
-    updateMoviesYTS(prevArray => [
-      ...prevArray,
-      ...resp.data.results.data.movies
-    ]);
+    if (resp) {
+      updateMoviesYTS(prevArray => [
+        ...prevArray,
+        ...resp.data.results
+      ]);
+      setLoadMore(false);
+    }
   };
 
   const setNewFilter = (e, option) => {
@@ -207,7 +221,7 @@ const Search = props => {
         {_isLoaded ? (
           <div>
             <div className="posters-list row wrap">
-              {moviesYTS.sort(compareYTS).map((movie, index) => {
+              {moviesYTS.map((movie, index) => {
                 if (!movie.large_cover_image)
                   movie.large_cover_image =
                     "http://story-one.com/wp-content/uploads/2016/02/Poster_Not_Available2.jpg";
@@ -223,8 +237,8 @@ const Search = props => {
               })}
             </div>
             <Button
-              content="More"
-              action={() => loadMore()}
+              content={loadMore ? "Loading..." : "Load more"}
+              action={() => loadMoreMovies()}
               style={{ margin: "0 auto" }}
             />
           </div>

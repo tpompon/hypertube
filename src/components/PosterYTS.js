@@ -3,7 +3,6 @@ import Rating from "react-rating";
 import ProgressBar from "components/ProgressBar";
 import { ReactComponent as StarFull } from "svg/star-full.svg";
 import { ReactComponent as StarEmpty } from "svg/star-empty.svg";
-import translations from "../translations";
 
 const Poster = ({ movie, language, from }) => (
   <div className="poster-container">
@@ -14,6 +13,7 @@ const Poster = ({ movie, language, from }) => (
           ? `https://yst.am${movie.large_cover_image}`
           : movie.large_cover_image
       }
+      onError={ e => { e.target.onerror = null; e.target.src="http://underscoremusic.co.uk/site/wp-content/uploads/2014/05/no-poster.jpg" }}
       alt={movie.title}
     />
     <ProgressBar progress={movie.watchPercent ? movie.watchPercent : 0} />

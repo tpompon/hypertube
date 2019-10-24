@@ -16,7 +16,7 @@ const getUsers = async() => {
 	let users = ""
 	const response = await API.users.get()
 	if (response.data.success) {
-		response.data.users.map((user, i) => {
+		response.data.users.forEach((user, i) => {
 			users += `${user.username}${(i < response.data.users.length - 1) ? ", " : ""}`
 		})
 		return [users]
@@ -42,7 +42,7 @@ const getMovies = async() => {
 	let movies = ""
 	const response = await API.movies.get()
 	if (response.data.success) {
-		response.data.movies.map((movie, i) => {
+		response.data.movies.forEach((movie, i) => {
 			movies += `${movie.name}${(i < response.data.movies.length - 1) ? ", " : ""} / id: ${movie._id}`
 		})
 		return [movies]

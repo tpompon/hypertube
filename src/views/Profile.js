@@ -34,6 +34,7 @@ const Profile = () => {
     return () => {
       window.removeEventListener("mousedown", closeCoverMenu);
     };
+    // eslint-disable-next-line
   }, []);
 
   const fetchData = async () => {
@@ -134,12 +135,12 @@ const Profile = () => {
             }}
           >
             <div className="profile-avatar center">
-              <a
+              <div
                 className="profile-avatar-overlay"
                 onClick={() => uploadAvatar.current.click()}
               >
                 {translations[language].profile.updateAvatar}
-              </a>
+              </div>
               <input
                 type="file"
                 id="file"

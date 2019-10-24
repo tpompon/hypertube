@@ -14,25 +14,25 @@ const Poster = props => {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    fetchMovieData();
-  }, []);
+    const fetchMovieData = async () => {
+      const response = await API.movies.ratingsById.get(movie._id);
+      if (response.data.success) {
+        updateRatingAverage(response.data.ratingAverage);
+        updateRatingCount(response.data.ratingCount);
+      }
+      if (!username) {
+        const resp = await axios.get(`${config.serverURL}/movies/${movie._id}/progress`)
+        if (resp.data.success)
+          setProgress(resp.data.watchPercent)
+      } else {
+        const resp = await axios.get(`${config.serverURL}/movies/${movie._id}/${username}/progress`)
+        if (resp.data.success)
+          setProgress(resp.data.watchPercent)
+      }
+    };
 
-  const fetchMovieData = async () => {
-    const response = await API.movies.ratingsById.get(movie._id);
-    if (response.data.success) {
-      updateRatingAverage(response.data.ratingAverage);
-      updateRatingCount(response.data.ratingCount);
-    }
-    if (!username) {
-      const resp = await axios.get(`${config.serverURL}/movies/${movie._id}/progress`)
-      if (resp.data.success)
-        setProgress(resp.data.watchPercent)
-    } else {
-      const resp = await axios.get(`${config.serverURL}/movies/${movie._id}/${username}/progress`)
-      if (resp.data.success)
-        setProgress(resp.data.watchPercent)
-    }
-  };
+    fetchMovieData();
+  }, [movie._id, username]);
 
   return (
     <div className="poster-container">

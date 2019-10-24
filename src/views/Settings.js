@@ -39,11 +39,8 @@ const Settings = () => {
     updateLanguage(event.target.value);
   };
 
-  const handleSubmit = async () => {
-    const response = await axios.put(
-      `http://${config.hostname}:${config.port}/users/${user._id}`,
-      user
-    );
+  const handleSubmit = () => {
+    axios.put(`http://${config.hostname}:${config.port}/users/${user._id}`, user);
   };
 
   const enterKeyDown = async event => {

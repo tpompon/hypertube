@@ -28,19 +28,9 @@ OS.login()
   })
   .catch((error) => console.log(error))
 
-router.route("/yts").get((req, res) => {
-  request.get({url: `${selectedSource}/list_movies.json?sort_by=rating${req.query.page ? '&page=' + req.query.page : ''}`},
-    (err, result, body) => {
-      const searchResults = JSON.parse(body.replace(/^\ufeff/g,""));
-      if (err) res.json({ success: false, error: err })
-      else if (searchResults) res.json({ success: true, results: searchResults })
-      else res.json({ success: true, count: 0, results: [] })
-    }
-  )
-})
-
 router.route("/yts/search").get(async (req, res) => {
-  request.get({url: `${selectedSource}/list_movies.json?query_term=${req.query.search}${req.query.genre ? ('&genre=' + req.query.genre) : '' }` },
+
+  request.get({url: `${selectedSource}/list_movies.json?query_term=${req.query.search}${req.query.genre ? ('&genre=' + req.query.genre) : '' }${req.query.page ? ('&page=' + req.query.page) : '' }${req.query.sort ? ('&sort_by=' + req.query.sort) : ''}${req.query.order ? ('&order_by=' + req.query.order) : ''}` },
   async (err, results, body) => {
     if (err) {
       res.json({ success: false });
@@ -51,11 +41,11 @@ router.route("/yts/search").get(async (req, res) => {
         if (searchResults) {
           const { minrating, maxrating, minyear, maxyear } = req.query
           const moviesFiltered = [];
-            searchResults.map((movie) => {
-              if (!movie.ratingAverage) movie.ratingAverage = 0;
-              if (movie.ratingAverage >= parseInt(minrating) && movie.ratingAverage <= parseInt(maxrating) && movie.year >= minyear && movie.year <= maxyear)
-                moviesFiltered.push(movie);
-            })
+          searchResults.forEach((movie) => {
+            if (!movie.ratingAverage) movie.ratingAverage = 0;
+            if (movie.ratingAverage >= parseInt(minrating) && movie.ratingAverage <= parseInt(maxrating) && movie.year >= minyear && movie.year <= maxyear)
+              moviesFiltered.push(movie);
+          })
           searchResults = moviesFiltered;
           res.json({
             success: true,
@@ -70,7 +60,7 @@ router.route("/yts/search").get(async (req, res) => {
 
 const setMoviesInfo = (uid, body) => {
   const searchResults = body
-  if (searchResults.status === "ok" && searchResults.data.movie_count !== 0) {
+  if (searchResults.status === "ok" && searchResults.data.movie_count !== 0 && searchResults.data.movies) {
     return Promise.all(
       searchResults.data.movies.map(async movie => {
         const responseMovie = await Movie.findOne({ _ytsId: movie.id }).exec()

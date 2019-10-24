@@ -1,6 +1,4 @@
 import React, { useState, useEffect, useContext } from "react";
-import axios from "axios";
-import config from "config";
 import translations from "translations";
 import Loading from "components/Loading";
 import { ReactComponent as CheckMark } from "svg/checkmark.svg";

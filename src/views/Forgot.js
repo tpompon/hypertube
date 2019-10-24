@@ -1,10 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { withRouter } from "react-router-dom";
-import axios from "axios";
-import config from "config";
-import translations from "translations";
 import Loading from "components/Loading";
-import { ReactComponent as CheckMark } from "svg/checkmark.svg";
 import Button from "components/Button";
 import API from "controllers";
 
@@ -17,20 +13,20 @@ const Forgot = props => {
   const [_isLoaded, updateIsLoaded] = useState(false);
 
   useEffect(() => {
-    fetchKey();
-  }, []);
+    const fetchKey = async () => {
+      const response = await API.auth.forgotByKey.get(key);
+      if (response.data.success) {
+        updateStatus("ok");
+        updateUser(response.data.user[0]);
+        updateIsLoaded(true);
+      } else {
+        updateStatus("not found");
+        updateIsLoaded(true);
+      }
+    };
 
-  const fetchKey = async () => {
-    const response = await API.auth.forgotByKey.get(key);
-    if (response.data.success) {
-      updateStatus("ok");
-      updateUser(response.data.user[0]);
-      updateIsLoaded(true);
-    } else {
-      updateStatus("not found");
-      updateIsLoaded(true);
-    }
-  };
+    fetchKey();
+  }, [key]);
 
   const verifyPassword = async () => {
     // Verify password security and match (make a function for all needed cases, in utility file)
