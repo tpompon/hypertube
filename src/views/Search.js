@@ -50,8 +50,8 @@ const Search = props => {
     genre: "",
     minYear: "1900",
     maxYear: "2019",
-    minRating: "0",
-    maxRating: "5",
+    minRating: 0,
+    maxRating: 5,
     sort: "title",
     order: "asc"
   });
@@ -198,7 +198,23 @@ const Search = props => {
               </option>
             ))}
           </select>
+          <select
+            onChange={e => setNewFilter(e, ["sort"])}
+            className="dark-input"
+          >
+            <option value="title">Title</option>
+            <option value="year">Year</option>
+          </select>
+          <select
+            onChange={e => setNewFilter(e, ["order"])}
+            className="dark-input"
+          >
+            <option value="asc">Ascending</option>
+            <option value="desc">Descending</option>
+          </select>
           <input
+            min={0}
+            max={5}
             onChange={e => setNewFilter(e, ["minRating"])}
             className="dark-input"
             type="number"
@@ -206,6 +222,8 @@ const Search = props => {
             style={{ marginLeft: 30 }}
           />
           <input
+            min={0}
+            max={5}
             onChange={e => setNewFilter(e, ["maxRating"])}
             className="dark-input"
             type="number"

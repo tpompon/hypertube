@@ -68,7 +68,7 @@ const languages = {
 			submit: "Register",
 			warns: {
 				match: "Passwords don't match",
-				length: "Password must contain at least 8 characters"
+				length: "Password must contain at least 8 characters, 1 uppercase letter and 1 number"
 			}
 		},
 		login: {
@@ -177,7 +177,7 @@ const languages = {
 			submit: "S'inscrire",
 			warns: {
 				match: "Les mots de passe ne correspondent pas",
-				length: "Le mot de passe doit contenir 8 caractères minimum"
+				length: "Le mot de passe doit contenir 8 caractères minimum, 1 majuscule et 1 chiffre"
 			}
 		},
 		login: {
@@ -286,7 +286,7 @@ const languages = {
 			submit: "Inscribirse",
 			warns: {
 				match: "Las contraseñas no coinciden",
-				length: "La contraseña debe contener al menos 8 caracteres"
+				length: "La contraseña debe contener al menos 8 caracteres, 1 mayúscula y 1 chiffre"
 			}
 		},
 		login: {

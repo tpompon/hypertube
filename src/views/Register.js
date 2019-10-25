@@ -8,6 +8,8 @@ import ReCAPTCHA from "react-google-recaptcha";
 import { Link } from "react-router-dom";
 import { UserConsumer } from "store";
 
+import { verifyPasswd, verifyEmail, verifyUsername, verifyNameOrCity, verifyPhone } from "utils/functions"
+
 const Register = () => {
   const [newUser, updatenewUser] = useState({
     origin: window.location.origin,
@@ -30,6 +32,7 @@ const Register = () => {
   const [success, setSuccess] = useState(false);
   const [warnMatch, updateWarnMatch] = useState(false);
   const [warnLength, updateWarnLength] = useState(false);
+  const [error, setError] = useState("");
   const uploadAvatar = useRef(null);
   const recaptchaRef = useRef(null);
   const context = useContext(UserConsumer);
@@ -39,38 +42,45 @@ const Register = () => {
     verifyPasswords();
   });
 
+  useEffect(() => {
+    if (error.trim() !== '')
+      document.getElementById("error").style.display = "block";
+    setTimeout(() => document.getElementById("error").style.display = "none", 5000)
+  }, [error])
+
   const onChangeReCAPTCHA = key => {
     // console.log(key);
   };
 
   const register = async () => {
-    // console.log(recaptchaRef.current.execute());
-
-    if (
-      newUser.password === newUser.confirmPassword &&
-      newUser.password.length >= 8
-    ) {
-      const response = await axios.post(
-        `http://${config.hostname}:${config.port}/users`,
-        newUser
-      );
-      if (response) setSuccess(true);
-    } else {
-      console.log("Invalid password");
-    }
+    if (verifyNameOrCity(newUser.firstname)) {
+      if (verifyNameOrCity(newUser.lastname)) {
+        if (verifyUsername(newUser.username)) {
+          if (verifyPasswd(newUser.password, newUser.confirmPassword)) {
+            if (verifyEmail(newUser.email)) {
+              if (verifyNameOrCity(newUser.city)) {
+                if (verifyPhone(newUser.phone)) {
+                  const response = await axios.post(`http://${config.hostname}:${config.port}/users`, newUser);
+                  if (response) setSuccess(true);
+                } else setError("Invalid phone");
+              } else setError("Invalid city");
+            } else setError("Invalid email");
+          } else setError("Invalid password");
+        } else setError("Invalid username");
+      } else setError("Invalid lastname");
+    } else setError("Invalid firstname");
   };
 
   const verifyPasswords = () => {
-    if (newUser.password !== newUser.confirmPassword) {
+    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[#$^+=?!*()@%&]).{8,32}$/g
+    if (newUser.password !== newUser.confirmPassword && newUser.confirmPassword.trim() !== '')
       updateWarnMatch(true);
-    } else {
+    else
       updateWarnMatch(false);
-    }
-    if (newUser.password.length < 8) {
+    if (!regex.test(newUser.password))
       updateWarnLength(true);
-    } else {
+    else
       updateWarnLength(false);
-    }
   };
 
   const onChange = (event, option) => {
@@ -107,10 +117,10 @@ const Register = () => {
             });
           }
         } else {
-          console.log("Avatar size too high")
+          alert("Avatar size too high")
         }
       } else {
-        console.log("Avatar extension invalid")
+        alert("Avatar extension invalid")
       }
       // Treat image upload and show it on form, save it temp, and move it in the user folder only if register success
     }
@@ -136,6 +146,14 @@ const Register = () => {
         <img src={newUser.avatar} alt={`Upload avatar`} />
       </div>
 
+      <div style={{
+        fontSize: 14,
+        marginTop: 20,
+        color: 'rgba(255, 255, 255, 0.6)'
+      }}>
+        Only jpeg, jpg or png files up to 5mb.
+      </div>
+
       <ReCAPTCHA
         ref={recaptchaRef}
         size="invisible"
@@ -153,6 +171,14 @@ const Register = () => {
           Account created, confirmation email has been sent
         </div>
       ) : null}
+
+      <div
+        id="error"
+        className="error"
+        onClick={() => document.getElementById("error").style.display = "none"}
+      >
+        {error}
+      </div>
 
       <div className="row" style={{width: '100%'}}>
         <input
