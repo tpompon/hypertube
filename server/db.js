@@ -6,7 +6,8 @@ const connectionString = `mongodb://${host}:${port}/${name}`;
 const options = {
 	useNewUrlParser: true,
 	useCreateIndex: true,
-	useFindAndModify: true
+	useFindAndModify: false,
+	useUnifiedTopology: true
 }
 
 mongoose.connect(connectionString, options);

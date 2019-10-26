@@ -12,6 +12,7 @@ import { ReactComponent as AnimalsIcon } from "svg/animals-icon.svg";
 import { ReactComponent as FruitsIcon } from "svg/fruits-icon.svg";
 import { UserConsumer } from "store";
 import API from "controllers";
+import { verifyAvatarExt, verifyAvatarSize } from "utils/functions"
 
 const covers = ["cinema", "japan", "animals", "fruits"];
 
@@ -56,7 +57,7 @@ const Profile = () => {
   };
 
   const closeCoverMenu = event => {
-    if (refMenu.current.contains(event.target)) return;
+    if (refMenu && event && refMenu.current && refMenu.current.contains(event.target)) return;
     updateToggleCoverMenu(false);
   };
 
@@ -104,20 +105,24 @@ const Profile = () => {
 
   const onChangeAvatar = async event => {
     if (event.target.files[0]) {
-      event.preventDefault();
-      const data = new FormData();
-      data.append("file", event.target.files[0]);
-      data.append("filename", event.target.files[0].name);
-      const response = await API.users.avatarById.post(user._id, data);
-      if (response.data.success) {
-        updateAvatar(
-          `http://${config.hostname}:${config.port}/${response.data.file}`
-        );
-        updateUser({
-          ...user,
-          avatar: `http://${config.hostname}:${config.port}/${response.data.file}`
-        });
-      }
+      if (verifyAvatarExt(event.target.files[0])) {
+        if (verifyAvatarSize(event.target.files[0])) {
+          event.preventDefault();
+          const data = new FormData();
+          data.append("file", event.target.files[0]);
+          data.append("filename", event.target.files[0].name);
+          const response = await API.users.avatarById.post(data);
+          if (response.data.success) {
+            updateAvatar(
+              `http://${config.hostname}:${config.port}/${response.data.file}`
+            );
+            updateUser({
+              ...user,
+              avatar: `http://${config.hostname}:${config.port}/${response.data.file}`
+            });
+          }
+        } else alert("Avatar size exceeds limit")
+      } else alert("Invalid avatar type")
     }
   };
 

@@ -35,7 +35,6 @@ const UserSchema = new Schema({
   phone: String,
   city: String,
   country: String,
-  verified: Boolean,
   confirmKey: String,
   forgotKey: String,
   admin: { type: Boolean, default: false },

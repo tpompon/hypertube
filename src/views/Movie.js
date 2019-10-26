@@ -1,20 +1,24 @@
+// Core
 import React, { useState, useEffect, useRef, useContext } from "react";
 import { withRouter } from "react-router-dom";
 import axios from "axios";
 import config from "config";
 import translations from "translations";
-import Rating from "react-rating";
+import { UserConsumer } from "store";
+import API from "controllers";
+
+// Components
 import Button from "components/Button";
 import Loading from "components/Loading";
+import Rating from "react-rating";
+
+// SVGs
 import { ReactComponent as StarFull } from "svg/star-full.svg";
 import { ReactComponent as StarEmpty } from "svg/star-empty.svg";
-import { ReactComponent as VerifiedIcon } from "svg/verified.svg";
 import { ReactComponent as ReportFlag } from "svg/report-flag.svg";
 import { ReactComponent as Close } from "svg/close.svg";
 import { ReactComponent as AddFav } from "svg/add_heart.svg";
 import { ReactComponent as RemoveFav } from "svg/remove_heart.svg";
-import { UserConsumer } from "store";
-import API from "controllers";
 
 const Movie = props => {
   const { match } = props;
@@ -39,11 +43,13 @@ const Movie = props => {
       document.removeEventListener("scroll", handleScroll, false);
       document.removeEventListener("keydown", onEscape, false);
       const videoPlayer = document.getElementsByClassName('video-player')[0];
-      const watchPercent = (videoPlayer.currentTime / videoPlayer.duration * 100).toFixed(0);
-      console.log("Leaving page with timecode: ", videoPlayer.currentTime)
-      console.log('Total duration of movie:', videoPlayer.duration)
-      console.log('% movie watched:', watchPercent + '%')
-      if (videoPlayer.currentTime > 5) {
+
+      // console.log("Leaving page with timecode: ", videoPlayer.currentTime)
+      // console.log('Total duration of movie:', videoPlayer.duration)
+      // console.log('% movie watched:', watchPercent + '%')
+
+      if (videoPlayer && videoPlayer.currentTime > 5) {
+        const watchPercent = (videoPlayer.currentTime / videoPlayer.duration * 100).toFixed(0);
         if (watchPercent >= 95) {
           API.movies.recentsById.post(id, null)
           API.movies.inprogressById.delete(id, null)
@@ -69,11 +75,6 @@ const Movie = props => {
       if (resp.data.movie[0]) {
         updateMovie(resp.data.movie[0]);
 
-        const resSubtitles = await axios.get(`${config.serverURL}/torrents/subtitles/${resp.data.movie[0].ytsData.imdb_code}`)
-        if (resSubtitles) {
-          updateSubtitles(resSubtitles.data.subtitles)
-        }
-
         updateLoaded(true);
 
         document.addEventListener("scroll", handleScroll, false);
@@ -83,6 +84,11 @@ const Movie = props => {
         if (res.data.success && res.data.found > 0) {
           const videoPlayer = document.getElementsByClassName('video-player')[0]
           videoPlayer.currentTime = res.data.list.inProgress[0].timecode;
+        }
+
+        const resSubtitles = await axios.get(`${config.serverURL}/torrents/subtitles/${resp.data.movie[0].ytsData.imdb_code}`)
+        if (resSubtitles && resSubtitles.data.subtitles) {
+          updateSubtitles(resSubtitles.data.subtitles)
         }
       }
     }
@@ -115,7 +121,7 @@ const Movie = props => {
     const maxBottom = movieInfos.offsetHeight + movieInfos.offsetTop;
     const posterHeight = moviePoster.offsetHeight + movieInfos.offsetTop;
 
-    if (top + posterHeight <= maxBottom)
+    if (moviePoster && movieInfos && top + posterHeight <= maxBottom)
       moviePoster.style.marginTop = `${top}px`;
   };
 
@@ -159,13 +165,17 @@ const Movie = props => {
   };
 
   const showPlayer = () => {
-    updateTogglePlayer(true);
-    player.current.play();
+    if (player) {
+      updateTogglePlayer(true);
+      player.current.play();
+    }
   };
 
   const hidePlayer = () => {
-    updateTogglePlayer(false);
-    player.current.pause();
+    if (player) {
+      updateTogglePlayer(false);
+      player.current.pause();
+    }
   };
 
   const toggleHeartbeat = async () => {
@@ -321,21 +331,6 @@ const Movie = props => {
                       <div>
                         {
                           movie.comments.reverse().map((comment, index) => {
-                            // const tags = comment.content
-                            //   .trim()
-                            //   .split(" ")
-                            //   .filter(x => x.startsWith("@"));
-                            // if (tags.length > 0) {
-                            //   tags.forEach(async tag => {
-                            //     try {
-                            //       const res = await axios.get(`http://${config.hostname}:${config.port}/users/n/${tag.replace('@', '')}`)
-                            //       if (res && res.data.success && res.data.user[0])
-                            //         comment.content = comment.content.replace(tag, `<a target="_blank" href='http://localhost:3000/user/${tag.replace('@', '')}' style="font-weight: bold; color: yellow;">${tag}</a>`);
-                            //     } catch (error) {  
-                            //       console.error(error)
-                            //     }
-                            //   })
-                            // }
                             if (index < commentsLimit) {
                               return (
                                 <div className="comment" key={`comment-${index}`}>
@@ -347,12 +342,8 @@ const Movie = props => {
                                   </div>
                                   <div className="comment-name">
                                     {comment.author}
-                                    <span style={{ marginLeft: 10 }}>
-                                      <VerifiedIcon width="15" height="15" />
-                                    </span>
                                   </div>
                                   {comment.content}
-                                  {/* <div dangerouslySetInnerHTML={{ __html: comment.content }} /> */}
                                 </div>
                               );
                             }
@@ -494,21 +485,6 @@ const Movie = props => {
                   <div>
                     {
                       movie.comments.reverse().map((comment, index) => {
-                        // const tags = comment.content
-                        //   .trim()
-                        //   .split(" ")
-                        //   .filter(x => x.startsWith("@"));
-                        // if (tags.length > 0) {
-                        //   tags.forEach(async tag => {
-                        //     try {
-                        //       const res = await axios.get(`http://${config.hostname}:${config.port}/users/n/${tag.replace('@', '')}`)
-                        //       if (res && res.data.success && res.data.user[0])
-                        //         comment.content = comment.content.replace(tag, `<a target="_blank" href='http://localhost:3000/user/${tag.replace('@', '')}' style="font-weight: bold; color: yellow;">${tag}</a>`);
-                        //     } catch (error) {  
-                        //       console.error(error)
-                        //     }
-                        //   })
-                        // }
                         if (index < commentsLimit) {
                           return (
                             <div className="comment" key={`comment-${index}`}>
@@ -520,12 +496,8 @@ const Movie = props => {
                               </div>
                               <div className="comment-name">
                                 {comment.author}
-                                <span style={{ marginLeft: 10 }}>
-                                  <VerifiedIcon width="15" height="15" />
-                                </span>
                               </div>
                               {comment.content}
-                              {/* <div dangerouslySetInnerHTML={{ __html: comment.content }} /> */}
                             </div>
                           );
                         }
@@ -587,7 +559,7 @@ const Movie = props => {
                 preload="metadata"
                 controlsList="nodownload"
               >
-                {/* <source src={ `http://${config.hostname}:${config.port}/torrents/stream/${encodeURIComponent(movie.ytsData.torrents[0].magnet)}` } />*/}
+                {/* <source src={ `http://${config.hostname}:${config.port}/torrents/stream/${encodeURIComponent(movie.ytsData.torrents[0].magnet)}` } /> */}
                 <source src="https://file-examples.com/wp-content/uploads/2017/04/file_example_MP4_1280_10MG.mp4" />
                 {
                   Object.entries(subtitles).map(entry => (

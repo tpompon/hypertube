@@ -27,8 +27,8 @@ router
       name: req.body.name,
       poster: req.body.poster,
       ytsData: req.body.ytsData,
-      description: req.body.description,
-      author: req.body.author,
+      description: req.body.description || "No description",
+      author: req.body.author || "No author",
       rating: req.body.rating
     });
 
@@ -41,7 +41,7 @@ router
     });
   })
   .delete((req, res) => {
-    Movie.remove({}, err => {
+    Movie.findOneAndRemove({}, err => {
       if (err) res.json({ success: false, error: err });
       else res.json({ success: true });
     });
@@ -58,7 +58,7 @@ router
       req.query.maxyear = new Date().getFullYear()
 
     if (req.query.genre !== "") {
-      const genreName = (genres.find(obj => obj.id == req.query.genre)).name;
+      const genreName = (genres.find(obj => obj.id === req.query.genre)).name;
       Movie.find({"ytsData.genres": genreName, $and: [ { "ytsData.year": { $gte: parseInt(req.query.minyear) } }, { "ytsData.year": { $lte: parseInt(req.query.maxyear) } } ]}, (err, movies) => {
         if (err) res.json({ success: false });
         else res.json({ success: true, movies: movies });

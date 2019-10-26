@@ -26,7 +26,7 @@ const getUsers = async() => {
 }
 
 const getDataUser = async(user) => {
-	const response = await API.user.byUsername.get(user)
+	const response = await API.users.byUsername.get(user)
 	if (response.data.user.length > 0) {
 		let string = ""
 		Object.entries(response.data.user[0]).forEach((entry) => {

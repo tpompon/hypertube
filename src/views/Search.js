@@ -6,19 +6,7 @@ import PosterYTS from "components/PosterYTS";
 import Loading from "components/Loading";
 import {withRouter } from "react-router-dom";
 import { UserConsumer } from "store";
-
-// function compareYTS(a, b) {
-//   const nameA = a.title.toUpperCase();
-//   const nameB = b.title.toUpperCase();
-
-//   let comparison = 0;
-//   if (nameA > nameB) {
-//     comparison = 1;
-//   } else if (nameA < nameB) {
-//     comparison = -1;
-//   }
-//   return comparison;
-// }
+import { escapeSpecial } from "utils/functions"
 
 const dropDownOptions = [
   { value: "", genre: "Genre:" },
@@ -70,7 +58,7 @@ const Search = props => {
     const response = await axios.get(
       `http://${config.hostname}:${
         config.port
-      }/torrents/yts/search?search=${search}${
+      }/torrents/yts/search?search=${escapeSpecial(search)}${
         filter.genre !== "" ? "&genre=" + filter.genre : ""
       }${filter.minYear !== "" ? "&minyear=" + filter.minYear : ""}${
         filter.maxYear !== "" ? "&maxyear=" + filter.maxYear : ""
@@ -92,7 +80,7 @@ const Search = props => {
     const resp = await axios.get(
       `http://${config.hostname}:${
         config.port
-      }/torrents/yts/search?search=${search}${
+      }/torrents/yts/search?search=${escapeSpecial(search)}${
         filter.genre !== "" ? "&genre=" + filter.genre : ""
       }${filter.minYear !== "" ? "&minyear=" + filter.minYear : ""}${
         filter.maxYear !== "" ? "&maxyear=" + filter.maxYear : ""
@@ -151,11 +139,8 @@ const Search = props => {
           `${config.serverURL}/movies`,
           newMovie
         );
-        if (responseNewMovie.data.success) {
+        if (responseNewMovie.data.success)
           props.history.push(`/watch/${responseNewMovie.data.movie._id}`);
-        } else {
-          alert("Could not create entry in Database for this movie");
-        }
       } else {
         inProgress = false;
       }
@@ -191,6 +176,7 @@ const Search = props => {
           <select
             onChange={e => setNewFilter(e, ["genre"])}
             className="dark-input"
+            style={{marginRight: 10}}
           >
             {dropDownOptions.map(option => (
               <option key={`option-${option.value}`} value={option.value}>
@@ -201,6 +187,7 @@ const Search = props => {
           <select
             onChange={e => setNewFilter(e, ["sort"])}
             className="dark-input"
+            style={{marginRight: 10}}
           >
             <option value="title">Title</option>
             <option value="year">Year</option>

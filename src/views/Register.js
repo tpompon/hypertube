@@ -2,13 +2,12 @@ import React, { useState, useContext, useEffect, useRef } from "react";
 import axios from "axios";
 import config from "config";
 import translations from "translations";
-import path from "path";
 import Button from "components/Button";
 import ReCAPTCHA from "react-google-recaptcha";
 import { Link } from "react-router-dom";
 import { UserConsumer } from "store";
 
-import { verifyPasswd, verifyEmail, verifyUsername, verifyNameOrCity, verifyPhone } from "utils/functions"
+import { verifyPasswd, verifyEmail, verifyUsername, verifyNameOrCity, verifyPhone, verifyAvatarExt, verifyAvatarSize } from "utils/functions"
 
 const Register = () => {
   const [newUser, updatenewUser] = useState({
@@ -19,15 +18,9 @@ const Register = () => {
     password: "",
     confirmPassword: "",
     avatar: `${config.serverURL}/public/avatars/default_avatar.png`,
-    // cover: req.body.cover,
-    // birthdate: req.body.birthdate,
-    // age: req.body.age,
-    // gender: req.body.gender,
-    // language: req.body.language,
     email: "",
     phone: "",
     city: ""
-    // country: req.body.country
   });
   const [success, setSuccess] = useState(false);
   const [warnMatch, updateWarnMatch] = useState(false);
@@ -45,7 +38,10 @@ const Register = () => {
   useEffect(() => {
     if (error.trim() !== '')
       document.getElementById("error").style.display = "block";
-    setTimeout(() => document.getElementById("error").style.display = "none", 5000)
+    setTimeout(() => {
+      document.getElementById("error").style.display = "none";
+      setError('');
+    }, 5000)
   }, [error])
 
   const onChangeReCAPTCHA = key => {
@@ -61,7 +57,10 @@ const Register = () => {
               if (verifyNameOrCity(newUser.city)) {
                 if (verifyPhone(newUser.phone)) {
                   const response = await axios.post(`http://${config.hostname}:${config.port}/users`, newUser);
-                  if (response) setSuccess(true);
+                  if (response && response.data.success)
+                    setSuccess(true);
+                  else
+                    setError("Username or email already used")
                 } else setError("Invalid phone");
               } else setError("Invalid city");
             } else setError("Invalid email");
@@ -87,20 +86,6 @@ const Register = () => {
     updatenewUser({ ...newUser, [option]: event.target.value });
   };
 
-  const verifyAvatarExt = (avatar) => {
-    const ext = path.extname(avatar.name);
-    const mimeType = avatar.type;
-
-    if (ext === '.png' || ext !== '.jpg' || ext !== '.jpeg')
-      if (mimeType === 'image/png' || mimeType === 'image/jpg' || mimeType === 'image/jpeg')
-        return true;
-    return false;
-  }
-
-  const verifyAvatarSize = (avatar) => {
-    return avatar.size < 5000000;
-  }
-
   const onChangeAvatar = async event => {
     if (event.target.files[0]) {
       if (verifyAvatarExt(event.target.files[0])) {
@@ -117,12 +102,11 @@ const Register = () => {
             });
           }
         } else {
-          alert("Avatar size too high")
+          setError("Avatar size too high")
         }
       } else {
-        alert("Avatar extension invalid")
+        setError("Avatar extension invalid")
       }
-      // Treat image upload and show it on form, save it temp, and move it in the user folder only if register success
     }
   };
 

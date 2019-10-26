@@ -3,6 +3,7 @@ import { withRouter } from "react-router-dom";
 import Loading from "components/Loading";
 import Button from "components/Button";
 import API from "controllers";
+import { verifyPasswd } from "utils/functions"
 
 const Forgot = props => {
   const { key } = props.match.params;
@@ -28,11 +29,11 @@ const Forgot = props => {
     fetchKey();
   }, [key]);
 
-  const verifyPassword = async () => {
+  const validate = async () => {
     // Verify password security and match (make a function for all needed cases, in utility file)
     // Update password in database and delete forgot key
 
-    if (password === confirmPassword && password.length >= 8) {
+    if (verifyPasswd(password, confirmPassword)) {
       const body = { passwd: password };
       const response = await API.auth.forgotByKey.post(key, body);
       if (response.data.success) {
@@ -41,7 +42,7 @@ const Forgot = props => {
         console.log("error not updated");
       }
     } else {
-      console.log("Password not safe/doesn't match");
+      console.log("Passwords don't match or not secure, must contains 1 uppercase letter, 1 number and 1 special character");
     }
   };
 
@@ -70,7 +71,7 @@ const Forgot = props => {
             style={{ width: "100%", marginTop: 5, marginBottom: 20 }}
           />
           <div className="row" style={{ justifyContent: "space-around" }}>
-            <div style={{ display: "table" }} onClick={() => verifyPassword()}>
+            <div style={{ display: "table" }} onClick={() => validate()}>
               <Button content="Submit" />
             </div>
           </div>

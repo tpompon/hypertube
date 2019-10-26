@@ -15,7 +15,7 @@ const users = {
     get: username => axios.get(url + `n/${username}`)
   },
   avatarById: {
-    post: (uid, data) => axios.post(url + `${uid}/avatar`, data)
+    post: (data) => axios.post(url + `avatar`, data)
   }
 };
 

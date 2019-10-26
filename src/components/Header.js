@@ -5,6 +5,7 @@ import { ReactComponent as SearchIcon } from "svg/search.svg";
 import { Link } from "react-router-dom";
 import { UserConsumer } from "store";
 import API from "controllers";
+import { escapeSpecial } from "utils/functions";
 
 axios.defaults.withCredentials = true;
 
@@ -14,9 +15,7 @@ const Header = props => {
   const [movies, updateMovies] = useState([]);
   const [_isAuth, updateIsAuth] = useState(false);
   const [searchInProgress, updateSearchInProgress] = useState(false);
-  const [toggleSearchBarCollapse, updateToggleSearchBarCollapse] = useState(
-    false
-  );
+  const [toggleSearchBarCollapse, updateToggleSearchBarCollapse] = useState(false);
   const [toggleAvatarDropdown, updateToggleAvatarDropdown] = useState(false);
   const context = useContext(UserConsumer);
   const { language, updateSearch, avatar, updateAvatar } = context;
@@ -89,8 +88,9 @@ const Header = props => {
         updateSearchInProgress(false);
       }
     }
-    updateBarSearchMovie(event.target.value);
-    context.updateSearch(event.target.value);
+    const searchValue = escapeSpecial(event.target.value);
+    updateBarSearchMovie(searchValue);
+    context.updateSearch(searchValue);
   };
 
   return (

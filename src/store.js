@@ -5,7 +5,7 @@ export const UserContext = createContext(true)
 class Provider extends Component {
 
     state = {
-        language: "fr",
+        language: "en",
         search: "",
         avatar: "",
         updateAvatar: (avatar) => this.setState({ avatar }),

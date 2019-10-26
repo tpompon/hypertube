@@ -34,6 +34,7 @@ const passport = require('passport')
           firstname: profile.name.givenName,
           lastname: "GoogleUser",
           //email: profile.emails[0].value,
+          language: "en",
           username: profile.name.givenName,
           cover: 'cinema',
           avatar: profile.photos[0].value
@@ -69,6 +70,7 @@ passport.use(new FourtyTwoStrategy({
           firstname: profile.name.givenName,
           lastname: profile.name.familyName,
           email: profile.emails[0].value,
+          language: "en",
           username: profile.username,
           cover: 'cinema',
           avatar: profile.photos[0].value
@@ -104,6 +106,7 @@ passport.use(new TwitterStrategy({
           _twitterID: profile.id,
           firstname: profile.displayName,
           lastname: "TwitterUser",
+          language: "en",
           username: profile.username,
           cover: 'cinema',
           avatar: profile.photos[0].value.replace("_normal", "")

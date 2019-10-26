@@ -152,13 +152,14 @@ const Settings = () => {
             />
             <select
               className="dark-input"
-              onChange={handleChangeLanguage}
+              //onChange={handleChangeLanguage}
+              onChange={e => { onChange(e, "language"); handleChangeLanguage(e); } }
               style={{ width: "26%", marginTop: 5 }}
             >
-              <option value="fr">
+              <option selected={user.language === 'fr'} value="fr">
                 {translations[language].settings.languages.french}
               </option>
-              <option value="en">
+              <option selected={user.language === 'en'} value="en">
                 {translations[language].settings.languages.english}
               </option>
             </select>

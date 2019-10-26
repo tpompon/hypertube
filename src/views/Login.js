@@ -148,21 +148,21 @@ const Login = () => {
               <button
                 onClick={() => authenticate("42")}
                 className="oauth-btn oauth-btn-42"
-                style={{ width: "31%" }}
+                style={{ width: 150 }}
               >
                 <FourtyTwoIcon fill="#fff" width="25" height="25" />
               </button>
               <button
                 onClick={() => authenticate("twitter")}
                 className="oauth-btn oauth-btn-twitter"
-                style={{ width: "31%" }}
+                style={{ width: 150, margin: '0 20px' }}
               >
                 <TwitterIcon fill="#fff" width="25" height="25" />
               </button>
               <button
                 onClick={() => authenticate("google")}
                 className="oauth-btn oauth-btn-google"
-                style={{ width: "31%" }}
+                style={{ width: 150 }}
               >
                 <GoogleIcon fill="#fff" width="25" height="25" />
               </button>

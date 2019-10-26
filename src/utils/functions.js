@@ -1,3 +1,5 @@
+import path from "path";
+
 export const verifyPasswd = (passwd1, passwd2) => {
 	const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[#$^+=?!*()@%&]).{8,32}$/g
 	if (passwd1 === passwd2)
@@ -23,4 +25,23 @@ export const verifyNameOrCity = (word) => {
 export const verifyPhone = (phone) => {
 	const regex = /((?:\+|00)[17](?: |-)?|(?:\+|00)[1-9]\d{0,2}(?: |-)?|(?:\+|00)1-\d{3}(?: |-)?)?(0\d|\([0-9]{3}\)|[1-9]{0,3})(?:((?: |-)[0-9]{2}){4}|((?:[0-9]{2}){4})|((?: |-)[0-9]{3}(?: |-)[0-9]{4})|([0-9]{7}))/ig
 	return regex.test(phone);
+}
+
+export const escapeSpecial = (string) => {
+	const regex = /[<>;`~'"\\]+/g
+	return string.replace(regex, '');
+}
+
+export const verifyAvatarExt = (avatar) => {
+	const ext = path.extname(avatar.name);
+	const mimeType = avatar.type;
+
+	if (ext === '.png' || ext !== '.jpg' || ext !== '.jpeg')
+		if (mimeType === 'image/png' || mimeType === 'image/jpg' || mimeType === 'image/jpeg')
+		return true;
+	return false;
+}
+
+export const verifyAvatarSize = (avatar) => {
+	return avatar.size < 5000000;
 }

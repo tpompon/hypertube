@@ -26,7 +26,6 @@ router
     const confirmKey = uuidv4();
     const confirmationLink = `${req.body.origin}/confirm/${confirmKey}`;
 
-    // const hash = await bcrypt.hash(req.body.password, 10);
     const newUser = User({
       firstname: req.body.firstname,
       lastname: req.body.lastname,
@@ -37,12 +36,11 @@ router
       birthdate: req.body.birthdate,
       age: req.body.age,
       gender: req.body.gender,
-      language: req.body.language,
+      language: "en",
       email: req.body.email,
       phone: req.body.phone,
       city: req.body.city,
       country: req.body.country,
-      verified: false,
       confirmKey: confirmKey,
       forgotKey: ""
     });
@@ -69,15 +67,14 @@ router
     <a href="${confirmationLink}" class="es-button" target="_blank" style="mso-style-priority:100 !important;text-decoration:none;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;font-size:20px;color:#FFFFFF;border-style:solid;border-color:#7BA9F7;border-width:15px 25px;display:inline-block;background:#7BA9F7;border-radius:2px;font-weight:normal;font-style:normal;line-height:24px;width:auto;text-align:center;">Activate account</a></span></td></tr></table></td></tr></table></td></tr></table></td></tr></table><table class="es-content" cellspacing="0" cellpadding="0" align="center" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;table-layout:fixed !important;width:100%;"><tr style="border-collapse:collapse;"><td align="center" style="padding:0;Margin:0;">
     <table class="es-content-body" width="600" cellspacing="0" cellpadding="0" bgcolor="#ffffff" align="center" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;background-color:#FFFFFF;"><tr style="border-collapse:collapse;"><td align="left" style="padding:0;Margin:0;"><table width="100%" cellspacing="0" cellpadding="0" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;"><tr style="border-collapse:collapse;"><td width="600" valign="top" align="center" style="padding:0;Margin:0;"><table style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:separate;border-spacing:0px;border-radius:4px;background-color:#111111;" width="100%" cellspacing="0" cellpadding="0" bgcolor="#111111"><tr style="border-collapse:collapse;">
     <td class="es-m-txt-l" bgcolor="#111111" align="left" style="padding:0;Margin:0;padding-left:30px;padding-right:30px;padding-top:35px;"><h2 style="Margin:0;line-height:29px;mso-line-height-rule:exactly;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;font-size:24px;font-style:normal;font-weight:normal;color:#FFFFFF;">HyperTube</h2></td></tr><tr style="border-collapse:collapse;"><td class="es-m-txt-l" align="left" style="Margin:0;padding-top:20px;padding-bottom:25px;padding-left:30px;padding-right:30px;"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-size:18px;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;line-height:27px;color:#666666;">Web streaming app, the best solution to watch any movie, anywhere at any moment.</p>
-    <p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-size:18px;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;line-height:27px;color:#666666;"><br></p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-size:18px;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;line-height:27px;color:#666666;">Made at 42 by tpompon, syboeuf, evbelico &amp;&nbsp;mthiery</p></td></tr></table></td></tr></table></td></tr></table></td></tr></table></td></tr></table></div></body>
+    <p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-size:18px;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;line-height:27px;color:#666666;"><br></p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-size:18px;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;line-height:27px;color:#666666;">Made at 42 by tpompon, syboeuf, evbelico</p></td></tr></table></td></tr></table></td></tr></table></td></tr></table></td></tr></table></div></body>
     </html>
     `
     };
 
     newUser.save(err => {
       if (err) {
-        console.log(err);
-        res.json({ success: false });
+        res.json({ success: false, error: err });
       } else {
         sgMail.send(msg);
         res.json({ success: true, user: newUser });
@@ -197,7 +194,7 @@ router
     );
   });
 
-router.route("/:id/avatar").post((req, res) => {
+router.route("/avatar").post((req, res) => {
   const imageFile = req.files.file;
   const timestamp = Date.now();
   imageFile.mv(
@@ -205,12 +202,9 @@ router.route("/:id/avatar").post((req, res) => {
     err => {
       if (err) res.json({ success: false, error: err });
       else {
-        User.update(
-          { _id: req.params.id },
-          {
-            avatar: `http://${config.server.host}:${config.server.port}/public/avatars/${req.params.id}_${timestamp}.jpg`
-          },
-          (a, b) => console.log(a, b)
+        User.findOneAndUpdate(
+          { _id: req.user._id },
+          {avatar: `http://${config.server.host}:${config.server.port}/public/avatars/${req.params.id}_${timestamp}.jpg`}
         );
         res.json({
           success: true,

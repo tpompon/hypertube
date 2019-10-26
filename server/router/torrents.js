@@ -74,8 +74,6 @@ const setMoviesInfo = (uid, body) => {
             });
             movie.ratingAverage = Math.floor((total / count) * 100) / 100
             movie.ratingCount = count
-          } else {
-            //console.log("no")
           }
         }
 
@@ -195,9 +193,10 @@ const getSubtitles = async(imdbid, langs) => {
             const stream = res.pipe(file)
             stream.on('finish', () => {
               fs.readFile(`./subtitles/${imdbid}_${langCode}`, "utf8", (err, content) => {
-                if (err) throw err;
-                const buffer = Buffer.from(content);
-                resolve({ key: langCode, value: buffer.toString("base64") })
+                if (!err) {
+                  const buffer = Buffer.from(content);
+                  resolve({ key: langCode, value: buffer.toString("base64") })
+                }
               })
             })
           })

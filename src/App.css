@@ -98,6 +98,13 @@ Responsive
     margin-left: 0 !important;
     margin-right: 0 !important;
   }
+  .logo {
+    width: 150px !important;
+  }
+  .App-header {
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+  }
 }
 
 /* Portrait phones and smaller */
@@ -120,6 +127,13 @@ Responsive
   .dark-input {
     margin-left: 0 !important;
     margin-right: 0 !important;
+  }
+  .logo {
+    width: 150px !important;
+  }
+  .App-header {
+    padding-left: 20px !important;
+    padding-right: 20px !important;
   }
 }
 
