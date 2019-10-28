@@ -332,16 +332,15 @@ router.route("/:id/comments").post((req, res) => {
 });
 
 router.route("/:id/comments/report").post((req, res) => {
-  MovieupdateOne(
+  Movie.updateOne(
     { _id: req.params.id, "comments._id": req.body.commId },
     {
-      $set: {
+      $inc: {
         "comments.$.report": 1
       }
     },
     err => {
       if (err) {
-        console.log(err);
         res.json({ success: false, error: err });
       } else {
         res.json({ success: true });

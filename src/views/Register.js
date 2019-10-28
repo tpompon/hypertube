@@ -78,6 +78,10 @@ const Register = () => {
       updateWarnLength(false);
   };
 
+  const onEnter = e => {
+    if (e.keyCode === 13) register();
+  };
+
   const onChange = (event, option) => {
     updatenewUser({ ...newUser, [option]: event.target.value });
   };
@@ -173,6 +177,7 @@ const Register = () => {
           placeholder={translations[language].register.firstname}
           style={{ marginRight: 10, marginTop: 5, marginBottom: 5, width: '100%' }}
           required
+          onKeyDown={onEnter}
         />
         <input
           className="dark-input"
@@ -182,6 +187,7 @@ const Register = () => {
           placeholder={translations[language].register.lastname}
           style={{ marginLeft: 10, marginTop: 5, marginBottom: 5, width: '100%' }}
           required
+          onKeyDown={onEnter}
         />
       </div>
       <br />
@@ -193,6 +199,7 @@ const Register = () => {
         placeholder={translations[language].register.username}
         style={{ width: "100%", marginRight: 10, marginTop: 5, marginBottom: 5 }}
         required
+        onKeyDown={onEnter}
       />
       <br />
       <div className="row" style={{width: '100%'}}>
@@ -204,6 +211,7 @@ const Register = () => {
           placeholder={translations[language].register.password}
           style={{ marginRight: 10, marginTop: 5, marginBottom: 5, width: '100%' }}
           required
+          onKeyDown={onEnter}
         />
         <input
           className="dark-input"
@@ -213,6 +221,7 @@ const Register = () => {
           placeholder={translations[language].register.confirmPassword}
           style={{ marginRight: 10, marginTop: 5, marginBottom: 5, width: '100%' }}
           required
+          onKeyDown={onEnter}
         />
       </div>
       <br />
@@ -224,6 +233,7 @@ const Register = () => {
         placeholder={translations[language].register.email}
         style={{ width: "100%", marginTop: 5, marginBottom: 5 }}
         required
+        onKeyDown={onEnter}
       />
       <br />
       <div className="row" style={{width: '100%'}}>
@@ -234,6 +244,7 @@ const Register = () => {
           onChange={event => onChange(event, "city")}
           placeholder={translations[language].register.city}
           style={{ marginRight: 10, marginTop: 5, marginBottom: 5, width: '100%' }}
+          onKeyDown={onEnter}
         />
         <input
           className="dark-input"
@@ -243,6 +254,7 @@ const Register = () => {
           onChange={event => onChange(event, "phone")}
           placeholder={translations[language].register.phone}
           style={{ marginLeft: 10, marginTop: 5, marginBottom: 5, width: '100%' }}
+          onKeyDown={onEnter}
         />
       </div>
       <div className="warnings">

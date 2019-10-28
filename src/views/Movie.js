@@ -111,13 +111,16 @@ const Movie = props => {
   const handleScroll = () => {
     const moviePoster = document.getElementById("movie-page-poster-fullsize");
     const movieInfos = document.getElementById("movie-infos-fullsize");
-    const top = window.pageYOffset;
+    
+    if (moviePoster && movieInfos) {
+      const top = window.pageYOffset;
 
-    const maxBottom = movieInfos.offsetHeight + movieInfos.offsetTop;
-    const posterHeight = moviePoster.offsetHeight + movieInfos.offsetTop;
-
-    if (moviePoster && movieInfos && top + posterHeight <= maxBottom)
-      moviePoster.style.marginTop = `${top}px`;
+      const maxBottom = movieInfos.offsetHeight + movieInfos.offsetTop;
+      const posterHeight = moviePoster.offsetHeight + movieInfos.offsetTop;
+  
+      if (top + posterHeight <= maxBottom)
+        moviePoster.style.marginTop = `${top}px`;
+    }
   };
 
   const onEnter = e => {
@@ -180,10 +183,8 @@ const Movie = props => {
     updateHeartbeat(!heartbeat);
   };
 
-  const reportComment = async id => {
-    // const response = await API.movies.reportCommentById(movie._id, {
-    //   commId: id
-    // });
+  const reportComment = id => {
+    API.movies.reportCommentById.post(movie._id, { commId: id });
   };
 
   return (

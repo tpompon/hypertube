@@ -6,8 +6,8 @@ const UserSchema = new Schema({
   _googleID: String,
   _fourtytwoID: String,
   _twitterID: String,
-  firstname: { type: String, required: true },
-  lastname: { type: String, required: true },
+  firstname: { type: String },
+  lastname: { type: String },
   username: { type: String, required: true, unique: true },
   password: { type: String },
   heartbeat: [{

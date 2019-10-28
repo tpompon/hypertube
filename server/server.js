@@ -7,7 +7,6 @@ const uuid = require('uuid/v4');
 const session = require('express-session');
 
 const User = require('./models/user');
-const Movie = require('./models/movie');
 
 require('dotenv').config();
 global.__basedir = __dirname;
@@ -32,8 +31,7 @@ const passport = require('passport')
         const newUser = User({
           _googleID: profile.id,
           firstname: profile.name.givenName,
-          lastname: "GoogleUser",
-          //email: profile.emails[0].value,
+          lastname: profile.name.familyName,
           language: "en",
           username: profile.name.givenName,
           cover: 'cinema',
@@ -42,7 +40,6 @@ const passport = require('passport')
 
         newUser.save((err) => {
           if (err) {
-            console.log(err)
             return done(null, false, { error: err });
           } else {
             return done(null, newUser);
@@ -78,7 +75,6 @@ passport.use(new FourtyTwoStrategy({
 
         newUser.save((err) => {
           if (err) {
-            console.log(err)
             return done(null, false, { error: err });
           } else {
             return done(null, newUser);
@@ -104,8 +100,6 @@ passport.use(new TwitterStrategy({
       } else if (!user) {
         const newUser = User({
           _twitterID: profile.id,
-          firstname: profile.displayName,
-          lastname: "TwitterUser",
           language: "en",
           username: profile.username,
           cover: 'cinema',
@@ -235,7 +229,7 @@ app.post('/register/avatar', (req, res) => {
   const imageFile = req.files.file;
   const timestamp = Date.now();
   const uniqueId = uuid();
-  imageFile.mv(`${__basedir}/public/avatars/tmp/${uniqueId}_${timestamp}.jpg`, (err) => {
+  imageFile.mv(`public/avatars/tmp/${uniqueId}_${timestamp}.jpg`, (err) => {
     if (err)
       res.json({ success: false })
     else

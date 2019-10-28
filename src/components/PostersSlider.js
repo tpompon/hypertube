@@ -108,9 +108,13 @@ const PostersSlider = props => {
         </div>
       ) : (
         <div className="posters-slider row center no-selection">
-          <div className="no-movie-poster">
-            No movies has been added to this list
-          </div>
+          <div className="no-movie-poster"></div>
+          <div className="no-movie-poster"></div>
+          <div className="no-movie-poster"></div>
+          <div className="no-movie-poster"></div>
+          <div className="no-movie-poster"></div>
+          <div className="no-movie-poster"></div>
+          <div className="no-movie-poster"></div>
         </div>
       )}
       <span className="control-right">

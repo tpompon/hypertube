@@ -22,8 +22,7 @@ const languages = {
 			},
 			subtitles: {
 				fr: "French",
-				en: "English",
-				es: "Spanish"
+				en: "English"
 			}
 		},
 		poster: {
@@ -68,7 +67,7 @@ const languages = {
 			submit: "Register",
 			warns: {
 				match: "Passwords don't match",
-				length: "Password must contain at least 8 characters, 1 uppercase letter and 1 number"
+				length: "Password must contain at least 8 characters, 1 uppercase letter, 1 number and 1 special character"
 			}
 		},
 		login: {
@@ -96,6 +95,8 @@ const languages = {
 			newPassword: "New password",
 			confirmPassword: "Confirm password",
 			submit: "Save",
+			delete: "Delete account",
+			confirm: "Are you sure you want to delete your account ?\nAll informations will be lost.\n",
 			languages: {
 				english: "English",
 				french: "French"
@@ -131,8 +132,7 @@ const languages = {
 			},
 			subtitles: {
 				fr: "Français",
-				en: "Anglais",
-				es: "Espagnol"
+				en: "Anglais"
 			}
 		},
 		poster: {
@@ -177,7 +177,7 @@ const languages = {
 			submit: "S'inscrire",
 			warns: {
 				match: "Les mots de passe ne correspondent pas",
-				length: "Le mot de passe doit contenir 8 caractères minimum, 1 majuscule et 1 chiffre"
+				length: "Le mot de passe doit contenir 8 caractères minimum, 1 majuscule, 1 chiffre et 1 caractère spécial"
 			}
 		},
 		login: {
@@ -205,6 +205,8 @@ const languages = {
 			newPassword: "Nouveau mot de passe",
 			confirmPassword: "Confirmer mot de passe",
 			submit: "Sauvegarder",
+			delete: "Supprimer mon compte",
+			confirm: "Etes-vous sûr de vouloir supprimer votre compte ?\nToutes les informations seront perdues.\n",
 			languages: {
 				english: "Anglais",
 				french: "Français"
@@ -217,114 +219,114 @@ const languages = {
 			title: "Projet 42 par tpompon, syboeuf, evbelico"
 		}
 	},
-	"es": {
-		header: {
-			searchPlaceholder: "Quiero mirar...",
-			avatarMenu: {
-				profile: "Perfil",
-				settings: "Configuraciones",
-				logout: "Salir"
-			}
-		},
-		movie: {
-			rating: "Nota",
-			watch: "Mirar",
-			comments: "Comentarios",
-			reviewPlaceholder: "Deja tu opinión...",
-			reviewSubmit: "Enviar",
-			noComments: "No hay comentarios actualmente, se el primero",
-			noResults: "Ningún resultado",
-			tooltip: {
-				heartbeatAdd: "Añadir a favoritos",
-				heartbeatRemove: "Eliminar de favoritos"
-			},
-			subtitles: {
-				fr: "Francés",
-				en: "Inglés",
-				es: "Español"
-			}
-		},
-		poster: {
-			rating: "Nota"
-		},
-		profile: {
-			you: "(usted)",
-			updateAvatar: "Edita mi avatar",
-			editCover: "Cambiar mi portada",
-			tooltip: {
-				copy: "Copiar al portapapeles",
-				copied: "Copiado"
-			},
-			list: {
-				heartbeat: "Favoritos",
-				recents: "Visto recientemente",
-				continue: "Continuar mirando"
-			}
-		},
-		user: {
-			notFound: "Este usuario no existe",
-			tooltip: {
-				copy: "Copiar al portapapeles",
-				copied: "Copiado"
-			},
-			list: {
-				heartbeat: "Favoritos",
-				recents: "Visto recientemente"
-			}
-		},
-		register: {
-			title: "Inscribirse",
-			firstname: "Nombre",
-			lastname: "Apellido",
-			username: "Nombre del usuario",
-			password: "Contraseña",
-			email: "E-mail",
-			city: "Ciudad",
-			country: "País",
-			phone: "Teléfono",
-			confirmPassword: "Confirmar la contraseña",
-			submit: "Inscribirse",
-			warns: {
-				match: "Las contraseñas no coinciden",
-				length: "La contraseña debe contener al menos 8 caracteres, 1 mayúscula y 1 chiffre"
-			}
-		},
-		login: {
-			title: "Conectarse",
-			inputs: {
-				username: "Nombre del usuario",
-				password: "Contraseña",
-				submit: "Conectarse",
-				forgotPassword: "Contraseña olvidada"
-			}
-		},
-		logout: {
-			title: "Has sido desconectado"
-		},
-		settings: {
-			title: "Configuraciones",
-			firstname: "Nombre",
-			lastname: "Apellido",
-			city: "Ciudad",
-			country: "País",
-			username: "Nombre del usuario",
-			email: "E-mail",
-			phone: "Teléfono",
-			newPassword: "Nueva contraseña",
-			confirmPassword: "Confirmar la contraseña",
-			submit: "Guardar",
-			languages: {
-				english: "Inglés",
-				french: "Francés"
-			}
-		},
-		notfound: {
-			title: "Esta pagina no existe"
-		},
-		footer: {
-			title: "Proyecto 42 de tpompon, syboeuf, evbelico"
-		}
-	}
+// 	"es": {
+// 		header: {
+// 			searchPlaceholder: "Quiero mirar...",
+// 			avatarMenu: {
+// 				profile: "Perfil",
+// 				settings: "Configuraciones",
+// 				logout: "Salir"
+// 			}
+// 		},
+// 		movie: {
+// 			rating: "Nota",
+// 			watch: "Mirar",
+// 			comments: "Comentarios",
+// 			reviewPlaceholder: "Deja tu opinión...",
+// 			reviewSubmit: "Enviar",
+// 			noComments: "No hay comentarios actualmente, se el primero",
+// 			noResults: "Ningún resultado",
+// 			tooltip: {
+// 				heartbeatAdd: "Añadir a favoritos",
+// 				heartbeatRemove: "Eliminar de favoritos"
+// 			},
+// 			subtitles: {
+// 				fr: "Francés",
+// 				en: "Inglés",
+// 				es: "Español"
+// 			}
+// 		},
+// 		poster: {
+// 			rating: "Nota"
+// 		},
+// 		profile: {
+// 			you: "(usted)",
+// 			updateAvatar: "Edita mi avatar",
+// 			editCover: "Cambiar mi portada",
+// 			tooltip: {
+// 				copy: "Copiar al portapapeles",
+// 				copied: "Copiado"
+// 			},
+// 			list: {
+// 				heartbeat: "Favoritos",
+// 				recents: "Visto recientemente",
+// 				continue: "Continuar mirando"
+// 			}
+// 		},
+// 		user: {
+// 			notFound: "Este usuario no existe",
+// 			tooltip: {
+// 				copy: "Copiar al portapapeles",
+// 				copied: "Copiado"
+// 			},
+// 			list: {
+// 				heartbeat: "Favoritos",
+// 				recents: "Visto recientemente"
+// 			}
+// 		},
+// 		register: {
+// 			title: "Inscribirse",
+// 			firstname: "Nombre",
+// 			lastname: "Apellido",
+// 			username: "Nombre del usuario",
+// 			password: "Contraseña",
+// 			email: "E-mail",
+// 			city: "Ciudad",
+// 			country: "País",
+// 			phone: "Teléfono",
+// 			confirmPassword: "Confirmar la contraseña",
+// 			submit: "Inscribirse",
+// 			warns: {
+// 				match: "Las contraseñas no coinciden",
+// 				length: "La contraseña debe contener al menos 8 caracteres, 1 mayúscula, 1 chiffre y 1 especial"
+// 			}
+// 		},
+// 		login: {
+// 			title: "Conectarse",
+// 			inputs: {
+// 				username: "Nombre del usuario",
+// 				password: "Contraseña",
+// 				submit: "Conectarse",
+// 				forgotPassword: "Contraseña olvidada"
+// 			}
+// 		},
+// 		logout: {
+// 			title: "Has sido desconectado"
+// 		},
+// 		settings: {
+// 			title: "Configuraciones",
+// 			firstname: "Nombre",
+// 			lastname: "Apellido",
+// 			city: "Ciudad",
+// 			country: "País",
+// 			username: "Nombre del usuario",
+// 			email: "E-mail",
+// 			phone: "Teléfono",
+// 			newPassword: "Nueva contraseña",
+// 			confirmPassword: "Confirmar la contraseña",
+// 			submit: "Guardar",
+// 			languages: {
+// 				english: "Inglés",
+// 				french: "Francés"
+// 			}
+// 		},
+// 		notfound: {
+// 			title: "Esta pagina no existe"
+// 		},
+// 		footer: {
+// 			title: "Proyecto 42 de tpompon, syboeuf, evbelico"
+// 		}
+// 	}
 }
 
 export default languages

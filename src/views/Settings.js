@@ -13,10 +13,26 @@ const Settings = () => {
   const [language, updateLanguage] = useState(context.language);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
+  const [isDeleted, updateIsDeleted] = useState(false);
 
   useEffect(() => {
     getDataUser();
   }, []);
+
+  useEffect(() => {
+    if (isDeleted) {
+      API.auth.logout();
+      setTimeout(() => {
+        window.location.href = "http://localhost:3000/login";
+      }, 1000);
+    }
+  }, [isDeleted]);
+
+  const handleDeleteAccount = async () => {
+    const response = await API.users.byId.delete(user);
+    if (response.data.success)
+      updateIsDeleted(true);
+  };
 
   const getDataUser = async () => {
     const responseAuth = await API.auth.check()
@@ -40,6 +56,7 @@ const Settings = () => {
   const handleSubmit = () => {
 
     setError(null);
+    setSuccess(null);
 
     setTimeout(async () => {
       if (user.firstname && !verifyNameOrCity(user.firstname))
@@ -146,30 +163,6 @@ const Settings = () => {
               style={{ width: "49%", marginTop: 5, marginBottom: 5 }}
             />
           </div>
-          {/* <div style={{ display: "flex", justifyContent: "space-between" }}>
-            <input
-              className="dark-input"
-              type="password"
-              placeholder={translations[language].settings.newPassword}
-              style={{
-                width: "49%",
-                marginRight: "1%",
-                marginTop: 5,
-                marginBottom: 5
-              }}
-            />
-            <input
-              className="dark-input"
-              type="password"
-              placeholder={translations[language].settings.confirmPassword}
-              style={{
-                width: "49%",
-                marginLeft: "1%",
-                marginTop: 5,
-                marginBottom: 5
-              }}
-            />
-          </div> */}
           <div
             style={{
               display: "flex",
@@ -199,10 +192,10 @@ const Settings = () => {
               onChange={e => { onChange(e, "language"); handleChangeLanguage(e); } }
               style={{ width: "26%", marginTop: 5 }}
             >
-              <option selected={user.language === 'fr'} value="fr">
+              <option value="fr">
                 {translations[language].settings.languages.french}
               </option>
-              <option selected={user.language === 'en'} value="en">
+              <option value="en">
                 {translations[language].settings.languages.english}
               </option>
             </select>
@@ -211,6 +204,10 @@ const Settings = () => {
             <Button
               action={() => handleSubmit()}
               content={translations[language].settings.submit}
+            />
+            <Button
+              action={() => window.confirm(`${translations[language].settings.confirm}`) ? handleDeleteAccount() : updateIsDeleted(false)}
+              content={translations[language].settings.delete}
             />
           </div>
         </div>
