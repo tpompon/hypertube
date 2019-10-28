@@ -184,6 +184,10 @@ App
   box-sizing: border-box; /* Opera/IE 8+ */
 }
 
+.hover-pointer:hover {
+  cursor: pointer;
+}
+
 .center {
   margin-left: auto;
   margin-right: auto;

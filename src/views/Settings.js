@@ -205,10 +205,17 @@ const Settings = () => {
               action={() => handleSubmit()}
               content={translations[language].settings.submit}
             />
-            <Button
-              action={() => window.confirm(`${translations[language].settings.confirm}`) ? handleDeleteAccount() : updateIsDeleted(false)}
-              content={translations[language].settings.delete}
-            />
+          </div>
+          <div
+            onClick={() => window.confirm(`${translations[language].settings.confirm}`) ? handleDeleteAccount() : updateIsDeleted(false)}
+            style={{
+              color: 'crimson',
+              marginTop: 20,
+              fontSize: 14
+            }}
+            className="hover-pointer"
+          >
+            {translations[language].settings.delete}
           </div>
         </div>
       ) : (
