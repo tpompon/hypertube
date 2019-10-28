@@ -139,14 +139,23 @@ router
   })
   .post((req, res) => {
     const movie = { id: req.params.id, time: Date.now() };
-    User.findOneAndUpdate(
-      { _id: req.user._id },
-      { $push: { heartbeat: movie } },
-      err => {
+    User.findOne(
+      { _id: req.user._id, "heartbeat.id": req.params.id },
+      (err, result) => {
         if (err) {
           res.json({ success: false });
-        } else {
-          res.json({ success: true, movie: movie });
+        } else if (!result) {
+          User.findOneAndUpdate(
+            { _id: req.user._id },
+            { $push: { heartbeat: movie } },
+            err => {
+              if (err) {
+                res.json({ success: false });
+              } else {
+                res.json({ success: true, movie: movie });
+              }
+            }
+          );
         }
       }
     );

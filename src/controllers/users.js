@@ -7,9 +7,9 @@ const users = {
   get: () => axios.get(url),
   post: body => axios.post(url, body),
   byId: {
-    get: uid => axios.get(url + uid),
-    put: (uid, body) => axios.put(url + uid, body),
-    delete: uid => axios.delete(url + uid)
+    get: () => axios.get(url + 'id'),
+    put: body => axios.put(url + 'id', body),
+    delete: () => axios.delete(url + 'id')
   },
   byUsername: {
     get: username => axios.get(url + `n/${username}`)

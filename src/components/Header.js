@@ -20,6 +20,7 @@ const Header = props => {
   const context = useContext(UserConsumer);
   const { language, updateSearch, avatar, updateAvatar } = context;
   const refSearchBar = useRef(null);
+  const refSearchBarLow = useRef(null);
   const refAvatar = useRef(null);
 
   useEffect(() => {
@@ -48,11 +49,10 @@ const Header = props => {
 
   useEffect(() => {
     const closeSearchBar = event => {
-      if (refSearchBar.current.contains(event.target)) {
-        if (searchMovie.trim() !== "") {
+      if (refSearchBar.current.contains(event.target) || refSearchBarLow.current.contains(event.target)) {
+        if (searchMovie.trim() !== "")
           updateSearchInProgress(true);
-        }
-        return;
+        return ;
       }
       updateSearchInProgress(false);
       updateToggleSearchBarCollapse(false);
@@ -68,9 +68,8 @@ const Header = props => {
 
 
   const closeMenu = event => {
-    if (refAvatar.current.contains(event.target)) {
-      return;
-    }
+    if (refAvatar.current && refAvatar.current.contains(event.target))
+      return ;
     updateToggleAvatarDropdown(false);
   };
 
@@ -82,12 +81,12 @@ const Header = props => {
 
   const handleSearch = event => {
     if (extended) {
-      if (event.target.value.trim() !== "") {
+      if (event.target.value.trim() !== "")
         updateSearchInProgress(true);
-      } else {
+      else
         updateSearchInProgress(false);
-      }
     }
+    
     const searchValue = escapeSpecial(event.target.value);
     updateBarSearchMovie(searchValue);
     context.updateSearch(searchValue);
@@ -224,6 +223,7 @@ const Header = props => {
             </div>
           </div>
           <div
+            ref={refSearchBarLow}
             className="search-bar-collapse"
             style={{
               display: toggleSearchBarCollapse ? "block" : "none",

@@ -22,7 +22,7 @@ const passport = require('passport')
   passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CONSUMER_KEY,
     clientSecret: process.env.GOOGLE_CONSUMER_SECRET,
-    callbackURL: "http://localhost:4001/oauth/google/redirect"
+    callbackURL: `http://${config.server.host}:${config.server.port}/oauth/google/redirect`
   },
   function(accessToken, refreshToken, profile, done) {
     User.findOne({ _googleID: profile.id }, function(err, user) {
@@ -58,7 +58,7 @@ const passport = require('passport')
 passport.use(new FourtyTwoStrategy({
     clientID: process.env.FOURTYTWO_CLIENT_ID,
     clientSecret: process.env.FOURTYTWO_CLIENT_SECRET,
-    callbackURL: "http://localhost:4001/oauth/42/redirect"
+    callbackURL: `http://${config.server.host}:${config.server.port}/oauth/42/redirect`
   },
   function(req, token, tokenSecret, profile, done) {
     User.findOne({ _fourtytwoID: profile.id }, function(err, user) {

@@ -89,9 +89,9 @@ router
   });
 
 router
-  .route("/:id")
+  .route("/id")
   .get((req, res) => {
-    User.find({ _id: req.params.id }, (err, user) => {
+    User.find({ _id: req.user._id }, (err, user) => {
       if (err) {
         res.json({ success: false });
       } else {
@@ -100,7 +100,7 @@ router
     });
   })
   .delete((req, res) => {
-    User.findOneAndRemove({ _id: req.params.id }, err => {
+    User.findOneAndRemove({ _id: req.user._id }, err => {
       if (err) {
         res.json({ success: false });
       } else {
@@ -126,14 +126,14 @@ router
     if (req.body.email) updateQuery.email = req.body.email;
     if (req.body.phone) updateQuery.phone = req.body.phone;
 
-    User.find({ _id: req.params.id }, (err, user) => {
+    User.find({ _id: req.user._id }, (err, user) => {
       // if (user.username == req.body.username || user.email == req.body.email) {
       //   return res.json({ success: false });
       // }
       if (err) { return res.json({success: false}); }
       else if (!user || !err ) {
         User.findOneAndUpdate(
-          { _id: req.params.id },
+          { _id: req.user._id },
           updateQuery,
           { upsert: true },
           (err, user) => {
@@ -156,59 +156,22 @@ router
       }
     });
   })
-  .delete((req, res) => {
-    User.findOneAndRemove({ username: req.params.username }, err => {
-      if (err) {
-        res.json({ success: false });
-      } else {
-        res.json({ success: true });
-      }
-    });
-  })
-  .put((req, res) => {
-    const updateQuery = {};
-
-    if (req.body.firstname) updateQuery.firstname = req.body.firstname;
-    if (req.body.lastname) updateQuery.lastname = req.body.lastname;
-    if (req.body.username) updateQuery.username = req.body.username;
-    if (req.body.password) updateQuery.password = req.body.password;
-    if (req.body.avatar) updateQuery.avatar = req.body.avatar;
-    if (req.body.cover) updateQuery.cover = req.body.cover;
-    if (req.body.birthdate) updateQuery.birthdate = req.body.birthdate;
-    if (req.body.city) updateQuery.city = req.body.city;
-    if (req.body.country) updateQuery.country = req.body.country;
-    if (req.body.age) updateQuery.age = req.body.age;
-    if (req.body.gender) updateQuery.gender = req.body.gender;
-    if (req.body.language) updateQuery.language = req.body.language;
-    if (req.body.email) updateQuery.email = req.body.email;
-    if (req.body.phone) updateQuery.phone = req.body.phone;
-
-    User.findOneAndUpdate(
-      { username: req.params.username },
-      updateQuery,
-      { upsert: true },
-      (err, user) => {
-        if (err) return res.json({ success: false });
-        else return res.json({ success: true, updated: user });
-      }
-    );
-  });
 
 router.route("/avatar").post((req, res) => {
   const imageFile = req.files.file;
   const timestamp = Date.now();
   imageFile.mv(
-    `${__basedir}/public/avatars/${req.params.id}_${timestamp}.jpg`,
+    `${__basedir}/public/avatars/${req.user._id}_${timestamp}.jpg`,
     err => {
       if (err) res.json({ success: false, error: err });
       else {
         User.findOneAndUpdate(
           { _id: req.user._id },
-          {avatar: `http://${config.server.host}:${config.server.port}/public/avatars/${req.params.id}_${timestamp}.jpg`}
+          {avatar: `http://${config.server.host}:${config.server.port}/public/avatars/${req.user._id}_${timestamp}.jpg`}
         );
         res.json({
           success: true,
-          file: `public/avatars/${req.params.id}_${timestamp}.jpg`
+          file: `public/avatars/${req.user._id}_${timestamp}.jpg`
         });
       }
     }

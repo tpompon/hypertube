@@ -25,7 +25,7 @@ const Register = () => {
   const [success, setSuccess] = useState(false);
   const [warnMatch, updateWarnMatch] = useState(false);
   const [warnLength, updateWarnLength] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(null);
   const uploadAvatar = useRef(null);
   const recaptchaRef = useRef(null);
   const context = useContext(UserConsumer);
@@ -35,39 +35,35 @@ const Register = () => {
     verifyPasswords();
   });
 
-  useEffect(() => {
-    if (error.trim() !== '')
-      document.getElementById("error").style.display = "block";
-    setTimeout(() => {
-      document.getElementById("error").style.display = "none";
-      setError('');
-    }, 5000)
-  }, [error])
-
   const onChangeReCAPTCHA = key => {
     // console.log(key);
   };
 
-  const register = async () => {
-    if (verifyNameOrCity(newUser.firstname)) {
-      if (verifyNameOrCity(newUser.lastname)) {
-        if (verifyUsername(newUser.username)) {
-          if (verifyPasswd(newUser.password, newUser.confirmPassword)) {
-            if (verifyEmail(newUser.email)) {
-              if (verifyNameOrCity(newUser.city)) {
-                if (verifyPhone(newUser.phone)) {
-                  const response = await axios.post(`http://${config.hostname}:${config.port}/users`, newUser);
-                  if (response && response.data.success)
-                    setSuccess(true);
-                  else
-                    setError("Username or email already used")
-                } else setError("Invalid phone");
-              } else setError("Invalid city");
-            } else setError("Invalid email");
-          } else setError("Invalid password");
-        } else setError("Invalid username");
-      } else setError("Invalid lastname");
-    } else setError("Invalid firstname");
+  const register = () => {
+
+    setError(null);
+
+    setTimeout(async () => {
+      if (verifyNameOrCity(newUser.firstname)) {
+        if (verifyNameOrCity(newUser.lastname)) {
+          if (verifyUsername(newUser.username)) {
+            if (verifyPasswd(newUser.password, newUser.confirmPassword)) {
+              if (verifyEmail(newUser.email)) {
+                if (verifyNameOrCity(newUser.city)) {
+                  if (verifyPhone(newUser.phone)) {
+                    const response = await axios.post(`http://${config.hostname}:${config.port}/users`, newUser);
+                    if (response && response.data.success)
+                      setSuccess(true);
+                    else
+                      setError("Username or email already used")
+                  } else setError("Invalid phone");
+                } else setError("Invalid city");
+              } else setError("Invalid email");
+            } else setError("Invalid password");
+          } else setError("Invalid username");
+        } else setError("Invalid lastname");
+      } else setError("Invalid firstname");
+    }, 100)
   };
 
   const verifyPasswords = () => {
@@ -156,13 +152,17 @@ const Register = () => {
         </div>
       ) : null}
 
-      <div
-        id="error"
-        className="error"
-        onClick={() => document.getElementById("error").style.display = "none"}
-      >
-        {error}
-      </div>
+      {
+        error ? (
+          <div
+            id="error"
+            className="error" style={{display: 'block'}}
+            onClick={() => { document.getElementById("error").style.display = "none"; setError(null); }}
+          >
+            {error}
+          </div>
+        ) : null
+      }
 
       <div className="row" style={{width: '100%'}}>
         <input

@@ -41,7 +41,7 @@ const Profile = () => {
   const fetchData = async () => {
     const check = await axios.get(`${config.serverURL}/auth`);
     if (check.data.auth) {
-      const res = await API.users.byId.get(check.data.user._id);
+      const res = await API.users.byId.get();
       if (res.data.success) {
         updateUser(res.data.user[0]);
         const getHeartbeatList = await getMoviesList(res.data.user[0].heartbeat);

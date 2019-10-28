@@ -42,12 +42,8 @@ const Movie = props => {
     return () => {
       document.removeEventListener("scroll", handleScroll, false);
       document.removeEventListener("keydown", onEscape, false);
+
       const videoPlayer = document.getElementsByClassName('video-player')[0];
-
-      // console.log("Leaving page with timecode: ", videoPlayer.currentTime)
-      // console.log('Total duration of movie:', videoPlayer.duration)
-      // console.log('% movie watched:', watchPercent + '%')
-
       if (videoPlayer && videoPlayer.currentTime > 5) {
         const watchPercent = (videoPlayer.currentTime / videoPlayer.duration * 100).toFixed(0);
         if (watchPercent >= 95) {
@@ -95,16 +91,15 @@ const Movie = props => {
     const responseUser = await API.auth.check();
     if (responseUser) {
       updateUser(responseUser.data.user);
-      const responseHeartbeat = await axios.get(
-        `http://${config.hostname}:${config.port}/movies/${id}/heartbeat`
-      );
-      if (responseHeartbeat.data.success && responseHeartbeat.data.found > 0) {
+
+      const responseHeartbeat = await API.movies.heartbeatById.get(id)
+      if (responseHeartbeat.data.success && responseHeartbeat.data.found > 0)
         updateHeartbeat(true);
-      }
+
       const responseRating = await API.movies.ratingsByIdAndUID.get(id);
-      if (responseRating.data.rating) {
+      if (responseRating.data.rating)
         updateRating(responseRating.data.rating);
-      }
+
       const responseRatingCount = await API.movies.ratingsById.get(id);
       if (responseRatingCount.data.success) {
         updateRatingAverage(responseRatingCount.data.ratingAverage);
@@ -179,15 +174,9 @@ const Movie = props => {
   };
 
   const toggleHeartbeat = async () => {
-    if (!heartbeat) {
-      axios.post(
-        `http://${config.hostname}:${config.port}/movies/${id}/heartbeat`
-      );
-    } else {
-      axios.delete(
-        `http://${config.hostname}:${config.port}/movies/${id}/heartbeat`
-      );
-    }
+    if (!heartbeat) API.movies.heartbeatById.post(id);
+    else API.movies.heartbeatById.delete(id);
+  
     updateHeartbeat(!heartbeat);
   };
 
@@ -341,7 +330,7 @@ const Movie = props => {
                                     <ReportFlag width="20" height="20" />
                                   </div>
                                   <div className="comment-name">
-                                    {comment.author}
+                                    <a target="_blank" rel="noopener noreferrer" href={`http://localhost:3000/user/${comment.author}`}>@{comment.author}</a>
                                   </div>
                                   {comment.content}
                                 </div>
@@ -350,7 +339,13 @@ const Movie = props => {
                             return null;
                           })
                         }
-                        <span style={{color: 'gray'}} onClick={() => setCommentsLimit(old => old + 10)}>More</span>
+                        {
+                          movie.comments.length > 5 && movie.comments.length > commentsLimit ? (
+                            <span className="more-comments" onClick={() => setCommentsLimit(old => old + 10)}>
+                              More
+                            </span>
+                          ) : null
+                        }
                       </div>
                     ) : (
                       <div
@@ -504,7 +499,13 @@ const Movie = props => {
                         return null;
                       })
                     }
-                    <span style={{color: 'gray'}} onClick={() => setCommentsLimit(old => old + 10)}>More</span>
+                    {
+                      movie.comments.length > 5 && movie.comments.length > commentsLimit ? (
+                        <span className="more-comments" onClick={() => setCommentsLimit(old => old + 10)}>
+                          More
+                        </span>
+                      ) : null
+                    }
                   </div>
                 ) : (
                   <div

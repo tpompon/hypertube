@@ -1,29 +1,27 @@
 import React, { useState, useEffect, useContext } from "react";
-import axios from "axios";
-import config from "config";
 import translations from "translations";
 import Button from "components/Button";
 import Loading from "components/Loading";
+import API from "controllers";
 import { UserConsumer } from "store";
+import { verifyUsername, verifyNameOrCity, verifyEmail, verifyPhone } from "utils/functions"
 
 const Settings = () => {
   const context = useContext(UserConsumer);
   const [user, updateUser] = useState({});
   const [_isLoaded, updateIsLoaded] = useState(false);
   const [language, updateLanguage] = useState(context.language);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
 
   useEffect(() => {
     getDataUser();
   }, []);
 
   const getDataUser = async () => {
-    const responseAuth = await axios.get(
-      `http://${config.hostname}:${config.port}/auth`
-    );
+    const responseAuth = await API.auth.check()
     if (responseAuth) {
-      const responseUser = await axios.get(
-        `http://${config.hostname}:${config.port}/users/${responseAuth.data.user._id}`
-      );
+      const responseUser = await API.users.byId.get();
       if (responseUser) {
         updateUser(responseUser.data.user[0]);
         updateIsLoaded(true);
@@ -32,7 +30,7 @@ const Settings = () => {
   };
 
   const onChange = (event, option) => {
-    updateUser({ ...user, [option]: event.target.value });
+      updateUser({ ...user, [option]: event.target.value });
   };
 
   const handleChangeLanguage = event => {
@@ -40,14 +38,37 @@ const Settings = () => {
   };
 
   const handleSubmit = () => {
-    axios.put(`http://${config.hostname}:${config.port}/users/${user._id}`, user);
+
+    setError(null);
+
+    setTimeout(async () => {
+      if (user.firstname && !verifyNameOrCity(user.firstname))
+        return setError("Invalid firstname")
+      if (user.lastname && !verifyNameOrCity(user.lastname))
+        return setError("Invalid lastname")
+      if (user.username && !verifyUsername(user.username))
+        return setError("Invalid username")
+      if (user.email && !verifyEmail(user.email))
+        return setError("Invalid email")
+      if (user.phone && !verifyPhone(user.phone))
+        return setError("Invalid phone")
+      if (user.country && !verifyNameOrCity(user.country))
+        return setError("Invalid country")
+      if (user.city && !verifyNameOrCity(user.city))
+        return setError("Invalid city")
+
+      const res = await API.users.byId.put(user);
+      if (res.data.success)
+        setSuccess("Informations updated")
+      else
+        setError("Email or Username already in use")
+    }, 100);
   };
 
   const enterKeyDown = async event => {
     const key = event.which || event.keyCode;
-    if (key === 13) {
+    if (key === 13)
       handleSubmit();
-    }
   };
 
   return (
@@ -59,6 +80,28 @@ const Settings = () => {
           style={{ width: "40%" }}
         >
           <h2>{translations[language].settings.title}</h2>
+          {
+            error ? (
+              <div
+                id="error"
+                className="error" style={{display: 'block'}}
+                onClick={() => { document.getElementById("error").style.display = "none"; setError(null); }}
+              >
+                {error}
+              </div>
+            ) : null
+          }
+          {
+            success ? (
+              <div
+                id="success"
+                className="success" style={{display: 'block'}}
+                onClick={() => { document.getElementById("success").style.display = "none"; setSuccess(null); }}
+              >
+                {success}
+              </div>
+            ) : null
+          }
           <div style={{ display: "flex", justifyContent: "space-between" }}>
             <input
               className="dark-input"
@@ -103,7 +146,7 @@ const Settings = () => {
               style={{ width: "49%", marginTop: 5, marginBottom: 5 }}
             />
           </div>
-          <div style={{ display: "flex", justifyContent: "space-between" }}>
+          {/* <div style={{ display: "flex", justifyContent: "space-between" }}>
             <input
               className="dark-input"
               type="password"
@@ -126,7 +169,7 @@ const Settings = () => {
                 marginBottom: 5
               }}
             />
-          </div>
+          </div> */}
           <div
             style={{
               display: "flex",

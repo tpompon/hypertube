@@ -135,18 +135,11 @@ const Search = props => {
           description: movie.description_full,
           author: "Someone"
         };
-        const responseNewMovie = await axios.post(
-          `${config.serverURL}/movies`,
-          newMovie
-        );
+        const responseNewMovie = await axios.post(`${config.serverURL}/movies`, newMovie);
         if (responseNewMovie.data.success)
           props.history.push(`/watch/${responseNewMovie.data.movie._id}`);
-      } else {
-        inProgress = false;
-      }
-    } else {
-      props.history.push(`/watch/${responseMovies.data.movie._id}`);
-    }
+      } else inProgress = false;
+    } else props.history.push(`/watch/${responseMovies.data.movie._id}`);
   };
 
   return (

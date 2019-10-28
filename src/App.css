@@ -166,6 +166,7 @@ App
   background-color: #121225;
   min-height: 100vh;
   font-size: 20px;
+  overflow-x: hidden;
 }
 
 .App-header {
@@ -491,6 +492,7 @@ App
   background-color: rgb(8, 9, 20);
   border-radius: 10px;
   padding: 20px;
+  margin: 5px 0px;
   color: white;
   -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
   -moz-box-sizing: border-box; /* Firefox, other Gecko */
@@ -907,6 +909,16 @@ App
   padding: 10px;
   border-radius: 10px;
   border: 1px solid blueviolet;
+}
+
+.more-comments {
+  color: gray;
+  display: table;
+  margin: 0 auto;
+  margin-bottom: 30px;
+}
+.more-comments:hover {
+  cursor: pointer;
 }
 
 /*

@@ -24,12 +24,11 @@ const selectedSource = sources[1];
 
 OS.login()
   .then((res) => {
-    console.log("Connect to opensubtitles")
+    console.log('\x1b[36m%s\x1b[0m', '-> OpenSubtitles connection established');
   })
-  .catch((error) => console.log(error))
+  .catch((error) => console.log('\x1b[31m%s\x1b[0m', '-> OpenSubtitles connection error'))
 
 router.route("/yts/search").get(async (req, res) => {
-
   request.get({url: `${selectedSource}/list_movies.json?query_term=${req.query.search}${req.query.genre ? ('&genre=' + req.query.genre) : '' }${req.query.page ? ('&page=' + req.query.page) : '' }${req.query.sort ? ('&sort_by=' + req.query.sort) : ''}${req.query.order ? ('&order_by=' + req.query.order) : ''}` },
   async (err, results, body) => {
     if (err) {
