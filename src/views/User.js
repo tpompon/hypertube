@@ -1,7 +1,5 @@
 import React, { useState, useEffect, useContext, useRef } from "react";
 import { withRouter } from "react-router-dom";
-import axios from "axios";
-import config from "config";
 import translations from "translations";
 import PostersSlider from "components/PostersSlider";
 import Loading from "components/Loading";
@@ -45,8 +43,8 @@ const User = props => {
 
   const getMoviesList = moviesListIds => {
     return Promise.all(
-      moviesListIds.map(async movie => {
-        const res = await axios.get(`${config.serverURL}/movies/${movie.id}`);
+      moviesListIds.reverse().map(async movie => {
+        const res = await API.movies.byId.get(movie.id);
         if (res.data.success && res.data.movie) {
           return res.data.movie[0];
         }

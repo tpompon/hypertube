@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef, useContext } from "react";
-import axios from "axios";
 import config from "config";
 import PostersSlider from "components/PostersSlider";
 import translations from "translations";
@@ -49,7 +48,7 @@ const Profile = () => {
   }, []);
 
   const fetchData = async () => {
-    const check = await axios.get(`${config.serverURL}/auth`);
+    const check = await API.auth.check();
     if (!isCanceled.current && check.data.auth) {
       const res = await API.users.byId.get();
       if (!isCanceled.current && res.data.success) {
@@ -76,8 +75,8 @@ const Profile = () => {
 
   const getMoviesList = moviesListIds => {
     return Promise.all(
-      moviesListIds.map(async movie => {
-        const res = await axios.get(`${config.serverURL}/movies/${movie.id}`);
+      moviesListIds.reverse().map(async movie => {
+        const res = await API.movies.byId.get(movie.id);
         if (res.data.success && res.data.movie) {
           return res.data.movie[0];
         }
@@ -113,7 +112,7 @@ const Profile = () => {
       updateCover(cover);
       body.cover = cover;
     }
-    API.users.byId.put(user._id, body);
+    API.users.byId.put(body);
   };
 
   const onChangeAvatar = async event => {
@@ -126,7 +125,7 @@ const Profile = () => {
           data.append("filename", event.target.files[0].name);
           const response = await API.users.avatarById.post(data);
           if (!isCanceled.current && response.data.success) {
-            updateAvatar(`http://${config.hostname}:${config.port}/${response.data.file}`);
+            updateAvatar(`http://${config.hostname}:${config.port}/${response.data.file}?${Date.now()}`);
             updateUser({
               ...user,
               avatar: `http://${config.hostname}:${config.port}/${response.data.file}`

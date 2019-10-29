@@ -147,9 +147,8 @@ passport.deserializeUser(function(user, done) {
 const app = express();
 
 app.use(session({
-  genid: (req) => {
-    console.log(`${req.method} Request from client - SESSION_ID: ${req.sessionID}`)
-    return uuid() // use UUIDs for session IDs
+  genid: () => {
+    return uuid();
   },
   secret: "c+IoG?1:wih`],]L=XMlr'uYP~H,ac~3xTmq-Vb|Bn{)`$Oe?*GwT_/Mx2/#yy7",
   cookie: {

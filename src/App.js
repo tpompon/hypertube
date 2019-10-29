@@ -28,7 +28,7 @@ const App = () => {
   const [_isAuth, updateIsAuth] = useState(false)
   const [_isLoaded, updateIsLoaded] = useState(false)
   const [isAdmin, updateIsAdmin] = useState(false)
-  const context = useContext(UserConsumer)
+  // const context = useContext(UserConsumer)
 
   const isCanceled = useRef(false)
 
@@ -44,7 +44,7 @@ const App = () => {
     const response = await API.auth.check()
     if (!isCanceled.current && response.data.auth) {
       if (response.data.user.language) {
-        context.updateLanguage(response.data.user.language)
+        // context.updateLanguage(response.data.user.language)
       }
       if (response.data.user.admin) {
         updateIsAdmin(true)
@@ -87,9 +87,6 @@ const App = () => {
                   _isAuth ? <Redirect to ="/" /> : <Login />
                 )}/>
 
-                {/* <Route exact path='/search' component={() => (
-                  _isAuth ? <Search /> : <Redirect to="/login" />
-                )}/> */}
                 <Route exact path='/confirm/:key' component={() => <Confirm />} />
                 <Route exact path='/forgot/:key' component={() => <Forgot />} />
                 <Route component={() => <NotFound />} />

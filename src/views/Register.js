@@ -6,6 +6,7 @@ import Button from "components/Button";
 import ReCAPTCHA from "react-google-recaptcha";
 import { Link } from "react-router-dom";
 import { UserConsumer } from "store";
+import API from "controllers";
 
 import { verifyPasswd, verifyEmail, verifyUsername, verifyNameOrCity, verifyPhone, verifyAvatarExt, verifyAvatarSize } from "utils/functions"
 
@@ -61,7 +62,7 @@ const Register = () => {
               if (verifyEmail(newUser.email)) {
                 if (verifyNameOrCity(newUser.city)) {
                   if (verifyPhone(newUser.phone)) {
-                    const response = await axios.post(`http://${config.hostname}:${config.port}/users`, newUser);
+                    const response = await API.users.post(newUser);
                     if (!isCanceled.current && response && response.data.success)
                       setSuccess(true);
                     else if (!isCanceled.current)

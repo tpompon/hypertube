@@ -127,9 +127,6 @@ router
     if (req.body.phone) updateQuery.phone = req.body.phone;
 
     User.find({ _id: req.user._id }, (err, user) => {
-      // if (user.username == req.body.username || user.email == req.body.email) {
-      //   return res.json({ success: false });
-      // }
       if (err) { return res.json({success: false}); }
       else if (!user || !err ) {
         User.findOneAndUpdate(
@@ -159,15 +156,14 @@ router
 
 router.route("/avatar").post((req, res) => {
   const imageFile = req.files.file;
-  const timestamp = Date.now();
   imageFile.mv(
-    `public/avatars/${req.user._id}_${timestamp}.jpg`,
+    `public/avatars/${req.user._id}.jpg`,
     err => {
       if (err) res.json({ success: false, error: err });
       else {
         User.findOneAndUpdate(
           { _id: req.user._id },
-          { avatar: `http://${config.server.host}:${config.server.port}/public/avatars/${req.user._id}_${timestamp}.jpg` },
+          { avatar: `http://${config.server.host}:${config.server.port}/public/avatars/${req.user._id}.jpg` },
           (err, doc, result) => {
             if (err) {
               res.json({
@@ -176,7 +172,7 @@ router.route("/avatar").post((req, res) => {
             } else if (doc) {
               res.json({
                 success: true,
-                file: `public/avatars/${req.user._id}_${timestamp}.jpg`
+                file: `public/avatars/${req.user._id}.jpg`
               });
             }
           }
