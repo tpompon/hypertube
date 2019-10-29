@@ -22,19 +22,26 @@ const Header = props => {
   const refSearchBar = useRef(null);
   const refSearchBarLow = useRef(null);
   const refAvatar = useRef(null);
+  const isCanceled = useRef(false)
+
+  useEffect(() => {
+    return () => {
+      isCanceled.current = true
+    }
+  }, [])
 
   useEffect(() => {
 
     const fetchData = async () => {
       const responseAuth = await API.auth.check();
-      if (responseAuth.data.auth) {
+      if (!isCanceled.current && responseAuth.data.auth) {
         updateIsAuth(true);
         window.addEventListener("mousedown", closeMenu);
         const responseUser = await API.users.byId.get(responseAuth.data.user._id);
-        if (responseUser.data.success) {
+        if (!isCanceled.current && responseUser.data.success) {
           updateAvatar(responseUser.data.user[0].avatar);
           const responseMovies = await API.movies.get();
-          if (responseMovies.data.success) {
+          if (!isCanceled.current && responseMovies.data.success) {
             updateMovies(responseMovies.data.movies);
           }
         }

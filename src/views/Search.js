@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useContext, useRef } from "react";
 import axios from "axios";
 import config from "config";
 import Button from "components/Button";
@@ -44,58 +44,66 @@ const Search = props => {
     order: "asc"
   });
   let inProgress = false;
+  const isCanceled = useRef(false)
   const context = useContext(UserConsumer);
   const { language, search } = context;
 
   useEffect(() => {
     fetchMovies();
+    return () => {
+      isCanceled.current = true
+    }
     // eslint-disable-next-line
   }, []);
 
   const fetchMovies = async () => {
-    updateIsLoaded(false);
-    setPage(1);
-    const response = await axios.get(
-      `http://${config.hostname}:${
-        config.port
-      }/torrents/yts/search?search=${escapeSpecial(search)}${
-        filter.genre !== "" ? "&genre=" + filter.genre : ""
-      }${filter.minYear !== "" ? "&minyear=" + filter.minYear : ""}${
-        filter.maxYear !== "" ? "&maxyear=" + filter.maxYear : ""
-      }${filter.minRating !== "" ? "&minrating=" + filter.minRating : ""}${
-        filter.maxRating !== "" ? "&maxrating=" + filter.maxRating : ""
-      }${filter.sort !== "" ? "&sort=" + filter.sort : ""}${
-        filter.order !== "" ? "&order=" + filter.order : ""
-      }`
-    );
-    if (response) {
-      updateMoviesYTS(response.data.results);
-      updateIsLoaded(true);
+    if (!isCanceled.current) {
+      updateIsLoaded(false);
+      setPage(1);
+      const response = await axios.get(
+        `http://${config.hostname}:${
+          config.port
+        }/torrents/yts/search?search=${escapeSpecial(search)}${
+          filter.genre !== "" ? "&genre=" + filter.genre : ""
+        }${filter.minYear !== "" ? "&minyear=" + filter.minYear : ""}${
+          filter.maxYear !== "" ? "&maxyear=" + filter.maxYear : ""
+        }${filter.minRating !== "" ? "&minrating=" + filter.minRating : ""}${
+          filter.maxRating !== "" ? "&maxrating=" + filter.maxRating : ""
+        }${filter.sort !== "" ? "&sort=" + filter.sort : ""}${
+          filter.order !== "" ? "&order=" + filter.order : ""
+        }`
+      );
+      if (!isCanceled.current && response) {
+        updateMoviesYTS(response.data.results);
+        updateIsLoaded(true);
+      }
     }
   };
 
   const loadMoreMovies = async () => {
-    setPage(curr => curr + 1);
-    setLoadMore(true);
-    const resp = await axios.get(
-      `http://${config.hostname}:${
-        config.port
-      }/torrents/yts/search?search=${escapeSpecial(search)}${
-        filter.genre !== "" ? "&genre=" + filter.genre : ""
-      }${filter.minYear !== "" ? "&minyear=" + filter.minYear : ""}${
-        filter.maxYear !== "" ? "&maxyear=" + filter.maxYear : ""
-      }${filter.minRating !== "" ? "&minrating=" + filter.minRating : ""}${
-        filter.maxRating !== "" ? "&maxrating=" + filter.maxRating : ""
-      }${filter.sort !== "" ? "&sort=" + filter.sort : ""}${
-        filter.order !== "" ? "&order=" + filter.order : ""}
-      ${page ? "&page=" + (page + 1) : ""}`
-    );
-    if (resp) {
-      updateMoviesYTS(prevArray => [
-        ...prevArray,
-        ...resp.data.results
-      ]);
-      setLoadMore(false);
+    if (!isCanceled.current) {
+      setPage(curr => curr + 1);
+      setLoadMore(true);
+      const resp = await axios.get(
+        `http://${config.hostname}:${
+          config.port
+        }/torrents/yts/search?search=${escapeSpecial(search)}${
+          filter.genre !== "" ? "&genre=" + filter.genre : ""
+        }${filter.minYear !== "" ? "&minyear=" + filter.minYear : ""}${
+          filter.maxYear !== "" ? "&maxyear=" + filter.maxYear : ""
+        }${filter.minRating !== "" ? "&minrating=" + filter.minRating : ""}${
+          filter.maxRating !== "" ? "&maxrating=" + filter.maxRating : ""
+        }${filter.sort !== "" ? "&sort=" + filter.sort : ""}${
+          filter.order !== "" ? "&order=" + filter.order : ""}
+        ${page ? "&page=" + (page + 1) : ""}`
+      );
+      if (!isCanceled.current && resp) {
+        updateMoviesYTS(prevArray => [
+          ...prevArray,
+          ...resp.data.results
+        ]);
+        setLoadMore(false);
+      }
     }
   };
 
@@ -108,12 +116,12 @@ const Search = props => {
     const responseMovies = await axios.get(
       `http://${config.hostname}:${config.port}/movies/yts/${ytsID}`
     );
-    if (!responseMovies.data.success) {
+    if (!isCanceled.current && !responseMovies.data.success) {
       inProgress = true;
       const responseYts = await axios.get(
         `http://${config.hostname}:${config.port}/torrents/yts/${ytsID}`
       );
-      if (responseYts) {
+      if (!isCanceled.current && responseYts) {
         const movie = responseYts.data.result.data.movie;
         movie.torrents.forEach(torrent => {
           torrent.magnet = `magnet:?xt=urn:btih:${
@@ -136,10 +144,10 @@ const Search = props => {
           author: "Someone"
         };
         const responseNewMovie = await axios.post(`${config.serverURL}/movies`, newMovie);
-        if (responseNewMovie.data.success)
+        if (!isCanceled.current && responseNewMovie.data.success)
           props.history.push(`/watch/${responseNewMovie.data.movie._id}`);
       } else inProgress = false;
-    } else props.history.push(`/watch/${responseMovies.data.movie._id}`);
+    } else if (!isCanceled.current) props.history.push(`/watch/${responseMovies.data.movie._id}`);
   };
 
   return (

@@ -30,9 +30,13 @@ const Register = () => {
   const recaptchaRef = useRef(null);
   const context = useContext(UserConsumer);
   const { language } = context;
+  const isCanceled = useRef(false)
 
   useEffect(() => {
     verifyPasswords();
+    return () => {
+      isCanceled.current = true
+    }
   });
 
   const onChangeReCAPTCHA = key => {
@@ -41,7 +45,8 @@ const Register = () => {
 
   const register = () => {
 
-    setError(null);
+    if (!isCanceled.current)
+      setError(null);
 
     setTimeout(async () => {
       if (verifyNameOrCity(newUser.firstname)) {
@@ -52,9 +57,9 @@ const Register = () => {
                 if (verifyNameOrCity(newUser.city)) {
                   if (verifyPhone(newUser.phone)) {
                     const response = await axios.post(`http://${config.hostname}:${config.port}/users`, newUser);
-                    if (response && response.data.success)
+                    if (!isCanceled.current && response && response.data.success)
                       setSuccess(true);
-                    else
+                    else if (!isCanceled.current)
                       setError("Username or email already used")
                   } else setError("Invalid phone");
                 } else setError("Invalid city");
@@ -95,7 +100,7 @@ const Register = () => {
           data.append("file", event.target.files[0]);
           data.append("filename", event.target.files[0].name);
           const res = await axios.post(`${config.serverURL}/register/avatar`, data);
-          if (res.data.success) {
+          if ( !isCanceled.current && res.data.success) {
             updatenewUser({
               ...newUser,
               avatar: `http://${config.hostname}:${config.port}/public/avatars/tmp/${res.data.file}`

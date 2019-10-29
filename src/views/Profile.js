@@ -29,10 +29,13 @@ const Profile = () => {
   const context = useContext(UserConsumer);
   const { language, avatar, updateAvatar } = context;
 
+  const isCancelled = useRef(false)
+
   useEffect(() => {
     fetchData();
     window.addEventListener("mousedown", closeCoverMenu);
     return () => {
+      isCancelled.current = true
       window.removeEventListener("mousedown", closeCoverMenu);
     };
     // eslint-disable-next-line
@@ -40,9 +43,9 @@ const Profile = () => {
 
   const fetchData = async () => {
     const check = await axios.get(`${config.serverURL}/auth`);
-    if (check.data.auth) {
+    if (!isCancelled.current && check.data.auth) {
       const res = await API.users.byId.get();
-      if (res.data.success) {
+      if (!isCancelled.current && res.data.success) {
         updateUser(res.data.user[0]);
         const getHeartbeatList = await getMoviesList(res.data.user[0].heartbeat);
         updateHeartbeat(getHeartbeatList);

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { ReactComponent as TerminalIcon } from "svg/terminal.svg";
 import { ReactComponent as Close } from "svg/close.svg";
 import { commands } from "utils/commandsTerminal";
@@ -7,17 +7,22 @@ const Terminal = () => {
   const [input, updateInput] = useState("");
   const [show, toggleShow] = useState(false);
   const [history, updateHistory] = useState([]);
+  const isCanceled = useRef(false)
 
   useEffect(() => {
-    // DidMount
+    return () => {
+      isCanceled.current = true
+    }
   }, []);
 
   const handleKeyDown = async e => {
     const key = e.which || e.keyCode;
     if (key === 13 && input.trim() !== "") {
       const response = await commands(input, history);
-      updateHistory(response);
-      updateInput("");
+      if (!isCanceled.current) {
+        updateHistory(response);
+        updateInput("");
+      }
     }
   };
 

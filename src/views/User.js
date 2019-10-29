@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import { withRouter } from "react-router-dom";
 import axios from "axios";
 import config from "config";
@@ -15,23 +15,29 @@ const User = props => {
   const [heartbeat, updateHeartbeat] = useState([]);
   const [recents, updateRecents] = useState([]);
   const context = useContext(UserConsumer);
+  const isCancelled = useRef(false)
   const { language } = context;
   const { match } = props;
 
   useEffect(() => {
     fetchData();
+    return () => {
+      isCancelled.current = true
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchData = async () => {
     const res = await API.users.byUsername.get(match.params.username);
-    if (res.data.success) {
+    if (!isCancelled.current && res.data.success) {
       updateUser(res.data.user[0]);
       if (res.data.user[0]) {
         const getHeartbeatList = await getMoviesList(res.data.user[0].heartbeat);
-        updateHeartbeat(getHeartbeatList);
+        if (!isCancelled.current)
+          updateHeartbeat(getHeartbeatList);
         const getRecentsList = await getMoviesList(res.data.user[0].recents);
-        updateRecents(getRecentsList);
+        if (!isCancelled.current)
+          updateRecents(getRecentsList);
       }
       updateIsLoaded(true);
     }

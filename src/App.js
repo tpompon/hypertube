@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext, useRef } from 'react';
 import './App.css';
 import Header from './components/Header'
 import Footer from './components/Footer'
 import Terminal from './components/Terminal'
+import { UserConsumer } from "store";
 
 import Search from './views/Search'
 
@@ -26,14 +27,28 @@ const App = () => {
   
   const [_isAuth, updateIsAuth] = useState(false)
   const [_isLoaded, updateIsLoaded] = useState(false)
+  const [isAdmin, updateIsAdmin] = useState(false)
+  const context = useContext(UserConsumer)
+
+  const isCancelled = useRef(false)
 
   useEffect(() => {
     fetchDataUser()
+    return () => {
+      isCancelled.current = true
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const fetchDataUser = async() => {
     const response = await API.auth.check()
-    if (response.data.auth) {
+    if (!isCancelled.current && response.data.auth) {
+      if (response.data.user.language) {
+        context.updateLanguage(response.data.user.language)
+      }
+      if (response.data.user.admin) {
+        updateIsAdmin(true)
+      }
       updateIsAuth(true)
     }
     updateIsLoaded(true)
@@ -85,7 +100,7 @@ const App = () => {
           }
         </div>
 
-        <Terminal />
+        { (isAdmin) ? <Terminal /> : null }
 
         <Footer />
       </div>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { withRouter } from "react-router-dom";
 import Loading from "components/Loading";
 import Button from "components/Button";
@@ -12,21 +12,25 @@ const Forgot = props => {
   const [confirmPassword, updateConfirmPassword] = useState("");
   const [status, updateStatus] = useState("");
   const [_isLoaded, updateIsLoaded] = useState(false);
+  const isCanceled = useRef(false)
 
   useEffect(() => {
     const fetchKey = async () => {
       const response = await API.auth.forgotByKey.get(key);
-      if (response.data.success) {
+      if (!isCanceled.current && response.data.success) {
         updateStatus("ok");
         updateUser(response.data.user[0]);
         updateIsLoaded(true);
-      } else {
+      } else if (!isCanceled.current) {
         updateStatus("not found");
         updateIsLoaded(true);
       }
     };
 
     fetchKey();
+    return () => {
+      isCanceled.current = true
+    }
   }, [key]);
 
   const validate = async () => {
@@ -36,9 +40,9 @@ const Forgot = props => {
     if (verifyPasswd(password, confirmPassword)) {
       const body = { passwd: password };
       const response = await API.auth.forgotByKey.post(key, body);
-      if (response.data.success) {
+      if (!isCanceled.current && response.data.success) {
         console.log("updated");
-      } else {
+      } else if (!isCanceled.current) {
         console.log("error not updated");
       }
     } else {

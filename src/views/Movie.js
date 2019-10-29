@@ -37,9 +37,11 @@ const Movie = props => {
   const [togglePlayer, updateTogglePlayer] = useState(false);
   const [subtitles, updateSubtitles] = useState({})
   const player = useRef(null);
+  const isCanceled = useRef(false)
 
   useEffect(() => {
     return () => {
+      isCanceled.current = true
       document.removeEventListener("scroll", handleScroll, false);
       document.removeEventListener("keydown", onEscape, false);
 
@@ -67,8 +69,15 @@ const Movie = props => {
 
   const fetchMovie = async () => {
     const resp = await API.movies.byId.get(id);
-    if (resp) {
+    if (!isCanceled.current && resp) {
       if (resp.data.movie[0]) {
+        let torrentMinSize = null
+        resp.data.movie[0].ytsData.torrents.forEach((torrent) => {
+          if (torrentMinSize === null || torrentMinSize.size > torrent.size) {
+            torrentMinSize = torrent
+          }
+        })
+        resp.data.movie[0].ytsData.torrents[0] = torrentMinSize
         updateMovie(resp.data.movie[0]);
 
         updateLoaded(true);
@@ -77,31 +86,31 @@ const Movie = props => {
         document.addEventListener("keydown", onEscape, false);
 
         const res = await API.movies.inprogressById.get(id);
-        if (res.data.success && res.data.found > 0) {
+        if (!isCanceled.current && res.data.success && res.data.found > 0) {
           const videoPlayer = document.getElementsByClassName('video-player')[0]
           videoPlayer.currentTime = res.data.list.inProgress[0].timecode;
         }
 
         const resSubtitles = await axios.get(`${config.serverURL}/torrents/subtitles/${resp.data.movie[0].ytsData.imdb_code}`)
-        if (resSubtitles && resSubtitles.data.subtitles) {
+        if (!isCanceled.current && resSubtitles && resSubtitles.data.subtitles) {
           updateSubtitles(resSubtitles.data.subtitles)
         }
       }
     }
     const responseUser = await API.auth.check();
-    if (responseUser) {
+    if (!isCanceled.current && responseUser) {
       updateUser(responseUser.data.user);
 
       const responseHeartbeat = await API.movies.heartbeatById.get(id)
-      if (responseHeartbeat.data.success && responseHeartbeat.data.found > 0)
+      if (!isCanceled.current && responseHeartbeat.data.success && responseHeartbeat.data.found > 0)
         updateHeartbeat(true);
 
       const responseRating = await API.movies.ratingsByIdAndUID.get(id);
-      if (responseRating.data.rating)
+      if (!isCanceled.current && responseRating.data.rating)
         updateRating(responseRating.data.rating);
 
       const responseRatingCount = await API.movies.ratingsById.get(id);
-      if (responseRatingCount.data.success) {
+      if (!isCanceled.current && responseRatingCount.data.success) {
         updateRatingAverage(responseRatingCount.data.ratingAverage);
         updateRatingCount(responseRatingCount.data.ratingCount);
       }
@@ -137,14 +146,13 @@ const Movie = props => {
       content: comment
     };
 
-    if (newComment.content.trim() !== "") {
-      const response = await API.movies.commentsById.post(id, newComment);
-      if (response) {
-        console.log(response.data);
+    if (!isCanceled.current) {
+      if (newComment.content.trim() !== "") {
+        API.movies.commentsById.post(id, newComment);
+        updateMovie({ ...movie, comments: [...movie.comments, newComment] });
       }
-      updateMovie({ ...movie, comments: [...movie.comments, newComment] });
+      updateComment("");
     }
-    updateComment("");
   };
 
   const updatingRating = async value => {
@@ -152,10 +160,10 @@ const Movie = props => {
       rating: value
     };
     const response = await API.movies.ratingsById.post(id, newRating);
-    if (response) {
+    if (!isCanceled.current && response) {
       updateRating(value);
       const responseRating = await API.movies.ratingsById.get(id);
-      if (responseRating.data.success) {
+      if (!isCanceled.current && responseRating.data.success) {
         updateRatingAverage(responseRating.data.ratingAverage);
         updateRatingCount(responseRating.data.ratingCount);
       }

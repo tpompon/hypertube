@@ -58,14 +58,13 @@ const PostersSlider = props => {
     const maxPosterShowInPage = pageWidth / valuePos
     const index = -pos / valuePos
     const length = movies.length
-
     if (length * valuePos < pageWidth) {
       return
     }
     if (pos > 0) {
       updateCurrentPos(0)
     } else if ((length - index) <= maxPosterShowInPage) {
-      updateCurrentPos((((length - maxPosterShowInPage) * -valuePos) - (maxPosterShowInPage * 20)) - (pageWidth - (maxPosterShowInPage * valuePos)))
+      updateCurrentPos((((length - maxPosterShowInPage) * -valuePos) - ((length + 1) * 20)) - (pageWidth - (maxPosterShowInPage * valuePos)))
     } else {
       updateCurrentPos(pos)
     }

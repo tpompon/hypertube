@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import translations from "translations";
 import Button from "components/Button";
 import Loading from "components/Loading";
@@ -15,6 +15,8 @@ const Settings = () => {
   const [success, setSuccess] = useState(null);
   const [isDeleted, updateIsDeleted] = useState(false);
 
+  const isCanceled = useRef(false)
+
   useEffect(() => {
     getDataUser();
   }, []);
@@ -26,11 +28,14 @@ const Settings = () => {
         window.location.href = "http://localhost:3000/login";
       }, 1000);
     }
+    return () => {
+      isCanceled.current = true
+    }
   }, [isDeleted]);
 
   const handleDeleteAccount = async () => {
     const response = await API.users.byId.delete(user);
-    if (response.data.success)
+    if (!isCanceled.current && response.data.success)
       updateIsDeleted(true);
   };
 
@@ -38,7 +43,7 @@ const Settings = () => {
     const responseAuth = await API.auth.check()
     if (responseAuth) {
       const responseUser = await API.users.byId.get();
-      if (responseUser) {
+      if (!isCanceled.current && responseUser) {
         updateUser(responseUser.data.user[0]);
         updateIsLoaded(true);
       }
@@ -50,13 +55,16 @@ const Settings = () => {
   };
 
   const handleChangeLanguage = event => {
+    context.updateLanguage(event.target.value)
     updateLanguage(event.target.value);
   };
 
   const handleSubmit = () => {
 
-    setError(null);
-    setSuccess(null);
+    if (!isCanceled.current) {
+      setError(null);
+      setSuccess(null);
+  }
 
     setTimeout(async () => {
       if (user.firstname && !verifyNameOrCity(user.firstname))
@@ -75,9 +83,9 @@ const Settings = () => {
         return setError("Invalid city")
 
       const res = await API.users.byId.put(user);
-      if (res.data.success)
+      if (!isCanceled.current && res.data.success)
         setSuccess("Informations updated")
-      else
+      else if (!isCanceled.current)
         setError("Email or Username already in use")
     }, 100);
   };

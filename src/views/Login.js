@@ -1,4 +1,4 @@
-import React, { useState, useContext, useRef } from "react";
+import React, { useState, useContext, useRef, useEffect } from "react";
 import axios from "axios";
 import config from "config";
 import translations from "translations";
@@ -25,6 +25,13 @@ const Login = () => {
     translations[language].login.inputs.forgotPassword
   );
   const recaptchaRef = useRef(null);
+  const isCanceled = useRef(false)
+
+    useEffect(() => {
+      return () => {
+        isCanceled.current = true
+      }
+    })
 
   const onChangeReCAPTCHA = key => {
     console.log(key);
@@ -53,9 +60,9 @@ const Login = () => {
         `http://${config.hostname}:${config.port}/auth/login/local`,
         body
       );
-      if (response.data.success) {
+      if (!isCanceled.current && response.data.success) {
         window.location.href = `http://localhost:3000/`;
-      } else {
+      } else if (!isCanceled.current) {
         updateError(response.data.status);
         document.getElementById("error").style.display = "block";
       }
@@ -66,10 +73,10 @@ const Login = () => {
     document.getElementById("error2").style.display = "none";
     const body = { email, origin: window.location.origin };
     const response = await axios.post(`${config.serverURL}/auth/forgot`, body);
-    if (!response.data.success) {
+    if (!isCanceled.current && !response.data.success) {
       updateSecondError(response.data.status);
       document.getElementById("error2").style.display = "block";
-    } else {
+    } else if (!isCanceled.current) {
       document.getElementById("success").style.display = "block";
     }
   };

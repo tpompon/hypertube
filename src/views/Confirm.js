@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { withRouter } from "react-router-dom";
 import Loading from "components/Loading";
 import { ReactComponent as CheckMark } from "svg/checkmark.svg";
@@ -9,24 +9,28 @@ const Confirm = props => {
   const { key } = props.match.params;
   const [status, updateStatus] = useState("");
   const [_isLoaded, updateIsLoaded] = useState(false);
+  const isCanceled = useRef(false)
 
   useEffect(() => {
     const fetchData = async () => {
       const response = await API.auth.confirm({ key });
       console.log(response.data);
-      if (response.data.success) {
+      if (!isCanceled.current && response.data.success) {
         updateStatus("ok");
         updateIsLoaded(true);
         setTimeout(() => {
           window.location.href = "http://localhost:3000/login";
         }, 1000);
-      } else {
+      } else if (!isCanceled.current) {
         updateStatus("not found");
         updateIsLoaded(true);
       }
     };
 
     fetchData();
+    return () => {
+      isCanceled.current = true
+    }
   }, [key]);
 
   return _isLoaded ? (

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import config from "config";
 import Rating from "react-rating";
@@ -12,21 +12,28 @@ const Poster = props => {
   const [ratingAverage, updateRatingAverage] = useState(0);
   const [ratingCount, updateRatingCount] = useState(0);
   const [progress, setProgress] = useState(0);
+  const isCanceled = useRef(false)
+
+  useEffect(() => {
+    return () => {
+      isCanceled.current = true
+    }
+  }, [])
 
   useEffect(() => {
     const fetchMovieData = async () => {
       const response = await API.movies.ratingsById.get(movie._id);
-      if (response.data.success) {
+      if (!isCanceled.current && response.data.success) {
         updateRatingAverage(response.data.ratingAverage);
         updateRatingCount(response.data.ratingCount);
       }
       if (!username) {
         const resp = await axios.get(`${config.serverURL}/movies/${movie._id}/progress`)
-        if (resp.data.success)
+        if (!isCanceled.current && resp.data.success)
           setProgress(resp.data.watchPercent)
       } else {
         const resp = await axios.get(`${config.serverURL}/movies/${movie._id}/${username}/progress`)
-        if (resp.data.success)
+        if (!isCanceled.current && resp.data.success)
           setProgress(resp.data.watchPercent)
       }
     };
@@ -38,7 +45,6 @@ const Poster = props => {
     <div className="poster-container">
       <img className="movie-poster" src={movie.poster} alt={movie.name} />
       <ProgressBar progress={progress} />
-      {/* To replace with the progression watch time of the user on the movie */}
       <div className="poster-overlay">
         <div className="poster-content">
           <h3>{movie.name} ({movie.ytsData.year})</h3>

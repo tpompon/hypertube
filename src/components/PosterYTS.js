@@ -17,7 +17,6 @@ const Poster = ({ movie, language, from }) => (
       alt={movie.title}
     />
     <ProgressBar progress={movie.watchPercent ? movie.watchPercent : 0} />
-    {/* To replace with the progression watch time of the user on the movie */}
     <div className="poster-overlay">
       <div className="poster-content">
         <h3>{movie.title} ({movie.year})</h3>
