@@ -161,18 +161,26 @@ router.route("/avatar").post((req, res) => {
   const imageFile = req.files.file;
   const timestamp = Date.now();
   imageFile.mv(
-    `${__basedir}/public/avatars/${req.user._id}_${timestamp}.jpg`,
+    `public/avatars/${req.user._id}_${timestamp}.jpg`,
     err => {
       if (err) res.json({ success: false, error: err });
       else {
         User.findOneAndUpdate(
           { _id: req.user._id },
-          {avatar: `http://${config.server.host}:${config.server.port}/public/avatars/${req.user._id}_${timestamp}.jpg`}
+          { avatar: `http://${config.server.host}:${config.server.port}/public/avatars/${req.user._id}_${timestamp}.jpg` },
+          (err, doc, result) => {
+            if (err) {
+              res.json({
+                success: false
+              });
+            } else if (doc) {
+              res.json({
+                success: true,
+                file: `public/avatars/${req.user._id}_${timestamp}.jpg`
+              });
+            }
+          }
         );
-        res.json({
-          success: true,
-          file: `public/avatars/${req.user._id}_${timestamp}.jpg`
-        });
       }
     }
   );

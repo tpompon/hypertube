@@ -27,11 +27,11 @@ const Login = () => {
   const recaptchaRef = useRef(null);
   const isCanceled = useRef(false)
 
-    useEffect(() => {
-      return () => {
-        isCanceled.current = true
-      }
-    })
+  useEffect(() => {
+    return () => {
+      isCanceled.current = true
+    }
+  }, [])
 
   const onChangeReCAPTCHA = key => {
     console.log(key);

@@ -19,6 +19,9 @@ const Settings = () => {
 
   useEffect(() => {
     getDataUser();
+    return () => {
+      isCanceled.current = true
+    }
   }, []);
 
   useEffect(() => {
@@ -27,9 +30,6 @@ const Settings = () => {
       setTimeout(() => {
         window.location.href = "http://localhost:3000/login";
       }, 1000);
-    }
-    return () => {
-      isCanceled.current = true
     }
   }, [isDeleted]);
 

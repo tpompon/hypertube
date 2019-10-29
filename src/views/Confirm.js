@@ -12,9 +12,14 @@ const Confirm = props => {
   const isCanceled = useRef(false)
 
   useEffect(() => {
+    return () => {
+      isCanceled.current = true
+    }
+  }, [])
+
+  useEffect(() => {
     const fetchData = async () => {
       const response = await API.auth.confirm({ key });
-      console.log(response.data);
       if (!isCanceled.current && response.data.success) {
         updateStatus("ok");
         updateIsLoaded(true);
@@ -28,9 +33,6 @@ const Confirm = props => {
     };
 
     fetchData();
-    return () => {
-      isCanceled.current = true
-    }
   }, [key]);
 
   return _isLoaded ? (

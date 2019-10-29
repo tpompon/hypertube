@@ -13,6 +13,12 @@ import { ReactComponent as FruitsIcon } from "svg/fruits-icon.svg";
 import { UserConsumer } from "store";
 import API from "controllers";
 import { verifyAvatarExt, verifyAvatarSize } from "utils/functions"
+import {
+  FacebookShareButton,
+  TwitterShareButton,
+  FacebookIcon,
+  TwitterIcon
+} from "react-share";
 
 const covers = ["cinema", "japan", "animals", "fruits"];
 
@@ -28,14 +34,15 @@ const Profile = () => {
   const uploadAvatar = useRef(null);
   const context = useContext(UserConsumer);
   const { language, avatar, updateAvatar } = context;
+  const shareUrl = `${window.location.origin}/user/${user.username}`;
 
-  const isCancelled = useRef(false)
+  const isCanceled = useRef(false)
 
   useEffect(() => {
     fetchData();
     window.addEventListener("mousedown", closeCoverMenu);
     return () => {
-      isCancelled.current = true
+      isCanceled.current = true
       window.removeEventListener("mousedown", closeCoverMenu);
     };
     // eslint-disable-next-line
@@ -43,18 +50,21 @@ const Profile = () => {
 
   const fetchData = async () => {
     const check = await axios.get(`${config.serverURL}/auth`);
-    if (!isCancelled.current && check.data.auth) {
+    if (!isCanceled.current && check.data.auth) {
       const res = await API.users.byId.get();
-      if (!isCancelled.current && res.data.success) {
-        updateUser(res.data.user[0]);
+      if (!isCanceled.current && res.data.success) {
+        if (!isCanceled.current)
+          updateUser(res.data.user[0]);
         const getHeartbeatList = await getMoviesList(res.data.user[0].heartbeat);
-        updateHeartbeat(getHeartbeatList);
+        if (!isCanceled.current) updateHeartbeat(getHeartbeatList);
         const getRecentsList = await getMoviesList(res.data.user[0].recents);
-        updateRecents(getRecentsList);
+        if (!isCanceled.current) updateRecents(getRecentsList);
         const getInProgressList = await getMoviesList(res.data.user[0].inProgress);
-        updateInProgress(getInProgressList);
-        updateCoverBackground(res.data.user[0].cover);
-        updateIsLoaded(true);
+        if (!isCanceled.current) {
+          updateInProgress(getInProgressList);
+          updateCoverBackground(res.data.user[0].cover);
+          updateIsLoaded(true);
+        }
       }
     }
   };
@@ -115,10 +125,8 @@ const Profile = () => {
           data.append("file", event.target.files[0]);
           data.append("filename", event.target.files[0].name);
           const response = await API.users.avatarById.post(data);
-          if (response.data.success) {
-            updateAvatar(
-              `http://${config.hostname}:${config.port}/${response.data.file}`
-            );
+          if (!isCanceled.current && response.data.success) {
+            updateAvatar(`http://${config.hostname}:${config.port}/${response.data.file}`);
             updateUser({
               ...user,
               avatar: `http://${config.hostname}:${config.port}/${response.data.file}`
@@ -181,6 +189,28 @@ const Profile = () => {
                 <span className="tooltip-text">
                   {translations[language].profile.tooltip.copy}
                 </span>
+              </div>
+            </div>
+            <div
+              className="col"
+              style={{
+                position: 'relative',
+                left: 30,
+                bottom: -40
+              }}
+            >
+              <div className="hover-pointer" style={{display: 'table', marginBottom: 10}}>
+                <FacebookShareButton url={`${shareUrl}`}>
+                  <FacebookIcon size={34} round />
+                </FacebookShareButton>
+              </div>
+              <div className="hover-pointer" style={{display: 'table'}}>
+                <TwitterShareButton
+                  title="Check out Hypertube"
+                  url={`${shareUrl}`}
+                >
+                  <TwitterIcon size={34} round />
+                </TwitterShareButton>
               </div>
             </div>
             <div

@@ -33,10 +33,13 @@ const Register = () => {
   const isCanceled = useRef(false)
 
   useEffect(() => {
-    verifyPasswords();
     return () => {
       isCanceled.current = true
     }
+  }, [])
+
+  useEffect(() => {
+    verifyPasswords();
   });
 
   const onChangeReCAPTCHA = key => {
@@ -45,8 +48,10 @@ const Register = () => {
 
   const register = () => {
 
-    if (!isCanceled.current)
+    if (!isCanceled.current) {
+      setSuccess(false);
       setError(null);
+    }
 
     setTimeout(async () => {
       if (verifyNameOrCity(newUser.firstname)) {
@@ -100,7 +105,7 @@ const Register = () => {
           data.append("file", event.target.files[0]);
           data.append("filename", event.target.files[0].name);
           const res = await axios.post(`${config.serverURL}/register/avatar`, data);
-          if ( !isCanceled.current && res.data.success) {
+          if (!isCanceled.current && res.data.success) {
             updatenewUser({
               ...newUser,
               avatar: `http://${config.hostname}:${config.port}/public/avatars/tmp/${res.data.file}`

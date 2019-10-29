@@ -30,19 +30,19 @@ const App = () => {
   const [isAdmin, updateIsAdmin] = useState(false)
   const context = useContext(UserConsumer)
 
-  const isCancelled = useRef(false)
+  const isCanceled = useRef(false)
 
   useEffect(() => {
     fetchDataUser()
     return () => {
-      isCancelled.current = true
+      isCanceled.current = true
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const fetchDataUser = async() => {
     const response = await API.auth.check()
-    if (!isCancelled.current && response.data.auth) {
+    if (!isCanceled.current && response.data.auth) {
       if (response.data.user.language) {
         context.updateLanguage(response.data.user.language)
       }

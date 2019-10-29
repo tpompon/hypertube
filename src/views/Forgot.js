@@ -13,6 +13,14 @@ const Forgot = props => {
   const [status, updateStatus] = useState("");
   const [_isLoaded, updateIsLoaded] = useState(false);
   const isCanceled = useRef(false)
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    return () => {
+      isCanceled.current = true
+    }
+  }, [])
 
   useEffect(() => {
     const fetchKey = async () => {
@@ -28,26 +36,30 @@ const Forgot = props => {
     };
 
     fetchKey();
-    return () => {
-      isCanceled.current = true
-    }
   }, [key]);
 
   const validate = async () => {
-    // Verify password security and match (make a function for all needed cases, in utility file)
-    // Update password in database and delete forgot key
+
+    if (!isCanceled.current) {
+      setSuccess(false);
+      setError(null);
+    }
 
     if (verifyPasswd(password, confirmPassword)) {
       const body = { passwd: password };
       const response = await API.auth.forgotByKey.post(key, body);
       if (!isCanceled.current && response.data.success) {
-        console.log("updated");
+        setSuccess(true);
       } else if (!isCanceled.current) {
-        console.log("error not updated");
+        setError("Sorry, an error occured");
       }
     } else {
-      console.log("Passwords don't match or not secure, must contains 1 uppercase letter, 1 number and 1 special character");
+      setError("Passwords don't match or not secure, must contains 1 uppercase letter, 1 number and 1 special character");
     }
+  };
+
+  const onEnter = e => {
+    if (e.keyCode === 13) validate();
   };
 
   return _isLoaded ? (
@@ -55,16 +67,43 @@ const Forgot = props => {
       {status === "ok" ? (
         <div className="dark-card center text-center">
           <div>
-            <span style={{ fontWeight: "bold" }}>{user.username}</span>, reset
-            your password
+            <span style={{ fontWeight: "bold" }}>{user.username}</span>, reset your password
           </div>
+
+          <div style={{marginTop: 20}}>
+          {
+            success ? (
+              <div
+                className="success"
+                style={{ display: "block" }}
+                onClick={() => setSuccess(false)}
+              >
+                Password has been reset successfully
+              </div>
+            ) : null
+          }
+
+          {
+            error ? (
+              <div
+                id="error"
+                className="error" style={{display: 'block', width: '100%'}}
+                onClick={() => { document.getElementById("error").style.display = "none"; setError(null); }}
+              >
+                {error}
+              </div>
+            ) : null
+          }
+          </div>
+
           <input
             value={password}
             onChange={event => updatePassword(event.target.value)}
             className="dark-input"
             type="password"
             placeholder="New password"
-            style={{ width: "100%", marginTop: 50, marginBottom: 5 }}
+            style={{ width: "100%", marginTop: 20, marginBottom: 5 }}
+            onKeyDown={(e) => onEnter(e)}
           />
           <input
             value={confirmPassword}
@@ -73,6 +112,7 @@ const Forgot = props => {
             type="password"
             placeholder="Confirm password"
             style={{ width: "100%", marginTop: 5, marginBottom: 20 }}
+            onKeyDown={(e) => onEnter(e)}
           />
           <div className="row" style={{ justifyContent: "space-around" }}>
             <div style={{ display: "table" }} onClick={() => validate()}>

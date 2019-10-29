@@ -37,7 +37,7 @@ const Search = props => {
   const [filter, updateFilter] = useState({
     genre: "",
     minYear: "1900",
-    maxYear: "2019",
+    maxYear: new Date().getFullYear(),
     minRating: 0,
     maxRating: 5,
     sort: "title",

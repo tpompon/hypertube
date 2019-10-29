@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext, useRef } from "react";
 import axios from "axios";
+import config from "config";
 import translations from "translations";
 import { ReactComponent as SearchIcon } from "svg/search.svg";
 import { Link } from "react-router-dom";
@@ -23,6 +24,7 @@ const Header = props => {
   const refSearchBarLow = useRef(null);
   const refAvatar = useRef(null);
   const isCanceled = useRef(false)
+  let inProgress = false;
 
   useEffect(() => {
     return () => {
@@ -40,9 +42,9 @@ const Header = props => {
         const responseUser = await API.users.byId.get(responseAuth.data.user._id);
         if (!isCanceled.current && responseUser.data.success) {
           updateAvatar(responseUser.data.user[0].avatar);
-          const responseMovies = await API.movies.get();
+          const responseMovies = await axios.get(`http://${config.hostname}:${config.port}/torrents/yts/search?search=${escapeSpecial(searchMovie)}&minyear=1900&maxyear=${new Date().getFullYear()}&minrating=0&maxrating=5`);
           if (!isCanceled.current && responseMovies.data.success) {
-            updateMovies(responseMovies.data.movies);
+            updateMovies(responseMovies.data.results);
           }
         }
       }
@@ -52,7 +54,7 @@ const Header = props => {
     return () => {
       window.removeEventListener("mousedown", closeMenu);
     };
-  }, [updateAvatar]);
+  }, [updateAvatar, searchMovie]);
 
   useEffect(() => {
     const closeSearchBar = event => {
@@ -99,6 +101,45 @@ const Header = props => {
     context.updateSearch(searchValue);
   };
 
+  const checkDatabase = async ytsID => {
+    if (inProgress) return;
+    const responseMovies = await axios.get(
+      `http://${config.hostname}:${config.port}/movies/yts/${ytsID}`
+    );
+    if (!isCanceled.current && !responseMovies.data.success) {
+      inProgress = true;
+      const responseYts = await axios.get(
+        `http://${config.hostname}:${config.port}/torrents/yts/${ytsID}`
+      );
+      if (!isCanceled.current && responseYts) {
+        const movie = responseYts.data.result.data.movie;
+        movie.torrents.forEach(torrent => {
+          torrent.magnet = `magnet:?xt=urn:btih:${
+            movie.torrents[0].hash
+          }&dn=${encodeURI(
+            movie.title
+          )}&tr=http://track.one:1234/announce&tr=udp://track.two:80`;
+          torrent.magnet2 = `magnet:?xt=urn:btih:${
+            movie.torrents[0].hash
+          }&dn=${encodeURI(
+            movie.title
+          )}&tr=http://track.one:1234/announce&tr=udp://tracker.openbittorrent.com:80`;
+        });
+        const newMovie = {
+          ytsId: movie.id,
+          name: movie.title,
+          poster: movie.large_cover_image,
+          ytsData: movie,
+          description: movie.description_full,
+          author: "Someone"
+        };
+        const responseNewMovie = await axios.post(`${config.serverURL}/movies`, newMovie);
+        if (!isCanceled.current && responseNewMovie.data.success)
+          window.location.href = `http://localhost:3000/watch/${responseNewMovie.data.movie._id}`;
+      } else inProgress = false;
+    } else if (!isCanceled.current) window.location.href = `http://localhost:3000/watch/${responseMovies.data.movie._id}`;
+  };
+
   return (
     <header style={{ marginBottom: 20 }}>
       {_isAuth ? (
@@ -140,36 +181,25 @@ const Header = props => {
                   style={{ display: searchInProgress ? "block" : "none" }}
                 >
                   {movies.map(movie => {
-                    if (
-                      movie.name
-                        .toLowerCase()
-                        .trim()
-                        .startsWith(searchMovie.toLowerCase().trim()) ||
-                      movie.name
-                        .toLowerCase()
-                        .trim()
-                        .startsWith(searchMovie.toLowerCase().trim())
-                    ) {
-                      return (
-                        <Link
-                          to={`/watch/${movie._id}`}
-                          key={`movie-${movie._id}`}
-                          onClick={() => resetSearchBar()}
-                        >
-                          <div className="search-bar-extended-result">
-                            <img
-                              src={movie.poster}
-                              width="20"
-                              height="20"
-                              alt={`movie-${movie._id}`}
-                              style={{ marginRight: 10 }}
-                            />
-                            {movie.name}
-                          </div>
-                        </Link>
-                      );
-                    }
-                    return null;
+                    return (
+                      <div
+                        key={`movie-${movie.id}`}
+                        className="search-bar-extended-result"
+                        onClick={() => {
+                          resetSearchBar();
+                          checkDatabase(movie.id);
+                        }}
+                      >
+                        <img
+                          src={movie.large_cover_image}
+                          width="20"
+                          height="20"
+                          alt={`movie-${movie.id}`}
+                          style={{ marginRight: 10 }}
+                        />
+                        {movie.title}
+                      </div>
+                    );
                   })}
                 </div>
               ) : null}
@@ -259,36 +289,25 @@ const Header = props => {
                 style={{ display: searchInProgress ? "block" : "none" }}
               >
                 {movies.map(movie => {
-                  if (
-                    movie.name
-                      .toLowerCase()
-                      .trim()
-                      .startsWith(searchMovie.toLowerCase().trim()) ||
-                    movie.name
-                      .toLowerCase()
-                      .trim()
-                      .startsWith(searchMovie.toLowerCase().trim())
-                  ) {
-                    return (
-                      <Link
-                        to={`/watch/${movie._id}`}
-                        key={`movie-${movie._id}`}
-                        onClick={() => resetSearchBar()}
-                      >
-                        <div className="search-bar-extended-result">
-                          <img
-                            src={movie.poster}
-                            width="20"
-                            height="20"
-                            alt={`movie-${movie._id}`}
-                            style={{ marginRight: 10 }}
-                          />
-                          {movie.name}
-                        </div>
-                      </Link>
-                    );
-                  }
-                  return null;
+                  return (
+                    <div
+                      key={`movie-${movie.id}-2`}
+                      className="search-bar-extended-result"
+                      onClick={() => {
+                        resetSearchBar();
+                        checkDatabase(movie.id);
+                      }}
+                    >
+                      <img
+                        src={movie.large_cover_image}
+                        width="20"
+                        height="20"
+                        alt={`movie-${movie.id}`}
+                        style={{ marginRight: 10 }}
+                      />
+                      {movie.title}
+                    </div>
+                  );
                 })}
               </div>
             ) : null}

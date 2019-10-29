@@ -18,7 +18,9 @@ const PostersSlider = props => {
       newCurrentPos(currentPos)
     }
     window.addEventListener("resize", handleResize)
-    return () => window.removeEventListener("resize", handleResize)
+    return () => {
+      window.removeEventListener("resize", handleResize)
+    }
     // eslint-disable-next-line
   }, [])
 
@@ -44,9 +46,8 @@ const PostersSlider = props => {
     const onMouseUp = () => {
       document.removeEventListener("mousemove", onMouseMove)
       document.removeEventListener("mouseup", onMouseUp)
-      if (!isDrag) {
-        return
-      }
+      if (!isDrag)
+        return;
       updateIsDraging(false)
     }
 
@@ -58,9 +59,8 @@ const PostersSlider = props => {
     const maxPosterShowInPage = pageWidth / valuePos
     const index = -pos / valuePos
     const length = movies.length
-    if (length * valuePos < pageWidth) {
-      return
-    }
+    if (length * valuePos < pageWidth)
+      return ;
     if (pos > 0) {
       updateCurrentPos(0)
     } else if ((length - index) <= maxPosterShowInPage) {
