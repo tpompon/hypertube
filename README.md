@@ -44,6 +44,20 @@ __Server:__
 
 -
 
+## Bonuses
+
+- Share profile on Facebook/Twitter
+
+- Terminal for Admin users
+
+- CSS without Framework, custom carousel
+
+- 3 OAuth methods (2 required)
+
+- Profile page, public profile page, option to customize banner
+
+- Movies list: heartbeat, recently viewed, in progress
+
 ## Possible improvements
 
 - ?  
