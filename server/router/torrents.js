@@ -88,20 +88,12 @@ const setMoviesInfo = (uid, body) => {
             }
           }
 
+        // Pas utile ?
         movie.torrents.map(torrent => {
-          torrent.magnet = `magnet:?xt=urn:btih:${
-            movie.torrents[0].hash
-          }&dn=${encodeURI(
-            movie.title
-          )}&tr=http://track.one:1234/announce&tr=udp://track.two:80`;
-          torrent.magnet2 = `magnet:?xt=urn:btih:${
-            movie.torrents[0].hash
-          }&dn=${encodeURI(
-            movie.title
-          )}&tr=http://track.one:1234/announce&tr=udp://tracker.openbittorrent.com:80`;
+          torrent.magnet = `magnet:?xt=urn:btih:${torrent.hash}&dn=${encodeURI(movie.title)}&tr=http://track.one:1234/announce&tr=udp://track.two:80`;
+          torrent.magnet2 = `magnet:?xt=urn:btih:${torrent.hash}&dn=${encodeURI(movie.title)}&tr=http://track.one:1234/announce&tr=udp://tracker.openbittorrent.com:80`;
           return torrent
         })
-        //console.log(movie.title === 'Batman & Mr. Freeze: SubZero' ? movie : null)
         return movie
       })
     )

@@ -131,8 +131,8 @@ const Profile = () => {
               avatar: `http://${config.hostname}:${config.port}/${response.data.file}`
             });
           }
-        } else alert("Avatar size exceeds limit")
-      } else alert("Invalid avatar type")
+        } else alert(translations[language].profile.errors.avatarSize)
+      } else alert(translations[language].profile.errors.avatarType)
     }
   };
 

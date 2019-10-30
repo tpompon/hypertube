@@ -41,7 +41,7 @@ router
     });
   })
   .delete((req, res) => {
-    Movie.findOneAndRemove({}, err => {
+    Movie.remove({}, err => {
       if (err) res.json({ success: false, error: err });
       else res.json({ success: true });
     });

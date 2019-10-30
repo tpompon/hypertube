@@ -66,14 +66,14 @@ const Register = () => {
                     if (!isCanceled.current && response && response.data.success)
                       setSuccess(true);
                     else if (!isCanceled.current)
-                      setError("Username or email already used")
-                  } else setError("Invalid phone");
-                } else setError("Invalid city");
-              } else setError("Invalid email");
-            } else setError("Invalid password");
-          } else setError("Invalid username");
-        } else setError("Invalid lastname");
-      } else setError("Invalid firstname");
+                      setError(translations[language].register.errors.alreadyUse)
+                  } else setError(translations[language].register.errors.phone);
+                } else setError(translations[language].register.errors.city);
+              } else setError(translations[language].register.errors.email);
+            } else setError(translations[language].register.errors.password);
+          } else setError(translations[language].register.errors.username);
+        } else setError(translations[language].register.errors.lastname);
+      } else setError(translations[language].register.errors.firstname);
     }, 100)
   };
 
@@ -113,10 +113,10 @@ const Register = () => {
             });
           }
         } else {
-          setError("Avatar size too high")
+          setError(translations[language].register.errors.avatarSize)
         }
       } else {
-        setError("Avatar extension invalid")
+        setError(translations[language].register.errors.avatarType)
       }
     }
   };
@@ -128,9 +128,8 @@ const Register = () => {
           className="profile-avatar-overlay"
           onClick={() => uploadAvatar.current.click()}
         >
-          Upload avatar
+          {translations[language].register.avatarUpload}
         </div>
-        {/* To translate */}
         <input
           type="file"
           id="file"
@@ -138,7 +137,7 @@ const Register = () => {
           onChange={e => onChangeAvatar(e)}
           style={{ display: "none" }}
         />
-        <img src={newUser.avatar} alt={`Upload avatar`} />
+        <img src={newUser.avatar} alt={translations[language].register.avatarUpload} />
       </div>
 
       <div style={{
@@ -146,7 +145,7 @@ const Register = () => {
         marginTop: 20,
         color: 'rgba(255, 255, 255, 0.6)'
       }}>
-        Only jpeg, jpg or png files up to 5mb.
+        {translations[language].register.avatarReq}
       </div>
 
       <ReCAPTCHA
@@ -163,7 +162,7 @@ const Register = () => {
           style={{ display: "block" }}
           onClick={() => setSuccess(false)}
         >
-          Account created, confirmation email has been sent
+          {translations[language].register.success}
         </div>
       ) : null}
 
@@ -291,7 +290,7 @@ const Register = () => {
         className="link center"
         style={{ marginTop: 20, fontSize: ".8em", opacity: 0.8 }}
       >
-        <Link to="/login">Login</Link>
+        <Link to="/login">{translations[language].register.login}</Link>
       </div>
     </div>
   );

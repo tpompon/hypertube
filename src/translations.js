@@ -8,6 +8,19 @@ const languages = {
 				logout: "Logout"
 			}
 		},
+		search: {
+			minyear: "Min. year",
+			maxyear: "Max year",
+			title: "Title",
+			year: "Year",
+			asc: "Ascending",
+			desc: "Descending",
+			minrating: "Min. rating",
+			maxrating: "Max rating",
+			loading: "Loading...",
+			loadMore: "Load more",
+			search: "Search"
+		},
 		movie: {
 			rating: "Rating",
 			watch: "Watch",
@@ -23,7 +36,8 @@ const languages = {
 			subtitles: {
 				fr: "French",
 				en: "English"
-			}
+			},
+			more: "More"
 		},
 		poster: {
 			rating: "Rating"
@@ -40,6 +54,10 @@ const languages = {
 				heartbeat: "Heartbeat",
 				recents: "Recently watched",
 				continue: "Continue watching"
+			},
+			errors: {
+				avatarSize: "Avatar size exceeds limit",
+				avatarType: "Invalid avatar type"
 			}
 		},
 		user: {
@@ -65,9 +83,25 @@ const languages = {
 			phone: "Phone",
 			confirmPassword: "Confirm password",
 			submit: "Register",
+			avatarUpload: "Upload avatar",
+			avatarReq: "Only jpeg, jpg or png files up to 5mb.",
+			success: "Account created, confirmation email has been sent",
+			login: "Login",
 			warns: {
 				match: "Passwords don't match",
 				length: "Password must contain at least 8 characters, 1 uppercase letter, 1 number and 1 special character"
+			},
+			errors: {
+				alreadyUse: "Username or email already used",
+				phone: "Invalid phone",
+				city: "Invalid city",
+				email: "Invalid email",
+				password: "Invalid password",
+				username: "Invalid username",
+				lastname: "Invalid lastname",
+				firstname: "Invalid firstname",
+				avatarSize: "Avatar size exceeds limit",
+				avatarType: "Invalid avatar type"
 			}
 		},
 		login: {
@@ -83,6 +117,9 @@ const languages = {
 		logout: {
 			title: "You've been disconnected"
 		},
+		terminal: {
+			input: "Enter command"
+		},
 		settings: {
 			title: "Settings",
 			firstname: "First name",
@@ -97,10 +134,36 @@ const languages = {
 			submit: "Save",
 			delete: "Delete account",
 			confirm: "Are you sure you want to delete your account ?\nAll informations will be lost.\n",
+			success: "Informations updated",
 			languages: {
 				english: "English",
 				french: "French"
+			},
+			errors: {
+				alreadyUse: "Username or email already used",
+				phone: "Invalid phone",
+				city: "Invalid city",
+				country: "Invalid country",
+				email: "Invalid email",
+				username: "Invalid username",
+				lastname: "Invalid lastname",
+				firstname: "Invalid firstname",
 			}
+		},
+		confirm: {
+			success: "Your e-mail has been confirmed."
+		},
+		forgot: {
+			error: "Sorry, an error occured",
+			errorPassword: "Passwords don't match or not secure, must contains 1 uppercase letter, 1 number and 1 special character",
+			errorKey: "Key doesn't exist",
+			instruction: "reset your password",
+			success: "Password has been reset successfully",
+			placeholders: {
+				newPassword: "New password",
+				confirmPassword: "Confirm password"
+			},
+			submit: "Submit"
 		},
 		notfound: {
 			title: "This page doesn't exist"
@@ -118,6 +181,19 @@ const languages = {
 				logout: "Déconnexion"
 			}
 		},
+		search: {
+			minyear: "Année min.",
+			maxyear: "Année max.",
+			title: "Titre",
+			year: "Année",
+			asc: "Ascendant",
+			desc: "Descendant",
+			minrating: "Note min.",
+			maxrating: "Note max.",
+			loading: "Chargement...",
+			loadMore: "Afficher plus",
+			search: "Rechercher"
+		},
 		movie: {
 			rating: "Note",
 			watch: "Regarder",
@@ -133,7 +209,8 @@ const languages = {
 			subtitles: {
 				fr: "Français",
 				en: "Anglais"
-			}
+			},
+			more: "Plus"
 		},
 		poster: {
 			rating: "Note"
@@ -150,6 +227,10 @@ const languages = {
 				heartbeat: "Coups de cœur",
 				recents: "Vus récemment",
 				continue: "Continuer à regarder"
+			},
+			errors: {
+				avatarSize: "L'avatar dépasse la taille autorisée",
+				avatarType: "Le type de fichier est invalide"
 			}
 		},
 		user: {
@@ -175,9 +256,25 @@ const languages = {
 			phone: "Téléphone",
 			confirmPassword: "Confirmer mot de passe",
 			submit: "S'inscrire",
+			avatarUpload: "Ajouter un avatar",
+			avatarReq: "Uniquement .jpeg, .jpg or .png jusqu'à 5mb.",
+			success: "Compte créé, un e-mail de confirmation a été envoyé",
+			login: "Se connecter",
 			warns: {
 				match: "Les mots de passe ne correspondent pas",
 				length: "Le mot de passe doit contenir 8 caractères minimum, 1 majuscule, 1 chiffre et 1 caractère spécial"
+			},
+			errors: {
+				alreadyUse: "Nom d'utilisateur ou e-mail déjà utilisé",
+				phone: "Téléphone invalide",
+				city: "Ville invalide",
+				email: "Email invalide",
+				password: "Mot de passe invalide",
+				username: "Nom d'utilisateur invalide",
+				lastname: "Nom invalide",
+				firstname: "Prénom invalide",
+				avatarSize: "L'avatar dépasse la taille autorisée",
+				avatarType: "Le type de fichier est invalide"
 			}
 		},
 		login: {
@@ -193,6 +290,9 @@ const languages = {
 		logout: {
 			title: "Vous avez été déconnecté"
 		},
+		terminal: {
+			input: "Entrez une commande"
+		},
 		settings: {
 			title: "Paramètres",
 			firstname: "Prénom",
@@ -207,10 +307,36 @@ const languages = {
 			submit: "Sauvegarder",
 			delete: "Supprimer mon compte",
 			confirm: "Etes-vous sûr de vouloir supprimer votre compte ?\nToutes les informations seront perdues.\n",
+			success: "Informations mises à jour",
 			languages: {
 				english: "Anglais",
 				french: "Français"
+			},
+			errors: {
+				alreadyUse: "Nom d'utilisateur ou e-mail déjà utilisé",
+				phone: "Téléphone invalide",
+				country: "Pays invalide",
+				city: "Ville invalide",
+				email: "Email invalide",
+				username: "Nom d'utilisateur invalide",
+				lastname: "Nom invalide",
+				firstname: "Prénom invalide",
 			}
+		},
+		confirm: {
+			success: "Votre e-mail a été confirmé."
+		},
+		forgot: {
+			error: "Désolé, une erreur s'est produite",
+			errorPassword: "Les mots de passe ne correspondent pas ou ne sont pas sécurisés, requis: 1 majuscule, 1 chiffre et 1 caractère spécial",
+			errorKey: "La clé n'existe pas",
+			instruction: "réinitialisez votre mot de passe",
+			success: "Le mot de passe a été modifié avec succès",
+			placeholders: {
+				newPassword: "Nouveau mot de passe",
+				confirmPassword: "Confirmer mot de passe"
+			},
+			submit: "Sauvegarder"
 		},
 		notfound: {
 			title: "Cette page n'existe pas"
@@ -218,115 +344,7 @@ const languages = {
 		footer: {
 			title: "Projet 42 par tpompon, syboeuf, evbelico"
 		}
-	},
-// 	"es": {
-// 		header: {
-// 			searchPlaceholder: "Quiero mirar...",
-// 			avatarMenu: {
-// 				profile: "Perfil",
-// 				settings: "Configuraciones",
-// 				logout: "Salir"
-// 			}
-// 		},
-// 		movie: {
-// 			rating: "Nota",
-// 			watch: "Mirar",
-// 			comments: "Comentarios",
-// 			reviewPlaceholder: "Deja tu opinión...",
-// 			reviewSubmit: "Enviar",
-// 			noComments: "No hay comentarios actualmente, se el primero",
-// 			noResults: "Ningún resultado",
-// 			tooltip: {
-// 				heartbeatAdd: "Añadir a favoritos",
-// 				heartbeatRemove: "Eliminar de favoritos"
-// 			},
-// 			subtitles: {
-// 				fr: "Francés",
-// 				en: "Inglés",
-// 				es: "Español"
-// 			}
-// 		},
-// 		poster: {
-// 			rating: "Nota"
-// 		},
-// 		profile: {
-// 			you: "(usted)",
-// 			updateAvatar: "Edita mi avatar",
-// 			editCover: "Cambiar mi portada",
-// 			tooltip: {
-// 				copy: "Copiar al portapapeles",
-// 				copied: "Copiado"
-// 			},
-// 			list: {
-// 				heartbeat: "Favoritos",
-// 				recents: "Visto recientemente",
-// 				continue: "Continuar mirando"
-// 			}
-// 		},
-// 		user: {
-// 			notFound: "Este usuario no existe",
-// 			tooltip: {
-// 				copy: "Copiar al portapapeles",
-// 				copied: "Copiado"
-// 			},
-// 			list: {
-// 				heartbeat: "Favoritos",
-// 				recents: "Visto recientemente"
-// 			}
-// 		},
-// 		register: {
-// 			title: "Inscribirse",
-// 			firstname: "Nombre",
-// 			lastname: "Apellido",
-// 			username: "Nombre del usuario",
-// 			password: "Contraseña",
-// 			email: "E-mail",
-// 			city: "Ciudad",
-// 			country: "País",
-// 			phone: "Teléfono",
-// 			confirmPassword: "Confirmar la contraseña",
-// 			submit: "Inscribirse",
-// 			warns: {
-// 				match: "Las contraseñas no coinciden",
-// 				length: "La contraseña debe contener al menos 8 caracteres, 1 mayúscula, 1 chiffre y 1 especial"
-// 			}
-// 		},
-// 		login: {
-// 			title: "Conectarse",
-// 			inputs: {
-// 				username: "Nombre del usuario",
-// 				password: "Contraseña",
-// 				submit: "Conectarse",
-// 				forgotPassword: "Contraseña olvidada"
-// 			}
-// 		},
-// 		logout: {
-// 			title: "Has sido desconectado"
-// 		},
-// 		settings: {
-// 			title: "Configuraciones",
-// 			firstname: "Nombre",
-// 			lastname: "Apellido",
-// 			city: "Ciudad",
-// 			country: "País",
-// 			username: "Nombre del usuario",
-// 			email: "E-mail",
-// 			phone: "Teléfono",
-// 			newPassword: "Nueva contraseña",
-// 			confirmPassword: "Confirmar la contraseña",
-// 			submit: "Guardar",
-// 			languages: {
-// 				english: "Inglés",
-// 				french: "Francés"
-// 			}
-// 		},
-// 		notfound: {
-// 			title: "Esta pagina no existe"
-// 		},
-// 		footer: {
-// 			title: "Proyecto 42 de tpompon, syboeuf, evbelico"
-// 		}
-// 	}
+	}
 }
 
 export default languages

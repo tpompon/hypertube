@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useContext, useRef } from "react";
 import axios from "axios";
 import config from "config";
+import translations from "translations";
 import Button from "components/Button";
 import PosterYTS from "components/PosterYTS";
 import Loading from "components/Loading";
@@ -124,16 +125,8 @@ const Search = props => {
       if (!isCanceled.current && responseYts) {
         const movie = responseYts.data.result.data.movie;
         movie.torrents.forEach(torrent => {
-          torrent.magnet = `magnet:?xt=urn:btih:${
-            movie.torrents[0].hash
-          }&dn=${encodeURI(
-            movie.title
-          )}&tr=http://track.one:1234/announce&tr=udp://track.two:80`;
-          torrent.magnet2 = `magnet:?xt=urn:btih:${
-            movie.torrents[0].hash
-          }&dn=${encodeURI(
-            movie.title
-          )}&tr=http://track.one:1234/announce&tr=udp://tracker.openbittorrent.com:80`;
+          torrent.magnet = `magnet:?xt=urn:btih:${torrent.hash}&dn=${encodeURI(movie.title)}&tr=http://track.one:1234/announce&tr=udp://track.two:80`;
+          torrent.magnet2 = `magnet:?xt=urn:btih:${torrent.hash}&dn=${encodeURI(movie.title)}&tr=http://track.one:1234/announce&tr=udp://tracker.openbittorrent.com:80`;
         });
         const newMovie = {
           ytsId: movie.id,
@@ -163,7 +156,7 @@ const Search = props => {
             onChange={e => setNewFilter(e, ["minYear"])}
             className="dark-input"
             type="number"
-            placeholder="Min. Year"
+            placeholder={translations[language].search.minyear}
           />
           <input
             min={1900}
@@ -171,7 +164,7 @@ const Search = props => {
             onChange={e => setNewFilter(e, ["maxYear"])}
             className="dark-input"
             type="number"
-            placeholder="Max. Year"
+            placeholder={translations[language].search.maxyear}
             style={{ marginLeft: 10, marginRight: 30 }}
           />
           <select
@@ -190,15 +183,15 @@ const Search = props => {
             className="dark-input"
             style={{marginRight: 10}}
           >
-            <option value="title">Title</option>
-            <option value="year">Year</option>
+            <option value="title">{translations[language].search.title}</option>
+            <option value="year">{translations[language].search.year}</option>
           </select>
           <select
             onChange={e => setNewFilter(e, ["order"])}
             className="dark-input"
           >
-            <option value="asc">Ascending</option>
-            <option value="desc">Descending</option>
+            <option value="asc">{translations[language].search.asc}</option>
+            <option value="desc">{translations[language].search.desc}</option>
           </select>
           <input
             min={0}
@@ -206,7 +199,7 @@ const Search = props => {
             onChange={e => setNewFilter(e, ["minRating"])}
             className="dark-input"
             type="number"
-            placeholder="Min. Rating"
+            placeholder={translations[language].search.minrating}
             style={{ marginLeft: 30 }}
           />
           <input
@@ -215,13 +208,13 @@ const Search = props => {
             onChange={e => setNewFilter(e, ["maxRating"])}
             className="dark-input"
             type="number"
-            placeholder="Max. Rating"
+            placeholder={translations[language].search.maxrating}
             style={{ marginLeft: 10 }}
           />
           <Button
             style={{ marginLeft: 20 }}
             action={() => fetchMovies()}
-            content="Search"
+            content={translations[language].search.search}
           />
         </div>
         {_isLoaded ? (
@@ -243,7 +236,7 @@ const Search = props => {
               })}
             </div>
             <Button
-              content={loadMore ? "Loading..." : "Load more"}
+              content={loadMore ? translations[language].search.loading : translations[language].search.loadMore}
               action={() => loadMoreMovies()}
               style={{ margin: "0 auto" }}
             />

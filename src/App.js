@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useContext, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
 import Header from './components/Header'
 import Footer from './components/Footer'
 import Terminal from './components/Terminal'
-import { UserConsumer } from "store";
 
 import Search from './views/Search'
 
@@ -28,7 +27,6 @@ const App = () => {
   const [_isAuth, updateIsAuth] = useState(false)
   const [_isLoaded, updateIsLoaded] = useState(false)
   const [isAdmin, updateIsAdmin] = useState(false)
-  // const context = useContext(UserConsumer)
 
   const isCanceled = useRef(false)
 
@@ -43,9 +41,6 @@ const App = () => {
   const fetchDataUser = async() => {
     const response = await API.auth.check()
     if (!isCanceled.current && response.data.auth) {
-      if (response.data.user.language) {
-        // context.updateLanguage(response.data.user.language)
-      }
       if (response.data.user.admin) {
         updateIsAdmin(true)
       }

@@ -30,11 +30,18 @@ router.route("/login/:strategy").post((req, res, next) => {
         if (err) {
           res.json({ success: false, status: info.message });
         } else if (user) {
-          res.json({
-            success: true,
-            status: "Authentication success",
-            user: req.user
-          });
+          if (user.bantime < Date.now()) {
+            res.json({
+              success: true,
+              status: "Authentication success",
+              user: req.user
+            });
+          } else {
+            res.json({
+              success: false,
+              status: `Banned`
+            });
+          }
         } else {
           res.json({ success: false, status: info.message });
         }

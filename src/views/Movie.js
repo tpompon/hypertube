@@ -351,7 +351,7 @@ const Movie = props => {
                         {
                           movie.comments.length > 5 && movie.comments.length > commentsLimit ? (
                             <span className="more-comments" onClick={() => setCommentsLimit(old => old + 10)}>
-                              More
+                              {translations[language].movie.more}
                             </span>
                           ) : null
                         }
@@ -511,7 +511,7 @@ const Movie = props => {
                     {
                       movie.comments.length > 5 && movie.comments.length > commentsLimit ? (
                         <span className="more-comments" onClick={() => setCommentsLimit(old => old + 10)}>
-                          More
+                          {translations[language].movie.more}
                         </span>
                       ) : null
                     }

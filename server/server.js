@@ -1,6 +1,7 @@
 const express = require("express");
 const config = require('./config');
 const cors = require('cors');
+const bcrypt = require("bcrypt");
 const bodyParser = require("body-parser");
 const fileUpload = require('express-fileupload');
 const uuid = require('uuid/v4');
@@ -45,8 +46,10 @@ const passport = require('passport')
             return done(null, newUser);
           }
         });
-      } else {
+      } else if (user.bantime < Date.now()) {
         return done(null, user);
+      } else {
+        return done(null, false)
       }
     });
   }
@@ -80,8 +83,10 @@ passport.use(new FourtyTwoStrategy({
             return done(null, newUser);
           }
         });
-      } else {
+      } else if (user.bantime < Date.now()) {
         return done(null, user);
+      } else {
+        return done(null, false)
       }
     });
   }
@@ -113,8 +118,10 @@ passport.use(new TwitterStrategy({
             return done(null, newUser);
           }
         });
-      } else {
+      } else if (user.bantime < Date.now()) {
         return done(null, user);
+      } else {
+        return done(null, false)
       }
     });
   }
@@ -170,12 +177,33 @@ app.use(fileUpload());
 app.use('/public', express.static(__dirname + '/public'));
 app.use('/torrents', express.static(__dirname + '/torrents'));
 
+// DATABASE
 const db = require('./db')
 db.on('error', console.error.bind(console, 'Database connection error:'));
 db.once('open', () => {
   console.log('\x1b[36m%s\x1b[0m', '-> Database connection established');
 });
 
+// ADMIN USER
+const adminUser = User({
+  language: "en",
+  username: "admin",
+  cover: 'cinema',
+  avatar: `http://${config.server.host}:${config.server.port}/public/avatars/admin_avatar.png`,
+  email: "admin@hypertube.com",
+  password: bcrypt.hashSync("admin", 10),
+  confirmKey: "confirmed",
+  admin: true
+});
+
+adminUser.save((err) => {
+  if (err)
+    console.log('\x1b[36m%s\x1b[0m', '-> Admin user already exist');
+  else
+    console.log('\x1b[36m%s\x1b[0m', '-> Admin user created');
+});
+
+// OAUTH
 app.get('/oauth/twitter',
   passport.authenticate('twitter'));
 app.get('/oauth/twitter/redirect', 

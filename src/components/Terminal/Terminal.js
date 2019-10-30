@@ -1,13 +1,17 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import { ReactComponent as TerminalIcon } from "svg/terminal.svg";
 import { ReactComponent as Close } from "svg/close.svg";
+import translations from "translations";
 import { commands } from "utils/commandsTerminal";
+import { UserConsumer } from "store";
 
 const Terminal = () => {
   const [input, updateInput] = useState("");
   const [show, toggleShow] = useState(false);
   const [history, updateHistory] = useState([]);
   const isCanceled = useRef(false)
+  const context = useContext(UserConsumer);
+  const { language } = context;
 
   useEffect(() => {
     return () => {
@@ -67,7 +71,7 @@ const Terminal = () => {
               onChange={e => updateInput(e.target.value)}
               className="terminal-input"
               type="text"
-              placeholder="Enter command"
+              placeholder={translations[language].terminal.input}
             />
           </div>
         </div>

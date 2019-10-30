@@ -1,11 +1,15 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import { withRouter } from "react-router-dom";
 import Loading from "components/Loading";
 import Button from "components/Button";
 import API from "controllers";
+import translations from "translations";
 import { verifyPasswd } from "utils/functions"
+import { UserConsumer } from "store";
 
 const Forgot = props => {
+  const context = useContext(UserConsumer);
+  const { language } = context;
   const { key } = props.match.params;
   const [user, updateUser] = useState({});
   const [password, updatePassword] = useState("");
@@ -51,10 +55,10 @@ const Forgot = props => {
       if (!isCanceled.current && response.data.success) {
         setSuccess(true);
       } else if (!isCanceled.current) {
-        setError("Sorry, an error occured");
+        setError(translations[language].forgot.error);
       }
     } else {
-      setError("Passwords don't match or not secure, must contains 1 uppercase letter, 1 number and 1 special character");
+      setError(translations[language].forgot.errorPassword);
     }
   };
 
@@ -67,7 +71,7 @@ const Forgot = props => {
       {status === "ok" ? (
         <div className="dark-card center text-center">
           <div>
-            <span style={{ fontWeight: "bold" }}>{user.username}</span>, reset your password
+            <span style={{ fontWeight: "bold" }}>{user.username}</span>, {translations[language].forgot.instruction}
           </div>
 
           <div style={{marginTop: 20}}>
@@ -78,7 +82,7 @@ const Forgot = props => {
                 style={{ display: "block" }}
                 onClick={() => setSuccess(false)}
               >
-                Password has been reset successfully
+                {translations[language].forgot.success}
               </div>
             ) : null
           }
@@ -101,7 +105,7 @@ const Forgot = props => {
             onChange={event => updatePassword(event.target.value)}
             className="dark-input"
             type="password"
-            placeholder="New password"
+            placeholder={translations[language].forgot.placeholders.newPassword}
             style={{ width: "100%", marginTop: 20, marginBottom: 5 }}
             onKeyDown={(e) => onEnter(e)}
           />
@@ -110,18 +114,18 @@ const Forgot = props => {
             onChange={event => updateConfirmPassword(event.target.value)}
             className="dark-input"
             type="password"
-            placeholder="Confirm password"
+            placeholder={translations[language].forgot.placeholders.confirmPassword}
             style={{ width: "100%", marginTop: 5, marginBottom: 20 }}
             onKeyDown={(e) => onEnter(e)}
           />
           <div className="row" style={{ justifyContent: "space-around" }}>
             <div style={{ display: "table" }} onClick={() => validate()}>
-              <Button content="Submit" />
+              <Button content={translations[language].forgot.submit} />
             </div>
           </div>
         </div>
       ) : (
-        <div>Key doesn't exist</div>
+        <div>{translations[language].forgot.errorKey}</div>
       )}
     </div>
   ) : (

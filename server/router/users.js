@@ -182,4 +182,57 @@ router.route("/avatar").post((req, res) => {
   );
 });
 
+router.route("/language").get((req, res) => {
+  if (req.user && req.user._id) {
+    User.findOne({ _id: req.user._id }, (err, user) => {
+      if (err) {
+        res.json({ success: false });
+      } else if (user && user.language) {
+        res.json({ success: true, language: user.language });
+      } else {
+        res.json({ success: false });
+      }
+    });
+  } else{
+    res.json({ success: false });
+  }
+})
+
+router.route("/ban/:username").post((req, res) => {
+  const username = req.params.username;
+  const bantime = req.body.bantime;
+  if (req.user && req.user.admin) {
+    User.updateOne(
+    { username: username },
+    {$set: {"bantime": bantime}},
+    (err) => {
+      if (err) {
+        res.json({ success: false, error: err });
+      } else {
+        res.json({ success: true, bantime: bantime });
+      }
+    });
+  } else {
+    res.json({ success: false, status: "Not authorized" })
+  }
+})
+
+router.route("/unban/:username").post((req, res) => {
+  const username = req.params.username;
+  if (req.user && req.user.admin) {
+    User.updateOne(
+      { username: username },
+      {$set: {"bantime": 0}},
+      (err) => {
+      if (err) {
+        res.json({ success: false, error: err });
+      } else {
+        res.json({ success: true });
+      }
+    });
+  } else {
+    res.json({ success: false, status: "Not authorized" })
+  }
+})
+
 module.exports = router;

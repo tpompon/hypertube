@@ -114,16 +114,8 @@ const Header = props => {
       if (!isCanceled.current && responseYts) {
         const movie = responseYts.data.result.data.movie;
         movie.torrents.forEach(torrent => {
-          torrent.magnet = `magnet:?xt=urn:btih:${
-            movie.torrents[0].hash
-          }&dn=${encodeURI(
-            movie.title
-          )}&tr=http://track.one:1234/announce&tr=udp://track.two:80`;
-          torrent.magnet2 = `magnet:?xt=urn:btih:${
-            movie.torrents[0].hash
-          }&dn=${encodeURI(
-            movie.title
-          )}&tr=http://track.one:1234/announce&tr=udp://tracker.openbittorrent.com:80`;
+          torrent.magnet = `magnet:?xt=urn:btih:${torrent.hash}&dn=${encodeURI(movie.title)}&tr=http://track.one:1234/announce&tr=udp://track.two:80`;
+          torrent.magnet2 = `magnet:?xt=urn:btih:${torrent.hash}&dn=${encodeURI(movie.title)}&tr=http://track.one:1234/announce&tr=udp://tracker.openbittorrent.com:80`;
         });
         const newMovie = {
           ytsId: movie.id,
@@ -320,6 +312,23 @@ const Header = props => {
             src={process.env.PUBLIC_URL + "/logo.png"}
             alt="Logo"
           />
+          <div className="row" style={{margin: '10px 0px'}}>
+            <span
+              className="hover-pointer"
+              style={{ fontWeight: (language === 'fr') ? 'bold' : 'normal' }}
+              onClick={() => context.updateLanguage("fr")}
+            >
+              FR
+            </span>
+            <span style={{ margin: '0px 5px' }}>|</span>
+            <span
+              className="hover-pointer"
+              style={{ fontWeight: (language === 'en') ? 'bold' : 'normal' }}
+              onClick={() => context.updateLanguage("en")}
+            >
+              EN
+            </span>
+          </div>
         </div>
       )}
     </header>

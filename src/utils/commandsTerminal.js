@@ -9,7 +9,7 @@ const help =
 	-movies: Liste la liste des films enregistré sur le serveur
 	-movie: 
 	-ban: Bannir l'utilisateur, prend deux arguments (le nom et le tempsdu bannissement)
-	-torrents: prend deux arguments (action (les infos ou la suppression) et le nom)
+	-torrents: prend un argument (id du film) title, description_full, cast, imdb_code, yt_trailer_code, year, genre,
 `
 
 const getUsers = async() => {
@@ -56,13 +56,18 @@ const getDataMovie = async(movieId, specificField = null) => {
 	const response = await API.movies.byId.get(movieId)
 	if (response.data.success) {
 		if (specificField === null) {
-			movie = response.data.movie[0].name
+			movie = response.data.movie[0].ytsData.title
 			return [movie]
 		} else {
-			if (response.data.movie[0][specificField] === undefined) {
+			if (response.data.movie[0].ytsData[specificField] === undefined || specificField === "cast" || specificField === "torrents") {
 				return ["The specific field doesn't exist"]
+			} else if (specificField === "genres") {
+				response.data.movie[0].ytsData[specificField].forEach((genre) => {
+					movie += `${genre}, `
+				})
+				return [movie]
 			} else {
-				return [response.data.movie[0][specificField]]
+				return [response.data.movie[0].ytsData[specificField]]
 			}
 		}
 	} else {
@@ -70,12 +75,50 @@ const getDataMovie = async(movieId, specificField = null) => {
 	}
 }
 
-const banUser = (user, time) => {
-	return
+const banUser = async(username, time) => {
+	if (username === undefined || time === undefined)
+		return ["Argument not renseigned"]
+
+	if (isNaN(parseInt(time, 10)) === true)
+		return ["Wrong argument"]
+
+	if (time[time.length - 1] !== "h" && time[time.length - 1] !== "d")
+		return ["Wrong argument"]
+
+	if (username === "admin")
+		return ["You can't ban admin account"]
+
+	const value = (time[time.length - 1] === "h") ? 60 * 60 : 60 * 60 * 24
+	let bantime = time.replace(time[time.length - 1], "")
+
+	if (isNaN(Number(bantime)) === true)
+		return ["Wrong argument"]
+
+	bantime = Date.now() + parseInt(bantime, 10) * value * 1000
+	try {
+		const response = await API.users.ban(username, { bantime })
+		if (response.data.success) {
+			return [`${username} has been banned successfully`]
+		} else {
+			return [`${username} doesn't exist`]
+		}
+	} catch (error) {
+		//console.log(error)
+	}
+	return ["Error"];
 }
 
-const getTorrents = (action, id) => {
-	return
+const unbanUser = async(username) => {
+	try {
+		const response = await API.users.unban(username)
+		if (response.data.success)
+			return [`${username} has been unbanned successfully`]
+		else
+			return [`${username} doesn't exist`]
+	} catch (error) {
+		//console.log(error)
+	}
+	return ["Error"];
 }
 
 export const commands = async(command, history) => {
@@ -95,9 +138,9 @@ export const commands = async(command, history) => {
 		case "movie":
 			return [...history, ...await getDataMovie(argv[1], argv[2])] // Display movie object depends on id (argv[1]), specific field [name, ] (argv[2])
 		case "ban":
-			return banUser() // Ban user - 2 args: user (argv[1]), bantime (argv[2])
-		case "torrents":
-			return getTorrents() // 2 args - action [infos, delete] (argv[1]), id/name (argv[2])
+			return [...history, ...await banUser(argv[1], argv[2])] // Ban user - 2 args: user (argv[1]), bantime (argv[2])
+		case "unban":
+			return [...history, ...await unbanUser(argv[1], argv[2])] // Unan user - 2 args: user (argv[1]), bantime (argv[2])
 
 		default:
 			return [...history, `command not found: ${argv[0]}`]

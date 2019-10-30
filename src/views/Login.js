@@ -34,7 +34,7 @@ const Login = () => {
   }, [])
 
   const onChangeReCAPTCHA = key => {
-    console.log(key);
+    //console.log(key);
   };
 
   const toggleForgot = () => {

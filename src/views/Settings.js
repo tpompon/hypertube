@@ -68,25 +68,25 @@ const Settings = () => {
 
     setTimeout(async () => {
       if (user.firstname && !verifyNameOrCity(user.firstname))
-        return setError("Invalid firstname")
+        return setError(translations[language].settings.errors.firstname)
       if (user.lastname && !verifyNameOrCity(user.lastname))
-        return setError("Invalid lastname")
+        return setError(translations[language].settings.errors.lastname)
       if (user.username && !verifyUsername(user.username))
-        return setError("Invalid username")
+        return setError(translations[language].settings.errors.username)
       if (user.email && !verifyEmail(user.email))
-        return setError("Invalid email")
+        return setError(translations[language].settings.errors.email)
       if (user.phone && !verifyPhone(user.phone))
-        return setError("Invalid phone")
+        return setError(translations[language].settings.errors.phone)
       if (user.country && !verifyNameOrCity(user.country))
-        return setError("Invalid country")
+        return setError(translations[language].settings.errors.country)
       if (user.city && !verifyNameOrCity(user.city))
-        return setError("Invalid city")
+        return setError(translations[language].settings.errors.city)
 
       const res = await API.users.byId.put(user);
       if (!isCanceled.current && res.data.success)
-        setSuccess("Informations updated")
+        setSuccess(translations[language].settings.success)
       else if (!isCanceled.current)
-        setError("Email or Username already in use")
+        setError(translations[language].settings.errors.alreadyUse)
     }, 100);
   };
 
@@ -196,9 +196,10 @@ const Settings = () => {
             />
             <select
               className="dark-input"
-              //onChange={handleChangeLanguage}
+              defaultValue={language}
               onChange={e => { onChange(e, "language"); handleChangeLanguage(e); } }
               style={{ width: "26%", marginTop: 5 }}
+
             >
               <option value="fr">
                 {translations[language].settings.languages.french}
