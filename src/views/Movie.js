@@ -579,7 +579,7 @@ const Movie = props => {
                 preload="metadata"
                 controlsList="nodownload"
               >
-                <source src={ `http://${config.hostname}:${config.port}/torrents/stream/${encodeURIComponent(movie.ytsData.torrents[0].magnet)}` } />
+                <source src={ (!isCanceled.current) ? `http://${config.hostname}:${config.port}/torrents/stream/${encodeURIComponent(movie.ytsData.torrents[0].magnet)}` : "" } />
                 {/* <source src="https://file-examples.com/wp-content/uploads/2017/04/file_example_MP4_1280_10MG.mp4" /> */}
                 {
                   Object.entries(subtitles).map(entry => (
