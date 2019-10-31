@@ -105,7 +105,7 @@ const PostersSlider = props => {
               key={`movie-${movie._id}-${number}`}
               onMouseUp={ () => (!isDraging) ? history.push(`/watch/${movie._id}`) : null }
             >
-              <Poster movie={movie}language={language} username={username ? username : null} />
+              <Poster movie={movie} language={language} username={username ? username : null} />
             </div>
           ))}
         </div>

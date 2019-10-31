@@ -71,13 +71,13 @@ const Movie = props => {
     const resp = await API.movies.byId.get(id);
     if (!isCanceled.current && resp) {
       if (resp.data.movie[0]) {
-        let torrentMinSize = null
+        let torrentMaxSeeds = resp.data.movie[0].ytsData.torrents[0]
         resp.data.movie[0].ytsData.torrents.forEach((torrent) => {
-          if (torrentMinSize === null || torrentMinSize.size > torrent.size) {
-            torrentMinSize = torrent
-          }
+          if (torrentMaxSeeds.seeds < torrent.seeds)
+            torrentMaxSeeds = torrent
         })
-        resp.data.movie[0].ytsData.torrents[0] = torrentMinSize
+        console.log(`Seeds: ${torrentMaxSeeds.seeds}`, `Peers: ${torrentMaxSeeds.peers}`, `Ratio (peers for seeds): ${((torrentMaxSeeds.peers / torrentMaxSeeds.seeds) * 100).toFixed()}%`)
+        resp.data.movie[0].ytsData.torrents[0] = torrentMaxSeeds
         updateMovie(resp.data.movie[0]);
 
         updateLoaded(true);
@@ -173,7 +173,17 @@ const Movie = props => {
   const showPlayer = () => {
     if (player) {
       updateTogglePlayer(true);
-      player.current.play();
+      const playPromise = player.current.play();
+      if (playPromise !== undefined) {
+        playPromise.then(() => {
+          // Automatic playback started
+          // Show playing UI
+        })
+        .catch((error) => {
+          // Autotplay vas prevent
+          console.log(error)
+        })
+      }
     }
   };
 
@@ -569,8 +579,8 @@ const Movie = props => {
                 preload="metadata"
                 controlsList="nodownload"
               >
-                {/* <source src={ `http://${config.hostname}:${config.port}/torrents/stream/${encodeURIComponent(movie.ytsData.torrents[0].magnet)}` } /> */}
-                <source src="https://file-examples.com/wp-content/uploads/2017/04/file_example_MP4_1280_10MG.mp4" />
+                <source src={ `http://${config.hostname}:${config.port}/torrents/stream/${encodeURIComponent(movie.ytsData.torrents[0].magnet)}` } />
+                {/* <source src="https://file-examples.com/wp-content/uploads/2017/04/file_example_MP4_1280_10MG.mp4" /> */}
                 {
                   Object.entries(subtitles).map(entry => (
                     <track

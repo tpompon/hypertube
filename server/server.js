@@ -35,6 +35,7 @@ const passport = require('passport')
           lastname: profile.name.familyName,
           language: "en",
           username: profile.name.givenName,
+          email: `${profile.username}@gmail.com`,
           cover: 'cinema',
           avatar: profile.photos[0].value
         });
@@ -108,6 +109,7 @@ passport.use(new TwitterStrategy({
           language: "en",
           username: profile.username,
           cover: 'cinema',
+          email: `${profile.username}@twitter.com`,
           avatar: profile.photos[0].value.replace("_normal", "")
         });
 

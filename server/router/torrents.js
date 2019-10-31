@@ -135,18 +135,6 @@ const write206Headers = (res, metadata) => {
   })
 }
 
-const checkDirectory = (directory) => {
-  try {
-    if (fs.existsSync(directory)) {
-      console.log("directory " + directory.length)
-    } else {
-      console.log("pas top")
-    }
-  } catch (error) {
-    console.log(error)
-  }
-}
-
 router.route("/stream/:magnet").get(async (req, res) => {
   const range = req.headers.range
   const engine = torrentStream(req.params.magnet, { path: `./torrents` });
@@ -157,7 +145,6 @@ router.route("/stream/:magnet").get(async (req, res) => {
           path.extname(file.name) === ".mkv" ||
           path.extname(file.name) === ".avi"
         ) {
-          checkDirectory(`./torrents/${file.path}`)
           if (range) {
             let [start, end] = range.replace(/bytes=/, "").split("-").map((e) => e && parseInt(e))
             end = end || file.length - 1
@@ -205,34 +192,26 @@ const getSubtitles = async(imdbid, langs) => {
       })
     )
   } catch (error) {
-    console.log(error)
+    //console.log(error)
   }
 }
 
 router.route("/subtitles/:imdbid").get(async(req, res) => {
   const { imdbid } = req.params
-  // Function to check subtitles exist or not
-  // try {
-  //   const path = `./subtitles/${imdbid}`
-  //   if (fs.existsSync(path)) {
-  //     console.log("test")
-  //   }
-  // } catch (error) {
-  //   console.log(error)
-  // }
   const langs = ["fre", "eng"]
   try {
     const response = await getSubtitles(imdbid, langs)
     let subtitles = {}
-    response.forEach((subtitle) => {
-      subtitles = {
-        ...subtitles,
-        [subtitle.key]: subtitle.value,
-      }
-    })
+    if (response) {
+      response.forEach((subtitle) => {
+        subtitles = {
+          ...subtitles,
+          [subtitle.key]: subtitle.value,
+        }
+      })
+    }
     res.json({ subtitles })
   } catch (error) {
-    console.log(error)
     res.json({ error })
   }
 })
