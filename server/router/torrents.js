@@ -1,8 +1,8 @@
 const fs = require("fs")
 const http = require("http")
+const https = require("https")
 const express = require("express");
 const router = express.Router();
-const config = require("../config");
 
 const torrentStream = require("torrent-stream");
 const OpenSubtitles = require("opensubtitles-api")
@@ -19,8 +19,7 @@ const Movie = require("../models/movie");
 const User = require("../models/user");
 
 const sources = ["https://yst.am/api/v2", "https://yts.lt/api/v2"];
-const selectedSource = sources[1];
-// Don't forget to update source in Search for Poster
+let selectedSource = sources[1];
 
 OS.login()
   .then((res) => {
@@ -29,6 +28,12 @@ OS.login()
   .catch((error) => console.log('\x1b[31m%s\x1b[0m', '-> OpenSubtitles connection error'))
 
 router.route("/yts/search").get(async (req, res) => {
+
+  https.get('https://yts.lt/api/v2/list_movies.json', (res) => {
+    if (res.statusCode !== 200)
+      selectedSource = sources[0];
+  })
+
   request.get({url: `${selectedSource}/list_movies.json?query_term=${req.query.search}${req.query.genre ? ('&genre=' + req.query.genre) : '' }${req.query.page ? ('&page=' + req.query.page) : '' }${req.query.sort ? ('&sort_by=' + req.query.sort) : ''}${req.query.order ? ('&order_by=' + req.query.order) : ''}` },
   async (err, results, body) => {
     if (err) {
@@ -80,12 +85,8 @@ const setMoviesInfo = (uid, body) => {
           { _id: uid },
           { inProgress: { $elemMatch: { ytsId: movie.id } } }).exec()
           if (responseWatchPercent) {
-            if (responseWatchPercent.inProgress.length > 0) {
-              // console.log('% watch ', result.inProgress[0].percent);
+            if (responseWatchPercent.inProgress.length > 0)
               movie.watchPercent = responseWatchPercent.inProgress[0].percent
-            } else {
-              //console.log('no inprogress movie')
-            }
           }
 
         // Pas utile ?
@@ -102,6 +103,12 @@ const setMoviesInfo = (uid, body) => {
 }
 
 router.route("/yts/:id").get((req, res) => {
+
+  https.get('https://yts.lt/api/v2/list_movies.json', (res) => {
+    if (res.statusCode !== 200)
+      selectedSource = sources[0];
+  })
+
   request.get(
     {
       url: `${selectedSource}/movie_details.json?movie_id=${req.params.id}&with_images=true&with_cast=true`

@@ -41,10 +41,12 @@ router
     });
   })
   .delete((req, res) => {
-    Movie.remove({}, err => {
-      if (err) res.json({ success: false, error: err });
-      else res.json({ success: true });
-    });
+    if (req.user && req.user.admin) {
+      Movie.remove({}, err => {
+        if (err) res.json({ success: false, error: err });
+        else res.json({ success: true });
+      });
+    } else res.json({ success: false, status: "Unauthorized" });
   });
 
 router
@@ -100,10 +102,12 @@ router
     );
   })
   .delete((req, res) => {
-    Movie.findOneAndRemove({ _id: req.params.id }, err => {
-      if (err) res.json({ success: false });
-      else res.json({ success: true });
-    });
+    if (req.user && req.user.admin) {
+      Movie.findOneAndRemove({ _id: req.params.id }, err => {
+        if (err) res.json({ success: false });
+        else res.json({ success: true });
+      });
+    } else res.json({ success: false, status: "Unauthorized" });
   });
 
 router.route("/yts/:id").get((req, res) => {

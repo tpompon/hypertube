@@ -42,6 +42,9 @@ const languages = {
 		poster: {
 			rating: "Rating"
 		},
+		postersSlider: {
+			empty: "Start watching movies to fill the list."
+		},
 		profile: {
 			you: "(you)",
 			updateAvatar: "Update your avatar",
@@ -214,6 +217,9 @@ const languages = {
 		},
 		poster: {
 			rating: "Note"
+		},
+		postersSlider: {
+			empty: "Commencez à regarder des films pour remplir la liste."
 		},
 		profile: {
 			you: "(vous)",

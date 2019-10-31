@@ -122,7 +122,7 @@ const Register = () => {
   };
 
   return (
-    <div className="dark-card center text-center">
+    <div className="dark-card center text-center" style={{width: '35%'}}>
       <div className="profile-avatar center">
         <div
           className="profile-avatar-overlay"

@@ -69,7 +69,7 @@ const Forgot = props => {
   return _isLoaded ? (
     <div style={{ textAlign: "center" }}>
       {status === "ok" ? (
-        <div className="dark-card center text-center">
+        <div className="dark-card center text-center" style={{width: '35%'}}>
           <div>
             <span style={{ fontWeight: "bold" }}>{user.username}</span>, {translations[language].forgot.instruction}
           </div>

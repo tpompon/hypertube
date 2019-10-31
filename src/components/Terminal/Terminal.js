@@ -21,11 +21,14 @@ const Terminal = () => {
 
   const handleKeyDown = async e => {
     const key = e.which || e.keyCode;
+    const terminal = document.getElementById("terminal");
+
     if (key === 13 && input.trim() !== "") {
       const response = await commands(input, history);
       if (!isCanceled.current) {
         updateHistory(response);
         updateInput("");
+        terminal.scrollTop = terminal.scrollHeight;
       }
     }
   };
@@ -38,7 +41,7 @@ const Terminal = () => {
       </div>
 
       {show ? (
-        <div className="terminal">
+        <div className="terminal" id="terminal">
           <span className="close-icon" onClick={() => toggleShow(false)}>
             <Close width="15" height="15" fill="#fff" />
           </span>
@@ -47,10 +50,13 @@ const Terminal = () => {
               return (
                 <div
                   key={`command-${index}`}
-                  onClick={e => updateInput(e.target.innerHTML)}
                   className="terminal-output"
                 >
-                  {command}
+                  {
+                    command.split('\n').map((item, i) => {
+                      return <p key={i}>{item}</p>
+                    })
+                  }
                 </div>
               );
             })}

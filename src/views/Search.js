@@ -148,7 +148,7 @@ const Search = props => {
       <div className="col">
         <div
           className="row wrap"
-          style={{ justifyContent: "center", marginBottom: 20 }}
+          style={{ justifyContent: "center", alignItems: 'center', marginBottom: 20 }}
         >
           <input
             min={1900}
@@ -230,7 +230,7 @@ const Search = props => {
                     key={`movie-${index}`}
                     onClick={() => checkDatabase(movie.id)}
                   >
-                    <PosterYTS from="yts" movie={movie} language={language} />
+                    <PosterYTS movie={movie} language={language} />
                   </div>
                 );
               })}

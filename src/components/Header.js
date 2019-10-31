@@ -183,7 +183,11 @@ const Header = props => {
                         }}
                       >
                         <img
-                          src={movie.large_cover_image}
+                          src={
+                            movie.large_cover_image.includes("https://yts.lt/")
+                              ? movie.large_cover_image
+                              : `https://yst.am${movie.large_cover_image}`
+                          }
                           width="20"
                           height="20"
                           alt={`movie-${movie.id}`}

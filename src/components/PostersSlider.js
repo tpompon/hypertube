@@ -1,16 +1,20 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { withRouter } from "react-router-dom"
+import translations from "translations"
 import Poster from "./Poster";
 import { ReactComponent as ArrowLeft } from "svg/arrow-point-to-left.svg";
 import { ReactComponent as ArrowRight } from "svg/arrow-point-to-right.svg";
+import { UserConsumer } from "store";
 
 const valuePos = 300
 
 const PostersSlider = props => {
-  const { movies, language, history, number, username } = props;
+  const { movies, history, number, username } = props;
   const [isDraging, updateIsDraging] = useState(false)
   const [currentPos, updateCurrentPos] = useState(0)
   const [pageWidth, setWindowSize] = useState(window.innerWidth)
+  const context = useContext(UserConsumer);
+  const { language } = context;
 
   useEffect(() => {
     const handleResize = () => {
@@ -106,7 +110,14 @@ const PostersSlider = props => {
           ))}
         </div>
       ) : (
-        <div className="posters-slider row center no-selection">
+        <div className="posters-slider row center no-selection blur-hover">
+          <div style={{
+            position: 'absolute',
+            top: '50%',
+            fontSize: 50
+          }}>
+            {translations[language].postersSlider.empty}
+          </div>
           <div className="no-movie-poster"></div>
           <div className="no-movie-poster"></div>
           <div className="no-movie-poster"></div>

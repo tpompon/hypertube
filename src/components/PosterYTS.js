@@ -9,9 +9,9 @@ const Poster = ({ movie, language, from }) => (
     <img
       className="movie-poster"
       src={
-        from === "yst"
-          ? `https://yst.am${movie.large_cover_image}`
-          : movie.large_cover_image
+        movie.large_cover_image.includes("https://yts.lt/")
+          ? movie.large_cover_image
+          : `https://yst.am${movie.large_cover_image}`
       }
       onError={ e => { e.target.onerror = null; e.target.src="http://underscoremusic.co.uk/site/wp-content/uploads/2014/05/no-poster.jpg" }}
       alt={movie.title}

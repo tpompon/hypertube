@@ -82,10 +82,12 @@ router
     });
   })
   .delete((req, res) => {
-    User.remove({}, err => {
-      if (err) res.json({ success: false, error: err });
-      else res.json({ success: true });
-    });
+    if (req.user && req.user.admin) {
+      User.remove({}, err => {
+        if (err) res.json({ success: false, error: err });
+        else res.json({ success: true });
+      });
+    } else res.json({ success: false, status: "Unauthorized" });
   });
 
 router

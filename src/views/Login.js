@@ -91,6 +91,7 @@ const Login = () => {
     <div
       onKeyDown={event => onEnter(event)}
       className="dark-card center text-center"
+      style={{width: '20%'}}
     >
       <h2>{translations[language].login.title}</h2>
       <ReCAPTCHA
@@ -155,21 +156,21 @@ const Login = () => {
               <button
                 onClick={() => authenticate("42")}
                 className="oauth-btn oauth-btn-42"
-                style={{ width: 150 }}
+                style={{ width: '30%' }}
               >
                 <FourtyTwoIcon fill="#fff" width="25" height="25" />
               </button>
               <button
                 onClick={() => authenticate("twitter")}
                 className="oauth-btn oauth-btn-twitter"
-                style={{ width: 150, margin: '0 20px' }}
+                style={{ width: '30%' }}
               >
                 <TwitterIcon fill="#fff" width="25" height="25" />
               </button>
               <button
                 onClick={() => authenticate("google")}
                 className="oauth-btn oauth-btn-google"
-                style={{ width: 150 }}
+                style={{ width: '30%' }}
               >
                 <GoogleIcon fill="#fff" width="25" height="25" />
               </button>
