@@ -142,27 +142,31 @@ router
     );
   })
   .post((req, res) => {
-    const movie = { id: req.params.id, time: Date.now() };
-    User.findOne(
-      { _id: req.user._id, "heartbeat.id": req.params.id },
-      (err, result) => {
-        if (err) {
-          res.json({ success: false });
-        } else if (!result) {
-          User.findOneAndUpdate(
-            { _id: req.user._id },
-            { $push: { heartbeat: movie } },
-            err => {
-              if (err) {
-                res.json({ success: false });
-              } else {
-                res.json({ success: true, movie: movie });
+    if (req.user && req.user._id) {
+      const movie = { id: req.params.id, time: Date.now() };
+      User.findOne(
+        { _id: req.user._id, "heartbeat.id": req.params.id },
+        (err, result) => {
+          if (err) {
+            res.json({ success: false });
+          } else if (!result) {
+            User.findOneAndUpdate(
+              { _id: req.user._id },
+              { $push: { heartbeat: movie } },
+              err => {
+                if (err) {
+                  res.json({ success: false });
+                } else {
+                  res.json({ success: true, movie: movie });
+                }
               }
-            }
-          );
+            );
+          }
         }
-      }
-    );
+      );
+    } else {
+      res.json({ success: false });
+    }
   })
   .delete((req, res) => {
     const movie = { id: req.params.id };
@@ -200,27 +204,29 @@ router
     );
   })
   .post((req, res) => {
-    const movie = { id: req.params.id, time: Date.now() };
-    User.findOne(
-      { _id: req.user._id, "recents.id": req.params.id },
-      (err, result) => {
-        if (err) {
-          res.json({ success: false });
-        } else if (!result) {
-          User.findOneAndUpdate(
-            { _id: req.user._id },
-            { $push: { recents: movie } },
-            err => {
-              if (err) {
-                res.json({ success: false });
-              } else {
-                res.json({ success: true, movie: movie });
+    if (req.user && req.user._id) {
+      const movie = { id: req.params.id, time: Date.now() };
+      User.findOne(
+        { _id: req.user._id, "recents.id": req.params.id },
+        (err, result) => {
+          if (err) {
+            res.json({ success: false });
+          } else if (!result) {
+            User.findOneAndUpdate(
+              { _id: req.user._id },
+              { $push: { recents: movie } },
+              err => {
+                if (err) {
+                  res.json({ success: false });
+                } else {
+                  res.json({ success: true, movie: movie });
+                }
               }
-            }
-          );
+            );
+          }
         }
-      }
-    );
+      );
+    }
   })
   .delete((req, res) => {
     const movie = { id: req.params.id };
@@ -258,51 +264,53 @@ router
     );
   })
   .post((req, res) => {
-    const movie = { id: req.params.id, ytsId: req.body.ytsId, percent: req.body.percent, timecode: req.body.timecode, time: Date.now() };
-    User.findOne(
-      { _id: req.user._id, "inProgress.id": req.params.id },
-      (err, result) => {
-        if (err) {
-          res.json({ success: false });
-        } else if (result) {
-          User.updateOne(
-            { _id: req.user._id, "inProgress.id": req.params.id },
-            { $set: {
-                "inProgress.$.percent": req.body.percent,
-                "inProgress.$.timecode": req.body.timecode
+    if (req.user && req.user._id) {
+      const movie = { id: req.params.id, ytsId: req.body.ytsId, percent: req.body.percent, timecode: req.body.timecode, time: Date.now() };
+      User.findOne(
+        { _id: req.user._id, "inProgress.id": req.params.id },
+        (err, result) => {
+          if (err) {
+            res.json({ success: false });
+          } else if (result) {
+            User.updateOne(
+              { _id: req.user._id, "inProgress.id": req.params.id },
+              { $set: {
+                  "inProgress.$.percent": req.body.percent,
+                  "inProgress.$.timecode": req.body.timecode
+                }
+              },
+              err => {
+                if (err) {
+                  res.json({ success: false, error: err });
+                } else {
+                  res.json({ success: true });
+                }
               }
-            },
-            err => {
-              if (err) {
-                res.json({ success: false, error: err });
-              } else {
-                res.json({ success: true });
+            );
+          } else {
+            User.findOneAndUpdate(
+              { _id: req.user._id },
+              { $push: { inProgress: movie } },
+              err => {
+                if (err) {
+                  res.json({ success: false, error: err });
+                } else {
+                  User.findOneAndUpdate(
+                    { _id: req.user._id },
+                    {new: true }, err => {
+                    if (err) {
+                      res.json({ success: false, error: err });
+                    } else {
+                      res.json({ success: true });
+                    }
+                  })
+                }
               }
-            }
-          );
-        } else {
-          User.findOneAndUpdate(
-            { _id: req.user._id },
-            { $push: { inProgress: movie } },
-            err => {
-              if (err) {
-                res.json({ success: false, error: err });
-              } else {
-                User.findOneAndUpdate(
-                  { _id: req.user._id },
-                  {new: true }, err => {
-                  if (err) {
-                    res.json({ success: false, error: err });
-                  } else {
-                    res.json({ success: true });
-                  }
-                })
-              }
-            }
-          );
+            );
+          }
         }
-      }
-    );
+      );
+    }
   })
   .delete((req, res) => {
     const movie = { id: req.params.id };

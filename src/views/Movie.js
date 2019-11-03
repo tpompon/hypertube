@@ -37,7 +37,7 @@ const Movie = props => {
   const [togglePlayer, updateTogglePlayer] = useState(false);
   const [subtitles, updateSubtitles] = useState({})
   const player = useRef(null);
-  const isCanceled = useRef(false)
+  const isCanceled = useRef(false);
 
   useEffect(() => {
     return () => {

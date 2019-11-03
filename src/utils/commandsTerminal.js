@@ -2,14 +2,12 @@ import API from "controllers"
 
 const help =
 `
-	Voici la liste de commande
-	-clear: Effacer l'historique de la console
-	-user: Donne les informations lié a l'utilisateur -Prend un argument (le nom)
-	-users: Liste la liste des utilisateurs enregistré dans la base de donnéé
-	-movies: Liste la liste des films enregistré sur le serveur
-	-movie: 
-	-ban: Bannir l'utilisateur, prend deux arguments (le nom et le tempsdu bannissement)
-	-torrents: prend un argument (id du film) title, description_full, cast, imdb_code, yt_trailer_code, year, genre,
+	--- Commands List ---
+	- clear / Clear terminal history
+	- user [name] / Give informations about an user
+	- users / List of the users
+	- movies / List movies stored in database
+	- movie / Give informations about a movie
 `
 
 const getUsers = async() => {

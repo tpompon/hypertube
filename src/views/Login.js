@@ -91,7 +91,6 @@ const Login = () => {
     <div
       onKeyDown={event => onEnter(event)}
       className="dark-card center text-center"
-      style={{width: '35%'}}
     >
       <h2>{translations[language].login.title}</h2>
       <ReCAPTCHA
