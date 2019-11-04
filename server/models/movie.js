@@ -21,6 +21,7 @@ const MovieSchema = new Schema({
 			default: 0
 		}
 	}],
+	last_seen: Number,
 	created_at: Date,
 	updated_at: Date
 });

@@ -26,6 +26,7 @@ router
       _ytsId: req.body.ytsId,
       name: req.body.name,
       poster: req.body.poster,
+      last_seen: Date.now(),
       ytsData: req.body.ytsData,
       description: req.body.description || "No description",
       author: req.body.author || "No author",
@@ -40,6 +41,19 @@ router
       }
     });
   })
+  .put((req, res) => {
+    Movie.findOneAndUpdate(
+      { _id: req.body.id },
+      { $set: { last_seen: Date.now() } },
+      err => {
+        if (err) {
+          res.json({ success: false });
+        } else {
+          res.json({ success: true });
+        }
+      }
+    );
+  })
   .delete((req, res) => {
     if (req.user && req.user.admin) {
       Movie.remove({}, err => {
@@ -52,8 +66,6 @@ router
 router
   .route("/filter")
   .get((req, res) => {
-    console.log("Movies Filters", req.query);
-
     if (req.query.minyear === "")
       req.query.minyear = 1900
     if (req.query.maxyear === "")
@@ -76,11 +88,15 @@ router
 router
   .route("/:id")
   .get((req, res) => {
-    Movie.find({ _id: req.params.id }, (err, movie) => {
-      if (err) res.json({ success: false });
-      else if (movie.length !== 0) res.json({ success: true, movie: movie });
-      else res.json({ success: false });
-    });
+    if (req.params._id) {
+      Movie.find({ _id: req.params.id }, (err, movie) => {
+        if (err) res.json({ success: false });
+        else if (movie.length !== 0) res.json({ success: true, movie: movie });
+        else res.json({ success: false });
+      });
+    } else {
+      res.json({ success: false });
+    }
   })
   .put((req, res) => {
     const updateQuery = {};

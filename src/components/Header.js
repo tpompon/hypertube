@@ -33,7 +33,6 @@ const Header = props => {
   }, [])
 
   useEffect(() => {
-
     const fetchData = async () => {
       const responseAuth = await API.auth.check();
       if (!isCanceled.current && responseAuth.data.auth) {
@@ -42,9 +41,10 @@ const Header = props => {
         const responseUser = await API.users.byId.get(responseAuth.data.user._id);
         if (!isCanceled.current && responseUser.data.success) {
           updateAvatar(responseUser.data.user[0].avatar);
-          const responseMovies = await axios.get(`http://${config.hostname}:${config.port}/torrents/yts/search?search=${escapeSpecial(searchMovie)}&minyear=1900&maxyear=${new Date().getFullYear()}&minrating=0&maxrating=5`);
-          if (!isCanceled.current && responseMovies.data.success) {
-            updateMovies(responseMovies.data.results);
+          if (searchMovie.trim() !== '') {
+            const responseMovies = await axios.get(`http://${config.hostname}:${config.port}/torrents/yts/search?search=${escapeSpecial(searchMovie)}&minyear=1900&maxyear=${new Date().getFullYear()}&minrating=0&maxrating=5`);
+            if (!isCanceled.current && responseMovies.data.success)
+              updateMovies(responseMovies.data.results);
           }
         }
       }

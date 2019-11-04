@@ -6,6 +6,8 @@ const bodyParser = require("body-parser");
 const fileUpload = require('express-fileupload');
 const uuid = require('uuid/v4');
 const session = require('express-session');
+const timeout = require('connect-timeout');
+const cron = require('./cronjob')
 
 const User = require('./models/user');
 
@@ -178,6 +180,7 @@ app.use(bodyParser.json({ limit: '10mb' }));
 app.use(fileUpload());
 app.use('/public', express.static(__dirname + '/public'));
 app.use('/torrents', express.static(__dirname + '/torrents'));
+app.use(timeout('6000s'));
 
 // DATABASE
 const db = require('./db')

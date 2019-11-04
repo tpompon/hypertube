@@ -70,7 +70,7 @@ const Movie = props => {
   const fetchMovie = async () => {
     const resp = await API.movies.byId.get(id);
     if (!isCanceled.current && resp) {
-      if (resp.data.movie[0]) {
+      if (resp.data.movie && resp.data.movie[0]) {
         let torrentMaxSeeds = resp.data.movie[0].ytsData.torrents[0]
         resp.data.movie[0].ytsData.torrents.forEach((torrent) => {
           if (torrentMaxSeeds.seeds < torrent.seeds)
@@ -79,6 +79,8 @@ const Movie = props => {
         console.log(`Seeds: ${torrentMaxSeeds.seeds}`, `Peers: ${torrentMaxSeeds.peers}`, `Ratio (peers for seeds): ${((torrentMaxSeeds.peers / torrentMaxSeeds.seeds) * 100).toFixed()}%`)
         resp.data.movie[0].ytsData.torrents[0] = torrentMaxSeeds
         updateMovie(resp.data.movie[0]);
+
+        axios.put(`${config.serverURL}/movies`, { id });
 
         updateLoaded(true);
 

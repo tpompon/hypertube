@@ -124,45 +124,56 @@ router.route("/yts/:id").get((req, res) => {
   );
 })
 
-
-const write206Headers = (res, metadata) => {
-  res.writeHead(206, {
-    "Accept-Ranges": "bytes",
-    "Content-Range": "bytes " + metadata.start + "-" + metadata.end + "/" + metadata.total,
-    "Connection": "keep-alive",
-    "Content-Length": metadata.chunksize,
-    "Content-Type": "video/mp4"
-  })
-}
-
-router.route("/stream/:magnet").get(async (req, res) => {
-  const range = req.headers.range
-  const engine = torrentStream(req.params.magnet, { path: `./torrents` });
-    engine.on("ready", () => {
-      engine.files.forEach((file) => {
-        if (
-          path.extname(file.name) === ".mp4" ||
-          path.extname(file.name) === ".mkv" ||
-          path.extname(file.name) === ".avi"
-        ) {
-          if (range) {
-            let [start, end] = range.replace(/bytes=/, "").split("-").map((e) => e && parseInt(e))
-            end = end || file.length - 1
-            const chunksize = (end - start) + 1
-            let stream = file.createReadStream({ start, end })
-            write206Headers(res, { start, end, total: file.length, chunksize })
-            stream.pipe(res)
-          } else {
-            const head = {
-              "Content-length": file.length,
-              "Content-Type": "video/mp4",
+router.route("/stream/:magnet").get((req, res) => {
+  const engine = torrentStream(req.params.magnet, { path: "./torrents" })
+  engine.on("ready", () => {
+    engine.files.forEach((file) => {
+      if (
+        path.extname(file.name) === ".mp4" ||
+        path.extname(file.name) === ".mkv" ||
+        path.extname(file.name) === ".avi"
+      ) {
+        if (fs.existsSync(`./torrents/${file.path}`)) {
+          fs.stat(`./torrents/${file.path}`, function(err, stats) {
+            if (err) {
+              if (err.code === 'ENOENT') {
+                // 404 Error if file not found
+                return res.sendStatus(404);
+              }
+            res.end(err);
             }
-            res.writeHead(200, head)
-            fs.createReadStream(`./torrents/${file.path}`).pipe(res)
-          }
+            var range = req.headers.range;
+            if (!range) {
+             // 416 Wrong range
+             return res.sendStatus(416);
+            }
+            const positions = range.replace(/bytes=/, "").split("-");
+            let start = parseInt(positions[0], 10);
+            const total = stats.size;
+            const end = positions[1] ? parseInt(positions[1], 10) : total - 1;
+            if (start >= end)
+              start = end
+            const chunksize = (end - start) + 1;
+            res.writeHead(206, {
+              "Content-Range": "bytes " + start + "-" + end + "/" + total,
+              "Accept-Ranges": "bytes",
+              "Content-Length": chunksize,
+              "Content-Type": "video/mp4"
+            })
+            var stream = fs.createReadStream(`./torrents/${file.path}`, { start, end })
+              .on("open", function() {
+                stream.pipe(res);
+              }).on("error", function(err) {
+                res.end(err);
+              })
+          })
+        } else {
+          const fileStream = file.createReadStream()
+          fileStream.pipe(res)
         }
-      })
+      }
     })
+  })
 })
 
 const getSubtitles = async(imdbid, langs) => {

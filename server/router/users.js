@@ -157,31 +157,33 @@ router
   })
 
 router.route("/avatar").post((req, res) => {
-  const imageFile = req.files.file;
-  imageFile.mv(
-    `public/avatars/${req.user._id}.jpg`,
-    err => {
-      if (err) res.json({ success: false, error: err });
-      else {
-        User.findOneAndUpdate(
-          { _id: req.user._id },
-          { avatar: `http://${config.server.host}:${config.server.port}/public/avatars/${req.user._id}.jpg` },
-          (err, doc, result) => {
-            if (err) {
-              res.json({
-                success: false
-              });
-            } else if (doc) {
-              res.json({
-                success: true,
-                file: `public/avatars/${req.user._id}.jpg`
-              });
+  if (req.files && req.files.file) {
+    const imageFile = req.files.file;
+    imageFile.mv(
+      `public/avatars/${req.user._id}.jpg`,
+      err => {
+        if (err) res.json({ success: false, error: err });
+        else {
+          User.findOneAndUpdate(
+            { _id: req.user._id },
+            { avatar: `http://${config.server.host}:${config.server.port}/public/avatars/${req.user._id}.jpg` },
+            (err, doc, result) => {
+              if (err) {
+                res.json({
+                  success: false
+                });
+              } else if (doc) {
+                res.json({
+                  success: true,
+                  file: `public/avatars/${req.user._id}.jpg`
+                });
+              }
             }
-          }
-        );
+          );
+        }
       }
-    }
-  );
+    );
+  } else res.json({ success: false });
 });
 
 router.route("/language").get((req, res) => {

@@ -30,7 +30,6 @@ const dropDownOptions = [
 ];
 
 const Search = props => {
-  //const [search, updateSearch] = useState("")
   const [page, setPage] = useState(1);
   const [loadMore, setLoadMore] = useState(false);
   const [moviesYTS, updateMoviesYTS] = useState([]);

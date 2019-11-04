@@ -8,6 +8,7 @@ const help =
 	- users / List of the users
 	- movies / List movies stored in database
 	- movie / Give informations about a movie
+	- ban [name] [time - h for hours / d for days]
 `
 
 const getUsers = async() => {
@@ -56,7 +57,7 @@ const getDataMovie = async(movieId, specificField = null) => {
 		if (specificField === null) {
 			movie = response.data.movie[0].ytsData.title
 			return [movie]
-		} else {
+		} else if (response.data.movie) {
 			if (response.data.movie[0].ytsData[specificField] === undefined || specificField === "cast" || specificField === "torrents") {
 				return ["The specific field doesn't exist"]
 			} else if (specificField === "genres") {
