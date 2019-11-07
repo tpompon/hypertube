@@ -88,7 +88,7 @@ router
 router
   .route("/:id")
   .get((req, res) => {
-    if (req.params._id) {
+    if (req.params.id) {
       Movie.find({ _id: req.params.id }, (err, movie) => {
         if (err) res.json({ success: false });
         else if (movie.length !== 0) res.json({ success: true, movie: movie });
